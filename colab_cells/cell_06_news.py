@@ -147,6 +147,8 @@ def _scrape_bing_news(keyword, max_results=100):
     """Scrape dari Bing News RSS Feed."""
     results = []
     seen_urls = set()
+    since_env = os.environ.get('SCRAPE_SINCE')
+    until_env = os.environ.get('SCRAPE_UNTIL')
 
     try:
         query = urllib.parse.quote(keyword)
