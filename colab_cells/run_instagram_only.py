@@ -27,16 +27,18 @@ from cell_07_instagram import (
     IG_DRIVER
 )
 
-# Tetap proses SEMUA 5 keywords per topik dari cell_02_config.py (total 10 keywords)
+# Sesuai standar cell_02_config.py:
+# - Keyword Pertama per Topik : 10.000 data
+# - Seluruh Keyword Sisanya   : 1.000 data
 active_topics = TOPICS
 total_keywords = sum(len(kws) for kws in active_topics.values())
 
 print("=" * 60)
-print("🚀 MEMULAI SCRAPING INSTAGRAM (MODE CEPAT: 100 DATA PER KEYWORD)")
-print("📊 Target Kuota:")
-print("   - Kuota per Keyword : 100 data (Termasuk Keyword Utama)")
-print(f"   - Total Target      : 1.000 data (10 keyword x 100 data)")
-print(f"   - Total Keyword     : {total_keywords} Keyword (5 Kementerian_PU + 5 Menteri_PU)")
+print("🚀 MEMULAI SCRAPING INSTAGRAM (PROJECT KEMEN PU RI)")
+print("📊 Target Kuota Sesuai Config:")
+print("   - Keyword Pertama per Topik : 10.000 data")
+print("   - Seluruh Keyword Sisanya   : 1.000 data")
+print(f"   - Total Keyword             : {total_keywords} Keyword (5 Kementerian_PU + 5 Menteri_PU)")
 print("🎯 Folder Output: " + str(OUTPUT_DIR))
 print("🔍 Fitur Unggulan:")
 print("   - Auto-Expand '... more' / '... selengkapnya' pada setiap post")
@@ -250,11 +252,12 @@ for topic, keywords in active_topics.items():
     print(f"{'='*40}")
 
     for i, kw in enumerate(keywords):
-        # Target kuota: khusus Instagram ambil 100 data saja per keyword (termasuk keyword utama)
+        # Target kuota: Mengikuti standar cell_02_config.py
+        # Keyword Pertama per Topik = 10.000 data, Keyword berikutnya = 1.000 data
         if target_custom_arg:
             target_results = target_custom_arg
         else:
-            target_results = 100
+            target_results = 10000 if (is_primary_only or i == 0) else 1000
 
         print(f"\n  [{current_kw}/{total_keywords}] Keyword: '{kw}' (Target: {target_results} data)")
 
