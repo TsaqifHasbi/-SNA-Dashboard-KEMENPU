@@ -1,0 +1,28 @@
+{
+  "model": "indobenchmark/indobert-base-p1",
+  "version": "v2",
+  "accuracy": 0.9775,
+  "macro_f1": 0.9774952553544134,
+  "confusion_matrix": [
+    [
+      785,
+      9,
+      6
+    ],
+    [
+      12,
+      776,
+      12
+    ],
+    [
+      3,
+      12,
+      785
+    ]
+  ],
+  "labels": [
+    "Negatif",
+    "Netral",
+    "Positif"
+  ]
+}

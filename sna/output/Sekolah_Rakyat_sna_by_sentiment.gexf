@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='utf-8'?>
+<gexf xmlns="http://www.gexf.net/1.2draft" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd" version="1.2">
+  <meta lastmodifieddate="2026-10-18">
+    <creator>NetworkX 3.6.1</creator>
+  </meta>
+  <graph defaultedgetype="directed" mode="static" name="">
+    <attributes mode="static" class="edge">
+      <attribute id="6" title="sentiment" type="string" />
+    </attributes>
+    <attributes mode="static" class="node">
+      <attribute id="0" title="sentiment" type="string" />
+      <attribute id="1" title="color" type="string" />
+      <attribute id="2" title="in_degree" type="long" />
+      <attribute id="3" title="out_degree" type="long" />
+      <attribute id="4" title="size" type="long" />
+      <attribute id="5" title="title" type="string" />
+    </attributes>
+    <nodes>
+      <node id="@shandi9475" label="@shandi9475">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="#64748B" />
+          <attvalue for="2" value="0" />
+          <attvalue for="3" value="6" />
+          <attvalue for="4" value="10" />
+          <attvalue for="5" value="@@shandi9475&lt;br&gt;Sentimen: Netral&lt;br&gt;In-Degree (Dirujuk): 0&lt;br&gt;Out-Degree: 6" />
+        </attvalues>
+      </node>
+      <node id="proyeksr" label="proyeksr">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="#64748B" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="0" />
+          <attvalue for="4" value="13" />
+          <attvalue for="5" value="@proyeksr&lt;br&gt;Sentimen: Netral&lt;br&gt;In-Degree (Dirujuk): 1&lt;br&gt;Out-Degree: 0" />
+        </attvalues>
+      </node>
+      <node id="donyahmadmunir" label="donyahmadmunir">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="#64748B" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="0" />
+          <attvalue for="4" value="13" />
+          <attvalue for="5" value="@donyahmadmunir&lt;br&gt;Sentimen: Netral&lt;br&gt;In-Degree (Dirujuk): 1&lt;br&gt;Out-Degree: 0" />
+        </attvalues>
+      </node>
+      <node id="jabar" label="jabar">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="#64748B" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="0" />
+          <attvalue for="4" value="13" />
+          <attvalue for="5" value="@jabar&lt;br&gt;Sentimen: Netral&lt;br&gt;In-Degree (Dirujuk): 1&lt;br&gt;Out-Degree: 0" />
+        </attvalues>
+      </node>
+      <node id="beritasumedanh" label="beritasumedanh">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="#64748B" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="0" />
+          <attvalue for="4" value="13" />
+          <attvalue for="5" value="@beritasumedanh&lt;br&gt;Sentimen: Netral&lt;br&gt;In-Degree (Dirujuk): 1&lt;br&gt;Out-Degree: 0" />
+        </attvalues>
+      </node>
+      <node id="sekolahrakyat" label="sekolahrakyat">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="#64748B" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="0" />
+          <attvalue for="4" value="13" />
+          <attvalue for="5" value="@sekolahrakyat&lt;br&gt;Sentimen: Netral&lt;br&gt;In-Degree (Dirujuk): 1&lt;br&gt;Out-Degree: 0" />
+        </attvalues>
+      </node>
+      <node id="sumedanh" label="sumedanh">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="#64748B" />
+          <attvalue for="2" value="1" />
+          <attvalue for="3" value="0" />
+          <attvalue for="4" value="13" />
+          <attvalue for="5" value="@sumedanh&lt;br&gt;Sentimen: Netral&lt;br&gt;In-Degree (Dirujuk): 1&lt;br&gt;Out-Degree: 0" />
+        </attvalues>
+      </node>
+    </nodes>
+    <edges>
+      <edge source="@shandi9475" target="proyeksr" id="0" weight="1">
+        <attvalues>
+          <attvalue for="6" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@shandi9475" target="donyahmadmunir" id="1" weight="1">
+        <attvalues>
+          <attvalue for="6" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@shandi9475" target="jabar" id="2" weight="1">
+        <attvalues>
+          <attvalue for="6" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@shandi9475" target="beritasumedanh" id="3" weight="1">
+        <attvalues>
+          <attvalue for="6" value="Negatif" />
+        </attvalues>
+      </edge>
+      <edge source="@shandi9475" target="sekolahrakyat" id="4" weight="1">
+        <attvalues>
+          <attvalue for="6" value="Negatif" />
+        </attvalues>
+      </edge>
+      <edge source="@shandi9475" target="sumedanh" id="5" weight="1">
+        <attvalues>
+          <attvalue for="6" value="Negatif" />
+        </attvalues>
+      </edge>
+    </edges>
+  </graph>
+</gexf>

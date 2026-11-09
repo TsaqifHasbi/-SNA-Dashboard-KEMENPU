@@ -1,0 +1,3408 @@
+<?xml version='1.0' encoding='utf-8'?>
+<gexf xmlns="http://www.gexf.net/1.2draft" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd" version="1.2">
+  <meta lastmodifieddate="2026-10-18">
+    <creator>NetworkX 3.6.1</creator>
+  </meta>
+  <graph defaultedgetype="directed" mode="static" name="">
+    <attributes mode="static" class="edge">
+      <attribute id="7" title="sentiment" type="string" />
+      <attribute id="8" title="emotion" type="string" />
+    </attributes>
+    <attributes mode="static" class="node">
+      <attribute id="0" title="sentiment" type="string" />
+      <attribute id="1" title="emotion" type="string" />
+      <attribute id="2" title="color" type="string" />
+      <attribute id="3" title="in_degree" type="long" />
+      <attribute id="4" title="out_degree" type="long" />
+      <attribute id="5" title="betweenness" type="double" />
+      <attribute id="6" title="size" type="long" />
+    </attributes>
+    <nodes>
+      <node id="kompas.com" label="kompas.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="0" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0" />
+          <attvalue for="6" value="12" />
+        </attvalues>
+      </node>
+      <node id="detikcom" label="detikcom">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0051" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kompas.id" label="kompas.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.01" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="detiknews" label="detiknews">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.015" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="suara.com" label="suara.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0199" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="tempo.co" label="tempo.co">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0247" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news" label="antara news">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0295" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="rri.co.id" label="rri.co.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0343" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="cnn indonesia" label="cnn indonesia">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.039" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kompasiana.com" label="kompasiana.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0436" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="cnbc indonesia" label="cnbc indonesia">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0482" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kompas.tv" label="kompas.tv">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0527" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="bloomberg technoz" label="bloomberg technoz">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0572" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="facebook" label="facebook">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0617" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="bbc" label="bbc">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.066" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="investortrust" label="investortrust">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0704" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="detikhealth" label="detikhealth">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0747" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="afu.id" label="afu.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0789" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="media indonesia" label="media indonesia">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0831" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="badan gizi nasional" label="badan gizi nasional">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0872" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="metrotvnews.com" label="metrotvnews.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0913" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="20detik" label="20detik">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0953" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="ombudsman republik indonesia" label="ombudsman republik indonesia">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0993" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="detikfinance - berita ekonomi bisnis, dan investasi hari ini" label="detikfinance - berita ekonomi bisnis, dan investasi hari ini">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1032" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kontan.co.id" label="kontan.co.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1071" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="inilah.com" label="inilah.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1109" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="merdeka" label="merdeka">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1146" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="instagram" label="instagram">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1184" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kumparan.com" label="kumparan.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.122" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="rm.id" label="rm.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1256" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="republika.co.id" label="republika.co.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1292" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="tribrata news" label="tribrata news">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1327" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="website resmi polri" label="website resmi polri">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1362" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="viva.co.id" label="viva.co.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="2" />
+          <attvalue for="4" value="2" />
+          <attvalue for="5" value="0.4455" />
+          <attvalue for="6" value="17.0" />
+        </attvalues>
+      </node>
+      <node id="inews.id" label="inews.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2387" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news jatim" label="antara news jatim">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2393" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="hukumonline" label="hukumonline">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2399" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kementerian agama" label="kementerian agama">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2405" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="https://dprd.jatimprov.go.id" label="https://dprd.jatimprov.go.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2411" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news sultra" label="antara news sultra">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2417" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="news.schoolmedia.id" label="news.schoolmedia.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2423" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="ddtcnews" label="ddtcnews">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.243" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="liputan6" label="liputan6">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2436" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="news.okezone.com" label="news.okezone.com">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2442" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="voi.id" label="voi.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2448" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="pemerintah kabupaten batang" label="pemerintah kabupaten batang">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2454" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="pemerintah provinsi jawa tengah" label="pemerintah provinsi jawa tengah">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.246" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="nu online" label="nu online">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2467" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="owrite" label="owrite">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2473" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="jpnn.com" label="jpnn.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2479" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="suara surabaya net" label="suara surabaya net">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2485" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="idnfinancials" label="idnfinancials">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2491" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kompas" label="kompas">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2497" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news sulteng" label="antara news sulteng">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2503" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="suarantb.com" label="suarantb.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.251" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kabar24" label="kabar24">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2516" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="tirto.id" label="tirto.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2522" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kementerian sekretariat negara" label="kementerian sekretariat negara">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2528" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="sindonews nasional" label="sindonews nasional">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2534" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news manado" label="antara news manado">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.254" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="beritanasionalupdate.com" label="beritanasionalupdate.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2547" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news bali" label="antara news bali">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2553" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="rmol.id" label="rmol.id">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2559" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news mataram" label="antara news mataram">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2565" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kompas regional" label="kompas regional">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2571" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="universitas gadjah mada" label="universitas gadjah mada">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2577" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="rcti+" label="rcti+">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2583" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="times indonesia" label="times indonesia">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.259" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="nusabali.com" label="nusabali.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2596" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="polres kutai timur" label="polres kutai timur">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2602" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="www.suaralandak.co.id" label="www.suaralandak.co.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2608" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news yogyakarta" label="antara news yogyakarta">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2614" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kemenag sulteng" label="kemenag sulteng">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.262" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="demokratis.co.id" label="demokratis.co.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2627" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="radar bromo" label="radar bromo">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2633" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="pontianak post" label="pontianak post">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2639" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="merahputih" label="merahputih">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2645" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="sumut pos" label="sumut pos">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2651" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="presiden ri" label="presiden ri">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2657" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="bisnis.com - ekonomi" label="bisnis.com - ekonomi">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2663" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news megapolitan" label="antara news megapolitan">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.267" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="infobanknews" label="infobanknews">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2676" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="the conversation" label="the conversation">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2682" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="www.bgn.go.id" label="www.bgn.go.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2688" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="divisi humas polri" label="divisi humas polri">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2694" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="mahkamah konstitusi ri" label="mahkamah konstitusi ri">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.27" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="espos.id" label="espos.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2707" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="suara merdeka" label="suara merdeka">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2713" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="universitas airlangga" label="universitas airlangga">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2719" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="liputan6.com" label="liputan6.com">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2725" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="transparency international indonesia" label="transparency international indonesia">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2731" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="idn times jabar" label="idn times jabar">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Senang" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2737" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="harianjogja.com" label="harianjogja.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2743" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="pantau.com" label="pantau.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.275" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="insidelombok" label="insidelombok">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2756" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news sumbar" label="antara news sumbar">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2762" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="indopolitika.com" label="indopolitika.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2768" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="harian terbit" label="harian terbit">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2774" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="eksposkaltim" label="eksposkaltim">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.278" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="media center sembada" label="media center sembada">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2786" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="idn times" label="idn times">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2793" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="dw.com" label="dw.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2799" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="viva jatim" label="viva jatim">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2805" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="investor.id" label="investor.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2811" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="harian disway" label="harian disway">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2817" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="tvri news" label="tvri news">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2823" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="detik news" label="detik news">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.283" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="tribunnews.com" label="tribunnews.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2836" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="waspada.id" label="waspada.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2842" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="balipost.com" label="balipost.com">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2848" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="media center riau" label="media center riau">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2854" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="jawa pos" label="jawa pos">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.286" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="tribunnews" label="tribunnews">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2866" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="minews id" label="minews id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2873" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="pemerintah provinsi gorontalo" label="pemerintah provinsi gorontalo">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2879" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news papua" label="antara news papua">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2885" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news kalteng" label="antara news kalteng">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2891" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news papua tengah" label="antara news papua tengah">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2897" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="pikiran rakyat koran" label="pikiran rakyat koran">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2903" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="badan pengawas obat dan makanan" label="badan pengawas obat dan makanan">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.291" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news jateng" label="antara news jateng">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2916" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="bpk ri perwakilan provinsi daerah istimewa yogyakarta" label="bpk ri perwakilan provinsi daerah istimewa yogyakarta">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2922" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="warta ekonomi" label="warta ekonomi">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2928" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kementerian koordinator bidang pangan" label="kementerian koordinator bidang pangan">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2934" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="mediaindonesia.com" label="mediaindonesia.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.294" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="pt suara dewata media" label="pt suara dewata media">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2946" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="sibawor! maen" label="sibawor! maen">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2953" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="radar palu" label="radar palu">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2959" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="partai nasdem" label="partai nasdem">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2965" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="tangselpos.id" label="tangselpos.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2971" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="fajar" label="fajar">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2977" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="https://www.suaralandak.co.id/" label="https://www.suaralandak.co.id/">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2983" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="ketik" label="ketik">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.299" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="lingkar tv" label="lingkar tv">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2996" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="radar pati" label="radar pati">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.3002" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="idn times jatim" label="idn times jatim">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.3008" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="https://www.publika.id/" label="https://www.publika.id/">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.3014" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="realita.co" label="realita.co">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.302" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="ylbhi" label="ylbhi">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.3026" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news jambi" label="antara news jambi">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.3033" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="validnews" label="validnews">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.3039" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="lingkar" label="lingkar">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.3045" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news makassar" label="antara news makassar">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2039" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="pemerintah kabupaten probolinggo" label="pemerintah kabupaten probolinggo">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2016" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="bandungbergerak.id" label="bandungbergerak.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1994" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="sekretariat kabinet republik indonesia" label="sekretariat kabinet republik indonesia">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.197" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="bbpmp jatim" label="bbpmp jatim">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1946" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="muhammadiyah" label="muhammadiyah">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1922" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="detikfinance" label="detikfinance">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1897" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="wwb.co.id" label="wwb.co.id">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1872" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="prabowosubianto.com" label="prabowosubianto.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1846" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news banten" label="antara news banten">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1819" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="tribunpapuatengah.com" label="tribunpapuatengah.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1793" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="jabarprov" label="jabarprov">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1765" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara foto" label="antara foto">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1737" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="olenka" label="olenka">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1709" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="vidio" label="vidio">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.168" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="law-justice.co" label="law-justice.co">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.165" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="beritajatim.com" label="beritajatim.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.162" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="memorandum.co.id" label="memorandum.co.id">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.159" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="sukabumi update" label="sukabumi update">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Senang" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1559" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="indometro media" label="indometro media">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1527" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="atnews.id" label="atnews.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1495" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="unicef" label="unicef">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1463" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="website kota cilegon" label="website kota cilegon">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.143" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="aktual.com" label="aktual.com">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1396" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="pemerintah kota depok" label="pemerintah kota depok">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1362" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="idisnews.co.id" label="idisnews.co.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1327" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kantor staf presiden" label="kantor staf presiden">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1292" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="pemerintah provinsi lampung" label="pemerintah provinsi lampung">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1256" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news kepri" label="antara news kepri">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.122" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="tim percepatan penurunan stunting" label="tim percepatan penurunan stunting">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1184" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="bekasikab" label="bekasikab">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1146" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="media center provinsi kalimantan selatan" label="media center provinsi kalimantan selatan">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1109" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="pikiran rakyat" label="pikiran rakyat">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1071" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="republika.id" label="republika.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1032" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kabar sulbar" label="kabar sulbar">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0993" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="indoposco" label="indoposco">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0953" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="batam pos" label="batam pos">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0913" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="aspek.id" label="aspek.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0872" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="media hub | polri" label="media hub | polri">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0831" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="https://www.politikindonesia.id/" label="https://www.politikindonesia.id/">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0789" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kupas tuntas" label="kupas tuntas">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0747" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kementerian agama republik indonesia" label="kementerian agama republik indonesia">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0704" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="pikiran rakyat sulbar" label="pikiran rakyat sulbar">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.066" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="waspada online" label="waspada online">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0617" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="halloriau.com" label="halloriau.com">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0572" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="koran jakarta" label="koran jakarta">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0527" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="tutur.co.id" label="tutur.co.id">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0482" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="jala hoaks" label="jala hoaks">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0436" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="tempo" label="tempo">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.039" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="radar malang" label="radar malang">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0343" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="bacaini.id" label="bacaini.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0295" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="suarajogja.id" label="suarajogja.id">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0247" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kedai pena" label="kedai pena">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0199" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news sumsel" label="antara news sumsel">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.015" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="humas provinsi jawa tengah" label="humas provinsi jawa tengah">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.01" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="topik.id" label="topik.id">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0051" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="informasi.com" label="informasi.com">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Netral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="0.0" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+    </nodes>
+    <edges>
+      <edge source="kompas.com" target="detikcom" id="0" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="detikcom" target="kompas.id" id="1" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kompas.id" target="detiknews" id="2" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="detiknews" target="suara.com" id="3" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="suara.com" target="tempo.co" id="4" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="tempo.co" target="antara news" id="5" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news" target="rri.co.id" id="6" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="rri.co.id" target="cnn indonesia" id="7" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="cnn indonesia" target="kompasiana.com" id="8" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kompasiana.com" target="cnbc indonesia" id="9" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="cnbc indonesia" target="kompas.tv" id="10" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kompas.tv" target="bloomberg technoz" id="11" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="bloomberg technoz" target="facebook" id="12" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="facebook" target="bbc" id="13" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="bbc" target="investortrust" id="14" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="investortrust" target="detikhealth" id="15" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="detikhealth" target="afu.id" id="16" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="afu.id" target="media indonesia" id="17" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="media indonesia" target="badan gizi nasional" id="18" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="badan gizi nasional" target="metrotvnews.com" id="19" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="metrotvnews.com" target="20detik" id="20" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="20detik" target="ombudsman republik indonesia" id="21" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="ombudsman republik indonesia" target="detikfinance - berita ekonomi bisnis, dan investasi hari ini" id="22" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="detikfinance - berita ekonomi bisnis, dan investasi hari ini" target="kontan.co.id" id="23" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kontan.co.id" target="inilah.com" id="24" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="inilah.com" target="merdeka" id="25" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="merdeka" target="instagram" id="26" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="instagram" target="kumparan.com" id="27" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kumparan.com" target="rm.id" id="28" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="rm.id" target="republika.co.id" id="29" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="republika.co.id" target="tribrata news" id="30" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="tribrata news" target="website resmi polri" id="31" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="website resmi polri" target="viva.co.id" id="32" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="viva.co.id" target="inews.id" id="33" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="viva.co.id" target="antara news makassar" id="34" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="inews.id" target="antara news jatim" id="35" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news jatim" target="hukumonline" id="36" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="hukumonline" target="kementerian agama" id="37" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kementerian agama" target="https://dprd.jatimprov.go.id" id="38" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="https://dprd.jatimprov.go.id" target="antara news sultra" id="39" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news sultra" target="news.schoolmedia.id" id="40" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="news.schoolmedia.id" target="ddtcnews" id="41" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="ddtcnews" target="liputan6" id="42" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="liputan6" target="news.okezone.com" id="43" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="news.okezone.com" target="voi.id" id="44" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="voi.id" target="pemerintah kabupaten batang" id="45" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="pemerintah kabupaten batang" target="pemerintah provinsi jawa tengah" id="46" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="pemerintah provinsi jawa tengah" target="nu online" id="47" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="nu online" target="owrite" id="48" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="owrite" target="jpnn.com" id="49" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="jpnn.com" target="suara surabaya net" id="50" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="suara surabaya net" target="idnfinancials" id="51" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="idnfinancials" target="kompas" id="52" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kompas" target="antara news sulteng" id="53" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news sulteng" target="suarantb.com" id="54" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="suarantb.com" target="kabar24" id="55" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kabar24" target="tirto.id" id="56" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="tirto.id" target="kementerian sekretariat negara" id="57" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kementerian sekretariat negara" target="sindonews nasional" id="58" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="sindonews nasional" target="antara news manado" id="59" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news manado" target="beritanasionalupdate.com" id="60" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="beritanasionalupdate.com" target="antara news bali" id="61" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news bali" target="rmol.id" id="62" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="rmol.id" target="antara news mataram" id="63" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news mataram" target="kompas regional" id="64" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kompas regional" target="universitas gadjah mada" id="65" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="universitas gadjah mada" target="rcti+" id="66" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="rcti+" target="times indonesia" id="67" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="times indonesia" target="nusabali.com" id="68" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="nusabali.com" target="polres kutai timur" id="69" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="polres kutai timur" target="www.suaralandak.co.id" id="70" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="www.suaralandak.co.id" target="antara news yogyakarta" id="71" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news yogyakarta" target="kemenag sulteng" id="72" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kemenag sulteng" target="demokratis.co.id" id="73" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="demokratis.co.id" target="radar bromo" id="74" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="radar bromo" target="pontianak post" id="75" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="pontianak post" target="merahputih" id="76" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="merahputih" target="sumut pos" id="77" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="sumut pos" target="presiden ri" id="78" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="presiden ri" target="bisnis.com - ekonomi" id="79" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="bisnis.com - ekonomi" target="antara news megapolitan" id="80" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news megapolitan" target="infobanknews" id="81" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="infobanknews" target="the conversation" id="82" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="the conversation" target="www.bgn.go.id" id="83" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="www.bgn.go.id" target="divisi humas polri" id="84" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="divisi humas polri" target="mahkamah konstitusi ri" id="85" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="mahkamah konstitusi ri" target="espos.id" id="86" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="espos.id" target="suara merdeka" id="87" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="suara merdeka" target="universitas airlangga" id="88" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="universitas airlangga" target="liputan6.com" id="89" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="liputan6.com" target="transparency international indonesia" id="90" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="transparency international indonesia" target="idn times jabar" id="91" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="idn times jabar" target="harianjogja.com" id="92" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="harianjogja.com" target="pantau.com" id="93" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="pantau.com" target="insidelombok" id="94" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="insidelombok" target="antara news sumbar" id="95" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news sumbar" target="indopolitika.com" id="96" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="indopolitika.com" target="harian terbit" id="97" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="harian terbit" target="eksposkaltim" id="98" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="eksposkaltim" target="media center sembada" id="99" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="media center sembada" target="idn times" id="100" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="idn times" target="dw.com" id="101" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="dw.com" target="viva jatim" id="102" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="viva jatim" target="investor.id" id="103" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="investor.id" target="harian disway" id="104" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="harian disway" target="tvri news" id="105" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="tvri news" target="detik news" id="106" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="detik news" target="tribunnews.com" id="107" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="tribunnews.com" target="waspada.id" id="108" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="waspada.id" target="balipost.com" id="109" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="balipost.com" target="media center riau" id="110" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="media center riau" target="jawa pos" id="111" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="jawa pos" target="tribunnews" id="112" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="tribunnews" target="minews id" id="113" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="minews id" target="pemerintah provinsi gorontalo" id="114" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="pemerintah provinsi gorontalo" target="antara news papua" id="115" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news papua" target="antara news kalteng" id="116" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news kalteng" target="antara news papua tengah" id="117" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news papua tengah" target="pikiran rakyat koran" id="118" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="pikiran rakyat koran" target="badan pengawas obat dan makanan" id="119" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="badan pengawas obat dan makanan" target="antara news jateng" id="120" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news jateng" target="bpk ri perwakilan provinsi daerah istimewa yogyakarta" id="121" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="bpk ri perwakilan provinsi daerah istimewa yogyakarta" target="warta ekonomi" id="122" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="warta ekonomi" target="kementerian koordinator bidang pangan" id="123" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kementerian koordinator bidang pangan" target="mediaindonesia.com" id="124" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="mediaindonesia.com" target="pt suara dewata media" id="125" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="pt suara dewata media" target="sibawor! maen" id="126" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="sibawor! maen" target="radar palu" id="127" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="radar palu" target="partai nasdem" id="128" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="partai nasdem" target="tangselpos.id" id="129" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="tangselpos.id" target="fajar" id="130" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="fajar" target="https://www.suaralandak.co.id/" id="131" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="https://www.suaralandak.co.id/" target="ketik" id="132" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="ketik" target="lingkar tv" id="133" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="lingkar tv" target="radar pati" id="134" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="radar pati" target="idn times jatim" id="135" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="idn times jatim" target="https://www.publika.id/" id="136" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="https://www.publika.id/" target="realita.co" id="137" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="realita.co" target="ylbhi" id="138" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="ylbhi" target="antara news jambi" id="139" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news jambi" target="validnews" id="140" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="validnews" target="lingkar" id="141" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="lingkar" target="viva.co.id" id="142" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news makassar" target="pemerintah kabupaten probolinggo" id="143" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="pemerintah kabupaten probolinggo" target="bandungbergerak.id" id="144" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="bandungbergerak.id" target="sekretariat kabinet republik indonesia" id="145" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="sekretariat kabinet republik indonesia" target="bbpmp jatim" id="146" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="bbpmp jatim" target="muhammadiyah" id="147" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="muhammadiyah" target="detikfinance" id="148" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="detikfinance" target="wwb.co.id" id="149" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="wwb.co.id" target="prabowosubianto.com" id="150" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="prabowosubianto.com" target="antara news banten" id="151" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news banten" target="tribunpapuatengah.com" id="152" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="tribunpapuatengah.com" target="jabarprov" id="153" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="jabarprov" target="antara foto" id="154" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara foto" target="olenka" id="155" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="olenka" target="vidio" id="156" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="vidio" target="law-justice.co" id="157" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="law-justice.co" target="beritajatim.com" id="158" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="beritajatim.com" target="memorandum.co.id" id="159" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="memorandum.co.id" target="sukabumi update" id="160" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="sukabumi update" target="indometro media" id="161" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="indometro media" target="atnews.id" id="162" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="atnews.id" target="unicef" id="163" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="unicef" target="website kota cilegon" id="164" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="website kota cilegon" target="aktual.com" id="165" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="aktual.com" target="pemerintah kota depok" id="166" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="pemerintah kota depok" target="idisnews.co.id" id="167" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="idisnews.co.id" target="kantor staf presiden" id="168" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kantor staf presiden" target="pemerintah provinsi lampung" id="169" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="pemerintah provinsi lampung" target="antara news kepri" id="170" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news kepri" target="tim percepatan penurunan stunting" id="171" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="tim percepatan penurunan stunting" target="bekasikab" id="172" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="bekasikab" target="media center provinsi kalimantan selatan" id="173" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="media center provinsi kalimantan selatan" target="pikiran rakyat" id="174" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="pikiran rakyat" target="republika.id" id="175" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="republika.id" target="kabar sulbar" id="176" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kabar sulbar" target="indoposco" id="177" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="indoposco" target="batam pos" id="178" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="batam pos" target="aspek.id" id="179" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="aspek.id" target="media hub | polri" id="180" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="media hub | polri" target="https://www.politikindonesia.id/" id="181" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="https://www.politikindonesia.id/" target="kupas tuntas" id="182" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kupas tuntas" target="kementerian agama republik indonesia" id="183" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kementerian agama republik indonesia" target="pikiran rakyat sulbar" id="184" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="pikiran rakyat sulbar" target="waspada online" id="185" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="waspada online" target="halloriau.com" id="186" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="halloriau.com" target="koran jakarta" id="187" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="koran jakarta" target="tutur.co.id" id="188" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="tutur.co.id" target="jala hoaks" id="189" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="jala hoaks" target="tempo" id="190" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="tempo" target="radar malang" id="191" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="radar malang" target="bacaini.id" id="192" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="bacaini.id" target="suarajogja.id" id="193" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="suarajogja.id" target="kedai pena" id="194" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kedai pena" target="antara news sumsel" id="195" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news sumsel" target="humas provinsi jawa tengah" id="196" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="humas provinsi jawa tengah" target="topik.id" id="197" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="topik.id" target="informasi.com" id="198" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+    </edges>
+  </graph>
+</gexf>

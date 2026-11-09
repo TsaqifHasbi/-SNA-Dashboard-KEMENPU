@@ -1,0 +1,59 @@
+# Python Virtual Environment
+venv/
+env/
+.venv/
+
+# Environment Variables & Secrets
+.env*
+.streamlit/secrets.toml
+accounts.db
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*.class
+*.pyc
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+
+# OS Files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Temporary Scraper Artifacts & Dumps
+scratch/
+tools/__pycache__/
+models/__pycache__/
+colab_cells/__pycache__/
+colab_cells/*.html
+colab_cells/*.json
+colab_cells/*.png
+colab_cells/*.csv
+
+# Large Model Weights (> 100 MB - Excluded to respect GitHub limits)
+*.safetensors
+*.bin
+*.pt
+*.zip
+*.tar.gz
+
+# Ignore raw scrapings and large raw CSVs by default
+ScrapeData/
+ScrapeData_TA_Elektrifikasi/
+*.csv
+
+# Explicitly keep runtime data needed by Streamlit & SNA
+!data/enriched_corpus_for_sna.parquet
+!data/gold_standard_sample_1000.csv
+!data/*.json
+!data/*.gexf
+!sna/output/*.gexf
+!sna/output/*.json
+!models/**/evaluation_metrics.json
+!models/**/confusion_matrix*.png
+!models/**/config.json
+!models/**/tokenizer*.json

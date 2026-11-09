@@ -1,0 +1,1707 @@
+<?xml version='1.0' encoding='utf-8'?>
+<gexf xmlns="http://www.gexf.net/1.2draft" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd" version="1.2">
+  <meta lastmodifieddate="2026-11-05">
+    <creator>NetworkX 3.6.1</creator>
+  </meta>
+  <graph defaultedgetype="directed" mode="static" name="">
+    <attributes mode="static" class="edge">
+      <attribute id="7" title="sentiment" type="string" />
+      <attribute id="8" title="emotion" type="string" />
+    </attributes>
+    <attributes mode="static" class="node">
+      <attribute id="0" title="sentiment" type="string" />
+      <attribute id="1" title="emotion" type="string" />
+      <attribute id="2" title="color" type="string" />
+      <attribute id="3" title="in_degree" type="long" />
+      <attribute id="4" title="out_degree" type="long" />
+      <attribute id="5" title="betweenness" type="double" />
+      <attribute id="6" title="size" type="long" />
+    </attributes>
+    <nodes>
+      <node id="mba" label="mba">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Trust" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="0" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="0.0" />
+          <attvalue for="6" value="12" />
+        </attvalues>
+      </node>
+      <node id="kesederhanaan" label="kesederhanaan">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="0" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="0.0" />
+          <attvalue for="6" value="12" />
+        </attvalues>
+      </node>
+      <node id="@gtid.news" label="@gtid.news">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Disgust" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="0" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0" />
+          <attvalue for="6" value="12" />
+        </attvalues>
+      </node>
+      <node id="@tribunnews" label="@tribunnews">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0099" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sppgnewcity" label="@sppgnewcity">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0196" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="detikcom" label="detikcom">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0291" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@kompascom" label="@kompascom">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0383" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kompas.id" label="kompas.id">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0474" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="detiknews" label="detiknews">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0563" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@indopolitika" label="@indopolitika">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0649" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@kontekscoid" label="@kontekscoid">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0734" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="suara.com" label="suara.com">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0816" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="cnn indonesia" label="cnn indonesia">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0897" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="tempo.co" label="tempo.co">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0975" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news" label="antara news">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1051" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="tribunnews" label="tribunnews">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1126" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@jogjastudent" label="@jogjastudent">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Disgust" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1198" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="metro tv" label="metro tv">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1268" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="rri.co.id" label="rri.co.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1336" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@selpikes81" label="@selpikes81">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Joy" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1402" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@t.eguh1" label="@t.eguh1">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Joy" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1466" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kompastv" label="kompastv">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1528" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@suaradotcom" label="@suaradotcom">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1587" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@samudrafakta" label="@samudrafakta">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1645" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="badangizinasional.ri" label="badangizinasional.ri">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1701" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@beritasatu" label="@beritasatu">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1754" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@kompastv" label="@kompastv">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1806" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@bang_jack_mgl" label="@bang_jack_mgl">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1855" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sppgpatangpuluhan.yk" label="@sppgpatangpuluhan.yk">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1903" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sppg.petapahan_pakam" label="@sppg.petapahan_pakam">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1948" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sppg.banyuwangi2" label="@sppg.banyuwangi2">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Joy" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1991" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kompasiana.com" label="kompasiana.com">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2033" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@joglosemarnews" label="@joglosemarnews">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2072" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sppg.kertamekar2" label="@sppg.kertamekar2">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Joy" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2109" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@lambesahamjja" label="@lambesahamjja">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2144" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@afrizal.za.16" label="@afrizal.za.16">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2177" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sppg_sejangko.ii_rtp" label="@sppg_sejangko.ii_rtp">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Anticipation" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2208" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@yuzarsifff69" label="@yuzarsifff69">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2237" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sppg.dapursehatsadeli" label="@sppg.dapursehatsadeli">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Joy" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2263" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sppgcikole_" label="@sppgcikole_">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Joy" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2288" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@trisnu05" label="@trisnu05">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2311" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@menuembegejelek" label="@menuembegejelek">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2331" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@tempodotco" label="@tempodotco">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.235" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@dherullyalkhalifi" label="@dherullyalkhalifi">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Joy" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2367" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="cnbc indonesia" label="cnbc indonesia">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2381" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@alxinsta12e" label="@alxinsta12e">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2393" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sppg.uepai_tamesandi" label="@sppg.uepai_tamesandi">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Joy" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2404" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@supraptocarvoez11" label="@supraptocarvoez11">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2412" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@garis.negerii" label="@garis.negerii">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2418" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sppgjatinangorcibeusi1" label="@sppgjatinangorcibeusi1">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Joy" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2422" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@heri_purnawinata" label="@heri_purnawinata">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2424" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@fgmedia.official" label="@fgmedia.official">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2424" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@jaketkulitra" label="@jaketkulitra">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Disgust" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2422" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="liputan6" label="liputan6">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2418" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@kabarmahasiswa.id" label="@kabarmahasiswa.id">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2412" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sppgtapiandolok" label="@sppgtapiandolok">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2404" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="fazila zila zila" label="fazila zila zila">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2393" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@katarakyat.official" label="@katarakyat.official">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2381" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@liputan6" label="@liputan6">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2367" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sppg_maleber01" label="@sppg_maleber01">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.235" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@gizinesia.id" label="@gizinesia.id">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Joy" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2331" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sppgbanjarpadang" label="@sppgbanjarpadang">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Joy" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2311" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@bisniscom" label="@bisniscom">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2288" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@polsek_teluk_nibung" label="@polsek_teluk_nibung">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2263" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@suara_trenggalek" label="@suara_trenggalek">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2237" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@harianjogja" label="@harianjogja">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2208" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kompas.tv" label="kompas.tv">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2177" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sppg.meunasahpanton1" label="@sppg.meunasahpanton1">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Joy" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2144" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@bangkapos_" label="@bangkapos_">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2109" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@zumaahmd" label="@zumaahmd">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Disgust" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2072" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@radiokrisnapacitan" label="@radiokrisnapacitan">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Disgust" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.2033" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sudutkotadotid" label="@sudutkotadotid">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1991" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@wartadewan" label="@wartadewan">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Disgust" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1948" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@lawjustice.co" label="@lawjustice.co">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1903" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="inilah.com" label="inilah.com">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1855" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sppgsudirejoii2_mdnkota" label="@sppgsudirejoii2_mdnkota">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1806" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="bloomberg technoz" label="bloomberg technoz">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1754" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="facebook" label="facebook">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1701" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@tegakluruspdiperjuangan" label="@tegakluruspdiperjuangan">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1645" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@timewave.id" label="@timewave.id">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1587" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@verloka.id" label="@verloka.id">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1528" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@manifesto.retorika" label="@manifesto.retorika">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1466" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@moderator_net" label="@moderator_net">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1402" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sumbarkita.id" label="@sumbarkita.id">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1336" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@minutambaksumur" label="@minutambaksumur">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Anticipation" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1268" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="beritasatu" label="beritasatu">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1198" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@dewiprihandini" label="@dewiprihandini">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1126" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@lensight.id" label="@lensight.id">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1051" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@kontannews" label="@kontannews">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0975" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@rubic_news" label="@rubic_news">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0897" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@tribunkaltim" label="@tribunkaltim">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0816" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@hariankompas" label="@hariankompas">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0734" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sppg_ie_masen_uleekareng" label="@sppg_ie_masen_uleekareng">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Joy" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0649" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@accu_sufu" label="@accu_sufu">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0563" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="investortrust" label="investortrust">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0474" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@ruang.demokrasii" label="@ruang.demokrasii">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0383" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@smpn3.blitar" label="@smpn3.blitar">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Joy" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0291" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@cibuburberdialog" label="@cibuburberdialog">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0196" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@hendrawan_ariwibowo" label="@hendrawan_ariwibowo">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Disgust" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0099" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@murianewscom" label="@murianewscom">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Surprise" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="0.0" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+    </nodes>
+    <edges>
+      <edge source="@gtid.news" target="@tribunnews" id="0" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@tribunnews" target="@sppgnewcity" id="1" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sppgnewcity" target="detikcom" id="2" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="detikcom" target="@kompascom" id="3" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@kompascom" target="kompas.id" id="4" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kompas.id" target="detiknews" id="5" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="detiknews" target="@indopolitika" id="6" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@indopolitika" target="@kontekscoid" id="7" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@kontekscoid" target="suara.com" id="8" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="suara.com" target="cnn indonesia" id="9" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="cnn indonesia" target="tempo.co" id="10" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="tempo.co" target="antara news" id="11" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="antara news" target="tribunnews" id="12" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="tribunnews" target="@jogjastudent" id="13" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@jogjastudent" target="metro tv" id="14" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="metro tv" target="rri.co.id" id="15" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="rri.co.id" target="@selpikes81" id="16" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@selpikes81" target="@t.eguh1" id="17" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@t.eguh1" target="kompastv" id="18" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kompastv" target="@suaradotcom" id="19" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@suaradotcom" target="@samudrafakta" id="20" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@samudrafakta" target="badangizinasional.ri" id="21" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="badangizinasional.ri" target="@beritasatu" id="22" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@beritasatu" target="@kompastv" id="23" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@kompastv" target="@bang_jack_mgl" id="24" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@bang_jack_mgl" target="@sppgpatangpuluhan.yk" id="25" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sppgpatangpuluhan.yk" target="@sppg.petapahan_pakam" id="26" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sppg.petapahan_pakam" target="@sppg.banyuwangi2" id="27" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sppg.banyuwangi2" target="kompasiana.com" id="28" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kompasiana.com" target="@joglosemarnews" id="29" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@joglosemarnews" target="@sppg.kertamekar2" id="30" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sppg.kertamekar2" target="@lambesahamjja" id="31" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@lambesahamjja" target="@afrizal.za.16" id="32" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@afrizal.za.16" target="@sppg_sejangko.ii_rtp" id="33" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sppg_sejangko.ii_rtp" target="@yuzarsifff69" id="34" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@yuzarsifff69" target="@sppg.dapursehatsadeli" id="35" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sppg.dapursehatsadeli" target="@sppgcikole_" id="36" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sppgcikole_" target="@trisnu05" id="37" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@trisnu05" target="@menuembegejelek" id="38" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@menuembegejelek" target="@tempodotco" id="39" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@tempodotco" target="@dherullyalkhalifi" id="40" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@dherullyalkhalifi" target="cnbc indonesia" id="41" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="cnbc indonesia" target="@alxinsta12e" id="42" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@alxinsta12e" target="@sppg.uepai_tamesandi" id="43" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sppg.uepai_tamesandi" target="@supraptocarvoez11" id="44" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@supraptocarvoez11" target="@garis.negerii" id="45" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@garis.negerii" target="@sppgjatinangorcibeusi1" id="46" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sppgjatinangorcibeusi1" target="@heri_purnawinata" id="47" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@heri_purnawinata" target="@fgmedia.official" id="48" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@fgmedia.official" target="@jaketkulitra" id="49" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@jaketkulitra" target="liputan6" id="50" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="liputan6" target="@kabarmahasiswa.id" id="51" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@kabarmahasiswa.id" target="@sppgtapiandolok" id="52" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sppgtapiandolok" target="fazila zila zila" id="53" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="fazila zila zila" target="@katarakyat.official" id="54" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@katarakyat.official" target="@liputan6" id="55" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@liputan6" target="@sppg_maleber01" id="56" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sppg_maleber01" target="@gizinesia.id" id="57" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@gizinesia.id" target="@sppgbanjarpadang" id="58" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sppgbanjarpadang" target="@bisniscom" id="59" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@bisniscom" target="@polsek_teluk_nibung" id="60" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@polsek_teluk_nibung" target="@suara_trenggalek" id="61" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@suara_trenggalek" target="@harianjogja" id="62" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@harianjogja" target="kompas.tv" id="63" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="kompas.tv" target="@sppg.meunasahpanton1" id="64" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sppg.meunasahpanton1" target="@bangkapos_" id="65" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@bangkapos_" target="@zumaahmd" id="66" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@zumaahmd" target="@radiokrisnapacitan" id="67" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@radiokrisnapacitan" target="@sudutkotadotid" id="68" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sudutkotadotid" target="@wartadewan" id="69" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@wartadewan" target="@lawjustice.co" id="70" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@lawjustice.co" target="inilah.com" id="71" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="inilah.com" target="@sppgsudirejoii2_mdnkota" id="72" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sppgsudirejoii2_mdnkota" target="bloomberg technoz" id="73" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="bloomberg technoz" target="facebook" id="74" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="facebook" target="@tegakluruspdiperjuangan" id="75" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@tegakluruspdiperjuangan" target="@timewave.id" id="76" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@timewave.id" target="@verloka.id" id="77" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@verloka.id" target="@manifesto.retorika" id="78" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@manifesto.retorika" target="@moderator_net" id="79" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@moderator_net" target="@sumbarkita.id" id="80" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sumbarkita.id" target="@minutambaksumur" id="81" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@minutambaksumur" target="beritasatu" id="82" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="beritasatu" target="@dewiprihandini" id="83" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@dewiprihandini" target="@lensight.id" id="84" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@lensight.id" target="@kontannews" id="85" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@kontannews" target="@rubic_news" id="86" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@rubic_news" target="@tribunkaltim" id="87" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@tribunkaltim" target="@hariankompas" id="88" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@hariankompas" target="@sppg_ie_masen_uleekareng" id="89" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@sppg_ie_masen_uleekareng" target="@accu_sufu" id="90" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@accu_sufu" target="investortrust" id="91" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="investortrust" target="@ruang.demokrasii" id="92" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@ruang.demokrasii" target="@smpn3.blitar" id="93" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@smpn3.blitar" target="@cibuburberdialog" id="94" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@cibuburberdialog" target="@hendrawan_ariwibowo" id="95" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+      <edge source="@hendrawan_ariwibowo" target="@murianewscom" id="96" weight="1">
+        <attvalues>
+          <attvalue for="7" value="Netral" />
+          <attvalue for="8" value="Netral" />
+        </attvalues>
+      </edge>
+    </edges>
+  </graph>
+</gexf>

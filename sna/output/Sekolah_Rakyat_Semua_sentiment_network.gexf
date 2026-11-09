@@ -1,0 +1,209 @@
+<?xml version='1.0' encoding='utf-8'?>
+<gexf xmlns="http://www.gexf.net/1.2draft" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd" version="1.2">
+  <meta lastmodifieddate="2026-10-20">
+    <creator>NetworkX 3.6.1</creator>
+  </meta>
+  <graph defaultedgetype="directed" mode="static" name="">
+    <attributes mode="static" class="edge">
+      <attribute id="7" title="sentiment" type="string" />
+      <attribute id="8" title="emotion" type="string" />
+      <attribute id="9" title="platform" type="string" />
+    </attributes>
+    <attributes mode="static" class="node">
+      <attribute id="0" title="sentiment" type="string" />
+      <attribute id="1" title="emotion" type="string" />
+      <attribute id="2" title="color" type="string" />
+      <attribute id="3" title="in_degree" type="long" />
+      <attribute id="4" title="out_degree" type="long" />
+      <attribute id="5" title="betweenness" type="double" />
+      <attribute id="6" title="size" type="long" />
+    </attributes>
+    <nodes>
+      <node id="@shandi9475" label="@shandi9475">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="0" />
+          <attvalue for="4" value="2" />
+          <attvalue for="5" value="0.0" />
+          <attvalue for="6" value="12" />
+        </attvalues>
+      </node>
+      <node id="proyeksr" label="proyeksr">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="0.0" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="donyahmadmunir" label="donyahmadmunir">
+        <attvalues>
+          <attvalue for="0" value="Negatif" />
+          <attvalue for="1" value="Anger" />
+          <attvalue for="2" value="#EF4444" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="0" />
+          <attvalue for="5" value="0.0" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@kemensosri" label="@kemensosri">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="2" />
+          <attvalue for="5" value="0.0572" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kompas.com" label="kompas.com">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0015" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="facebook_user" label="facebook_user">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0108" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="rri.co.id" label="rri.co.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0201" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@radioelshinta" label="@radioelshinta">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0294" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="detikcom" label="detikcom">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0387" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="detiknews" label="detiknews">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0479" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@itjenkemsosri" label="@itjenkemsosri">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0642" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="antara news" label="antara news">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0726" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="suara.com" label="suara.com">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0807" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="kemensosri" label="kemensosri">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0886" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="metro tv" label="metro tv">
+        <attvalues>
+          <attvalue for="0" value="Positif" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#10B981" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.0964" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="tempo.co" label="tempo.co">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1039" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="tirto.id" label="tirto.id">
+        <attvalues>
+          <attvalue for="0" value="Netral" />
+          <attvalue for="1" value="Neutral" />
+          <attvalue for="2" value="#64748B" />
+          <attvalue for="3" value="1" />
+          <attvalue for="4" value="1" />
+          <attvalue for="5" value="0.1112" />
+          <attvalue for="6" value="14.5" />
+        </attvalues>
+      </node>
+      <node id="@sentraterpaduintensoeweno"

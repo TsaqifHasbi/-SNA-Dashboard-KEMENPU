@@ -1,0 +1,132 @@
+{
+  "model": "indobenchmark/indobert-base-p1",
+  "task": "emotion_9class",
+  "accuracy": 0.9177777777777778,
+  "macro_precision": 0.917548778083574,
+  "macro_recall": 0.9177777777777778,
+  "macro_f1": 0.9174152278995678,
+  "implicit_sentiment_accuracy": 0.9374603174603174,
+  "confusion_matrix": [
+    [
+      325,
+      1,
+      3,
+      5,
+      2,
+      2,
+      2,
+      3,
+      7
+    ],
+    [
+      0,
+      338,
+      3,
+      0,
+      2,
+      1,
+      2,
+      2,
+      2
+    ],
+    [
+      3,
+      6,
+      306,
+      3,
+      3,
+      5,
+      1,
+      7,
+      16
+    ],
+    [
+      2,
+      4,
+      5,
+      313,
+      5,
+      2,
+      2,
+      7,
+      10
+    ],
+    [
+      1,
+      0,
+      2,
+      2,
+      340,
+      0,
+      2,
+      2,
+      1
+    ],
+    [
+      0,
+      1,
+      1,
+      3,
+      5,
+      335,
+      2,
+      1,
+      2
+    ],
+    [
+      0,
+      1,
+      3,
+      1,
+      8,
+      1,
+      331,
+      2,
+      3
+    ],
+    [
+      3,
+      2,
+      3,
+      6,
+      9,
+      1,
+      5,
+      317,
+      4
+    ],
+    [
+      8,
+      7,
+      19,
+      15,
+      2,
+      1,
+      3,
+      9,
+      286
+    ]
+  ],
+  "labels": [
+    "Trust",
+    "Anticipation",
+    "Joy",
+    "Disgust",
+    "Fear",
+    "Sadness",
+    "Anger",
+    "Surprise",
+    "Neutral"
+  ],
+  "emotion_to_sentiment": {
+    "Trust": "Positif",
+    "Anticipation": "Positif",
+    "Joy": "Positif",
+    "Disgust": "Negatif",
+    "Fear": "Negatif",
+    "Sadness": "Negatif",
+    "Anger": "Negatif",
+    "Surprise": "Netral",
+    "Neutral": "Netral"
+  }
+}

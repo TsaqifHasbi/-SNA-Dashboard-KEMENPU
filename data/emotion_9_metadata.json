@@ -1,0 +1,50 @@
+{
+  "classes": [
+    "Trust",
+    "Anticipation",
+    "Joy",
+    "Disgust",
+    "Fear",
+    "Sadness",
+    "Anger",
+    "Surprise",
+    "Neutral"
+  ],
+  "label2id": {
+    "Trust": 0,
+    "Anticipation": 1,
+    "Joy": 2,
+    "Disgust": 3,
+    "Fear": 4,
+    "Sadness": 5,
+    "Anger": 6,
+    "Surprise": 7,
+    "Neutral": 8
+  },
+  "id2label": {
+    "0": "Trust",
+    "1": "Anticipation",
+    "2": "Joy",
+    "3": "Disgust",
+    "4": "Fear",
+    "5": "Sadness",
+    "6": "Anger",
+    "7": "Surprise",
+    "8": "Neutral"
+  },
+  "emotion_to_sentiment": {
+    "Trust": "Positif",
+    "Anticipation": "Positif",
+    "Joy": "Positif",
+    "Disgust": "Negatif",
+    "Fear": "Negatif",
+    "Sadness": "Negatif",
+    "Anger": "Negatif",
+    "Surprise": "Netral",
+    "Neutral": "Netral"
+  },
+  "samples_per_class": 3500,
+  "total_train": 25200,
+  "total_val": 3150,
+  "total_test": 3150
+}
