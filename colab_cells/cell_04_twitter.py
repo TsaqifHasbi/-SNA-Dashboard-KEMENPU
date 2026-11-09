@@ -262,9 +262,17 @@ def scrape_twitter(keyword, max_results=500):
     # ========== FASE 1: KUMPULKAN URL DARI SEARCH ==========
     print(f"    [FASE 1] Mengumpulkan URL tweet dari pencarian...")
 
-    # Gunakan query biasa tanpa filter since atau lang, karena kita fokus ke Top engagement murni
+    # Query pencarian (mendukung injeksi filter tanggal otomatis via SCRAPE_SINCE & SCRAPE_UNTIL)
     query_text = keyword
+    since_env = os.environ.get('SCRAPE_SINCE')
+    until_env = os.environ.get('SCRAPE_UNTIL')
+    if since_env and 'since:' not in query_text:
+        query_text += f" since:{since_env}"
+    if until_env and 'until:' not in query_text:
+        query_text += f" until:{until_env}"
+    
     query = urllib.parse.quote(query_text)
+    print(f"      [TWITTER SEARCH] Query: {query_text}")
     
     # Mulai dari tab 'Top' (Teratas / Populer) untuk menangkap tweet viral & tokoh sentral
     url = f"https://x.com/search?q={query}&src=typed_query"

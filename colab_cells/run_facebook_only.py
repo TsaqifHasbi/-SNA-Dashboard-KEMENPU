@@ -171,16 +171,17 @@ for topic, keywords in TOPICS.items():
         if len(all_results) > 0:
             current_count = sum(1 for r in all_results if r.get('keyword') == kw)
 
-        if current_count >= target_results:
+        is_targeted = bool(os.environ.get('SCRAPE_TARGETED'))
+        if not is_targeted and current_count >= target_results:
             print(f"  [SKIP] Keyword '{kw}' sudah memenuhi target ({current_count}/{target_results} data).")
             current_kw += 1
             continue
 
-        needed = target_results - current_count
-        if current_count > 0:
+        needed = target_results if is_targeted else (target_results - current_count)
+        if current_count > 0 and not is_targeted:
             print(f"  [REFILL] Keyword '{kw}' baru ada {current_count}/{target_results} data. Melanjutkan ambil {needed} data lagi...")
         else:
-            print(f"  [START] Keyword '{kw}' belum ada di CSV. Mengambil target {needed} data...")
+            print(f"  [START] Mengambil target {needed} data untuk '{kw}'{' [TARGETED MODE]' if is_targeted else ''}...")
 
         try:
             data = scrape_facebook(kw, max_results=needed)

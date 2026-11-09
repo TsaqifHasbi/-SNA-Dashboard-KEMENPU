@@ -66,16 +66,17 @@ for topic, keywords in all_keywords.items():
         if len(all_results) > 0:
             current_count = sum(1 for r in all_results if r.get('keyword') == kw)
 
-        if current_count >= target_results:
+        is_targeted = bool(os.environ.get('SCRAPE_TARGETED'))
+        if not is_targeted and current_count >= target_results:
             print(f"\n  [{current_kw}/{total_keywords}] Keyword: '{kw}' [SKIP: sudah {current_count}/{target_results} data]")
             current_kw += 1
             continue
 
-        needed = target_results - current_count
-        if current_count > 0:
+        needed = target_results if is_targeted else (target_results - current_count)
+        if current_count > 0 and not is_targeted:
             print(f"\n  [{current_kw}/{total_keywords}] Keyword: '{kw}' [REFILL: {current_count}/{target_results} data, mencari {needed} data lagi...]")
         else:
-            print(f"\n  [{current_kw}/{total_keywords}] Keyword: '{kw}' (Target: {target_results} data)")
+            print(f"\n  [{current_kw}/{total_keywords}] Keyword: '{kw}' (Target: {needed} data{' [TARGETED MODE]' if is_targeted else ''})")
         
         try:
             data = scrape_news(kw, max_results=needed)

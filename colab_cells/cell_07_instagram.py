@@ -288,11 +288,15 @@ def _search_urls_via_google(keyword, max_urls=200):
     found_urls = []
     found_set = set()
 
-    # Variasi query untuk hasil lebih banyak
+    # Variasi query untuk hasil lebih banyak (mendukung filter tanggal SCRAPE_SINCE / SCRAPE_UNTIL)
+    since_env = os.environ.get('SCRAPE_SINCE')
+    until_env = os.environ.get('SCRAPE_UNTIL')
+    date_filter = f" after:{since_env} before:{until_env}" if (since_env and until_env) else ""
+
     queries = [
-        f'site:instagram.com/p/ "{keyword}"',
-        f'site:instagram.com/reel/ "{keyword}"',
-        f'site:instagram.com "{keyword}" instagram',
+        f'site:instagram.com/p/ "{keyword}"{date_filter}',
+        f'site:instagram.com/reel/ "{keyword}"{date_filter}',
+        f'site:instagram.com "{keyword}" instagram{date_filter}',
     ]
 
     for query in queries:
@@ -325,6 +329,9 @@ def _search_urls_via_google(keyword, max_urls=200):
 
 def scrape_instagram(keyword, max_results=50, use_google=False, use_hashtag=True, on_item_scraped=None):
     global IG_DRIVER, _VISITED_HASHTAGS, _SEEN_URLS
+
+    if os.environ.get('SCRAPE_TARGETED') or os.environ.get('SCRAPE_SINCE'):
+        use_google = True
 
     print(f"    - Instagram Selenium: mencari '{keyword}'...")
 

@@ -64,14 +64,20 @@ def scrape_youtube_api(keyword, max_results=100):
         snippets = {}
         
         per_page = min(50, max_results)  # API max 50 per request
+        since_env = os.environ.get('SCRAPE_SINCE')
+        until_env = os.environ.get('SCRAPE_UNTIL')
+        pub_after = f"{since_env}T00:00:00Z" if since_env else "2025-01-01T00:00:00Z"
+        
         params = {
             "part": "snippet",
             "q": keyword,
             "type": "video",
             "maxResults": per_page,
-            "publishedAfter": "2025-01-01T00:00:00Z",
+            "publishedAfter": pub_after,
             "key": api_key
         }
+        if until_env:
+            params["publishedBefore"] = f"{until_env}T23:59:59Z"
         
         while len(video_ids) < max_results:
             res = requests.get(search_url, params=params)

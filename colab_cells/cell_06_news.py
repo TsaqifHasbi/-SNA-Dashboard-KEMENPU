@@ -68,7 +68,12 @@ def _scrape_google_news(keyword, max_results=100):
     seen_urls = set()
 
     try:
-        query = urllib.parse.quote(keyword)
+        q_text = keyword
+        since_env = os.environ.get('SCRAPE_SINCE')
+        until_env = os.environ.get('SCRAPE_UNTIL')
+        if since_env and 'after:' not in q_text:
+            q_text += f" after:{since_env} before:{until_env}"
+        query = urllib.parse.quote(q_text)
         rss_url = f"https://news.google.com/rss/search?q={query}&hl=id&gl=ID&ceid=ID:id"
         
         feed = feedparser.parse(rss_url)
@@ -107,8 +112,10 @@ def _scrape_google_news(keyword, max_results=100):
             raw_date = entry.get("published", "")
             created_at = _parse_date_to_wib(raw_date) if raw_date else datetime.now(WIB).strftime("%Y-%m-%d %H:%M:%S WIB")
             
-            # FILTER TANGGAL: 1 Januari 2024 - Sekarang
-            if created_at < "2024-01-01 00:00:00 WIB":
+            # FILTER TANGGAL: Mendukung filter tanggal spesifik jika SCRAPE_SINCE aktif
+            if since_env and created_at < f"{since_env} 00:00:00 WIB":
+                continue
+            elif not since_env and created_at < "2024-01-01 00:00:00 WIB":
                 continue
             
             # Bersihkan summary
@@ -177,8 +184,10 @@ def _scrape_bing_news(keyword, max_results=100):
             raw_date = entry.get("published", "")
             created_at = _parse_date_to_wib(raw_date) if raw_date else datetime.now(WIB).strftime("%Y-%m-%d %H:%M:%S WIB")
             
-            # FILTER TANGGAL: 1 Januari 2024 - Sekarang
-            if created_at < "2024-01-01 00:00:00 WIB":
+            # FILTER TANGGAL: Mendukung filter tanggal spesifik jika SCRAPE_SINCE aktif
+            if since_env and created_at < f"{since_env} 00:00:00 WIB":
+                continue
+            elif not since_env and created_at < "2024-01-01 00:00:00 WIB":
                 continue
             
             # Description

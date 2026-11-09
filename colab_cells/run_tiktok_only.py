@@ -89,17 +89,18 @@ for topic, keywords in TOPICS.items():
         current_count = keyword_counts.get(kw, 0)
 
         # 1. CEK APAKAH SUDAH MEMENUHI TARGET
-        if current_count >= target_results:
+        is_targeted = bool(os.environ.get('SCRAPE_TARGETED'))
+        if not is_targeted and current_count >= target_results:
             print(f"  [{current_kw}/{total_keywords}] [SKIP] Keyword '{kw}' sudah terpenuhi ({current_count}/{target_results} data).")
             current_kw += 1
             continue
 
         # 2. HITUNG SISA KEKURANGAN
-        needed = target_results - current_count
-        if current_count > 0:
+        needed = target_results if is_targeted else (target_results - current_count)
+        if current_count > 0 and not is_targeted:
             print(f"\n  [{current_kw}/{total_keywords}] Keyword: '{kw}' (Sudah ada: {current_count}/{target_results} | Mencari sisa: {needed} data baru)")
         else:
-            print(f"\n  [{current_kw}/{total_keywords}] Keyword: '{kw}' (Target: {target_results} data | Belum ada data di CSV)")
+            print(f"\n  [{current_kw}/{total_keywords}] Keyword: '{kw}' (Target: {needed} data{' [TARGETED MODE]' if is_targeted else ''})")
 
         try:
             data = scrape_tiktok(kw, max_results=needed)

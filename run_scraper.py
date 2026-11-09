@@ -66,6 +66,7 @@ def print_banner():
     for key, script in PLATFORM_SCRIPTS.items():
         print(f"  • {key:<12} -> colab_cells/{script}")
     print("  • all          -> Jalankan seluruh platform (1 s/d 7) lalu combine")
+    print("  • targeted     -> Jalankan Targeted Date Scraper (Rentang 31 Okt - 9 Nov 2026)")
     print("=" * 75)
 
 def run_script(script_name, title=""):
@@ -98,6 +99,13 @@ def run_platform(platform_name):
         run_script(PLATFORM_SCRIPTS['combine'], "COMBINE ALL DATA")
         return True
         
+    if platform_name in ['targeted', 'date', 'dates']:
+        print("\n🎯 Memulai Targeted Date Scraper (31 Okt - 9 Nov 2026)...")
+        target_script = os.path.join(BASE_DIR, 'run_targeted_date_scrape.py')
+        cmd = [sys.executable, "-u", target_script]
+        ret = subprocess.run(cmd)
+        return ret.returncode == 0
+
     if platform_name not in PLATFORM_SCRIPTS:
         print(f"❌ Platform '{platform_name}' tidak dikenal!")
         print(f"Pilihan yang tersedia: {', '.join(PLATFORM_SCRIPTS.keys())}, all")
@@ -115,7 +123,7 @@ def main():
     else:
         print_banner()
         print("\nPilih nomor / nama platform untuk dijalankan:")
-        options = list(PLATFORM_SCRIPTS.keys()) + ['all']
+        options = list(PLATFORM_SCRIPTS.keys()) + ['all', 'targeted']
         for idx, opt in enumerate(options, 1):
             print(f"  [{idx}] {opt.upper()}")
         print("  [0] Keluar")
