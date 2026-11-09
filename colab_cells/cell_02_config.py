@@ -28,10 +28,29 @@ nest_asyncio.apply()
 OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'ScrapeData')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
+# Load environment variables dari .env (jika ada)
+try:
+    from dotenv import load_dotenv
+    env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '.env')
+    if os.path.exists(env_file):
+        load_dotenv(env_file)
+except Exception:
+    pass
+
 # ================================================================
-# YOUTUBE — YouTube Data API v3 Key
+# YOUTUBE — YouTube Data API v3 Key (Multi-Key Rotation dari .env)
 # ================================================================
-YOUTUBE_API_KEY = "YOUR_YOUTUBE_API_KEY_HERE"
+_yt_env_keys = os.environ.get('YOUTUBE_API_KEYS', '')
+if _yt_env_keys:
+    YOUTUBE_API_KEYS = [k.strip() for k in _yt_env_keys.split(',') if k.strip()]
+else:
+    YOUTUBE_API_KEYS = [k for k in [
+        os.environ.get('YOUTUBE_API_KEY'),
+        os.environ.get('YOUTUBE_API_KEY_2'),
+        os.environ.get('YOUTUBE_API_KEY_3'),
+    ] if k and k.strip()]
+
+YOUTUBE_API_KEY = YOUTUBE_API_KEYS[0] if YOUTUBE_API_KEYS else os.environ.get('YOUTUBE_API_KEY', 'YOUR_YOUTUBE_API_KEY_HERE')
 
 # ================================================================
 # TWITTER/X — Cookie dari browser

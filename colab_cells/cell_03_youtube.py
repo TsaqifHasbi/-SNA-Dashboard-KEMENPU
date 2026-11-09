@@ -18,11 +18,34 @@ from datetime import datetime
 import sys
 # Resolve API Key dari Colab (__main__) atau local import
 try:
-    _yt_key = getattr(sys.modules['__main__'], 'YOUTUBE_API_KEY', None)
-    if not _yt_key:
-        from cell_02_config import YOUTUBE_API_KEY as _yt_key
+    from cell_02_config import YOUTUBE_API_KEYS as _yt_keys_pool
 except ImportError:
-    _yt_key = "PASTE_YOUTUBE_API_KEY_DI_SINI"
+    _yt_keys_pool = []
+
+if not _yt_keys_pool:
+    try:
+        from cell_02_config import YOUTUBE_API_KEY as _single_k
+        if _single_k and _single_k != "YOUR_YOUTUBE_API_KEY_HERE" and _single_k != "PASTE_YOUTUBE_API_KEY_DI_SINI":
+            _yt_keys_pool = [_single_k]
+    except Exception:
+        _yt_keys_pool = []
+
+_current_key_idx = 0
+
+def get_current_yt_key():
+    global _current_key_idx, _yt_keys_pool
+    if _yt_keys_pool and _current_key_idx < len(_yt_keys_pool):
+        return _yt_keys_pool[_current_key_idx]
+    return getattr(sys.modules['__main__'], 'YOUTUBE_API_KEY', None)
+
+def rotate_yt_key():
+    global _current_key_idx, _yt_keys_pool
+    if _yt_keys_pool and _current_key_idx + 1 < len(_yt_keys_pool):
+        _current_key_idx += 1
+        new_k = _yt_keys_pool[_current_key_idx]
+        print(f"\n    🔄 [KEY ROTATION] Berpindah ke YouTube API Key #{_current_key_idx + 1} ({new_k[:10]}...)")
+        return new_k
+    return None
 
 def parse_view_count(text):
     """Mengubah teks views YouTube menjadi integer."""
@@ -49,9 +72,9 @@ def scrape_youtube_api(keyword, max_results=100):
     if _yt_api_exhausted:
         return None
     
-    api_key = _yt_key
+    api_key = get_current_yt_key()
     if not api_key or api_key == "PASTE_YOUTUBE_API_KEY_DI_SINI":
-        print("    [!] YOUTUBE_API_KEY belum diisi di Cell 2.")
+        print("    [!] YOUTUBE_API_KEY belum diisi di Cell 2 atau .env.")
         return None  # Return None agar otomatis masuk fallback
 
     results = []
@@ -85,9 +108,15 @@ def scrape_youtube_api(keyword, max_results=100):
                 err_msg = res.text[:100]
                 print(f"    [!] Error API v3 (Search): {res.status_code} - {err_msg}")
                 if res.status_code == 429 or "Quota exceeded" in res.text or "quotaExceeded" in res.text or res.status_code == 403:
+                    new_key = rotate_yt_key()
+                    if new_key:
+                        api_key = new_key
+                        params["key"] = new_key
+                        continue
+
                     _yt_api_exhausted = True
                     print("\n" + "="*60)
-                    print("🚨 KUOTA API YOUTUBE HABIS! 🚨")
+                    print("🚨 SELURUH KUOTA API YOUTUBE HABIS! 🚨")
                     print("Batas token harian YouTube Data API telah tercapai (HTTP 403 Quota Exceeded).")
                     print("Proses dihentikan agar data sebelumnya bisa tersimpan.")
                     print("API YouTube akan reset pada TENGAH MALAM waktu Pasifik (Pacific Time / PT).")
