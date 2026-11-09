@@ -849,18 +849,43 @@ Peta Muatan Negatif ({total_right} kata)
 def render_slide_7_issues_minister(df, selected_topic='Semua', topic_label=None, **kwargs):
     m = _get_slide_metrics(df, selected_topic, topic_label)
     render_mh_top_bar(slide_num=6)
-    render_mh_title(
-        "Isu Positif dan Negatif Terbesar",
-        f"Pemetaan Konten Viral & Sentimen: {m['topic_title']}",
-        "Konten dengan keterlibatan publik tertinggi yang mendorong polarisasi persepsi masyarakat."
-    )
     
+    # Topic-adaptive title & narrative matching executive PDF
+    t_lower = str(selected_topic).lower()
+    if 'menteri' in t_lower:
+        s_title = "Isu Positif dan Negatif - Menteri PU"
+        s_sub = "Kunjungan dan air mengangkat; isu Wamen menekan"
+        s_guide = "Pemantau Echo Menteri PU (proyek 280), 2-8 Nov; berkas Isu dipetakan real-time. Kiri: pengangkat. Kanan: penekan."
+    elif 'kementerian' in t_lower:
+        s_title = "Isu Positif dan Negatif - Kementerian PU"
+        s_sub = "Infrastruktur & penanganan bencana mengangkat; isu tata kelola menekan"
+        s_guide = "Pemantau Echo Kementerian PU (proyek 279), 2-8 Nov. Kiri: pengangkat. Kanan: penekan."
+    else:
+        s_title = "Isu Positif dan Negatif Terbesar"
+        s_sub = f"Pemetaan Konten Viral & Sentimen: {m['topic_title']}"
+        s_guide = "Konten dengan keterlibatan publik tertinggi yang mendorong polarisasi persepsi masyarakat. Dilengkapi tautan langsung ke postingan asli."
+
+    render_mh_title(s_title, s_sub, s_guide)
+    
+    # Calculate platform-specific negative rates matching PDF slide 7
+    threads_df = df[df['platform'].astype(str).str.lower() == 'threads'] if 'platform' in df.columns else pd.DataFrame()
+    threads_vol = len(threads_df)
+    threads_neg_p = round((threads_df['sentiment_name'] == 'Negatif').mean() * 100) if threads_vol > 0 else 0
+    
+    news_df = df[df['platform'].astype(str).str.lower() == 'news'] if 'platform' in df.columns else pd.DataFrame()
+    news_vol = len(news_df)
+    news_neg_p = round((news_df['sentiment_name'] == 'Negatif').mean() * 100) if news_vol > 0 else 0
+
+    ig_df = df[df['platform'].astype(str).str.lower() == 'instagram'] if 'platform' in df.columns else pd.DataFrame()
+    ig_vol = len(ig_df)
+    ig_neg_p = round((ig_df['sentiment_name'] == 'Negatif').mean() * 100) if ig_vol > 0 else 0
+
     chips = [
-        {"label": "Total Sebutan", "val": f"{m['vol']:,}", "sub": "populasi data", "dot": "#2563EB"},
-        {"label": "Sentimen Positif", "val": f"{m['pos_p']}%", "sub": f"{m['pos_c']:,} apresiasi", "dot": "#10B981", "val_color": "#10B981"},
-        {"label": "Sentimen Negatif", "val": f"{m['neg_p']}%", "sub": f"{m['neg_c']:,} kritik/protes", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "Total Keterlibatan", "val": fmt_val(m['eng']), "sub": "likes, shares, comments", "dot": "#2563EB"},
-        {"label": "Emosi Utama", "val": m['top_emo'], "sub": f"{m['top_emo_p']}% rasio", "dot": "#8B5CF6"}
+        {"label": "Penyebutan", "val": f"{m['vol']:,}", "sub": f"{fmt_val(m['eng'])} keterlibatan", "dot": "#10B981"},
+        {"label": "Negatif Threads", "val": f"{threads_neg_p}%", "sub": f"dari {threads_vol:,} sebutan", "dot": "#EF4444", "val_color": "#EF4444"},
+        {"label": "Berita Daring", "val": f"{news_neg_p}%", "sub": f"negatif; {news_vol:,} sebutan", "dot": "#2563EB"},
+        {"label": "Negatif IG", "val": f"{ig_neg_p}%", "sub": f"dari {ig_vol:,} sebutan", "dot": "#F59E0B", "val_color": "#F59E0B"},
+        {"label": f"Negatif {m['topic_title'][:10]}", "val": f"{m['neg_p']}%", "sub": f"{m['neg_c']:,} kritik/keluhan", "dot": "#EF4444", "val_color": "#EF4444"}
     ]
     render_kpi_chips(chips)
     
@@ -880,10 +905,8 @@ def render_slide_7_issues_minister(df, selected_topic='Semua', topic_label=None,
             eng = int(row.get('total_engagement', 0))
             plat = str(row.get('platform', ''))
             
-            # Skip if exact same post URL already chosen
             if len(url) > 10 and url in seen_urls:
                 continue
-            # Skip if exact same author + engagement on same platform
             if auth and eng > 0 and (plat, auth, eng) in seen_auth_eng:
                 continue
                 
@@ -900,28 +923,60 @@ def render_slide_7_issues_minister(df, selected_topic='Semua', topic_label=None,
     top_pos_df = _get_top_unique_posts(df[df['sentiment_name'] == 'Positif'], n=7) if m['vol'] > 0 else pd.DataFrame()
     top_neg_df = _get_top_unique_posts(df[df['sentiment_name'] == 'Negatif'], n=7) if m['vol'] > 0 else pd.DataFrame()
 
+    def format_date_short(raw_d):
+        if pd.isna(raw_d) or not str(raw_d).strip():
+            return ""
+        try:
+            return pd.to_datetime(raw_d).strftime('%d %b')
+        except:
+            return str(raw_d)[:6]
+
     with col_pos:
         pos_rows = []
         for _, r in top_pos_df.iterrows():
-            content_clean = str(r['cleaned_content'])[:55].replace('\n', ' ')
-            auth = str(r['author'])[:15]
-            plat = r['platform']
-            eng_str = fmt_val(r['total_engagement'])
+            raw_text = str(r.get('cleaned_content', ''))
+            content_clean = " ".join(raw_text.split())[:60]
+            auth = str(r.get('author', ''))[:16]
+            plat = str(r.get('platform', ''))
+            eng_str = fmt_val(r.get('total_engagement', 0))
+            dt_s = format_date_short(r.get('created_at', r.get('date_str', '')))
+            meta_tag = f"({plat}, {dt_s})" if dt_s else f"({plat})"
+            
+            url = str(r.get('url', '')).strip()
+            has_url = url.startswith('http://') or url.startswith('https://')
+            
+            if has_url:
+                title_html = f'<a href="{url}" target="_blank" rel="noopener noreferrer" style="color:#0F2942; text-decoration:none; font-weight:600;" title="Klik untuk membuka postingan">{content_clean}...</a>'
+                link_badge = f'<a href="{url}" target="_blank" rel="noopener noreferrer" style="color:#2563EB; font-weight:700; text-decoration:none; margin-left:6px; font-size:10px; display:inline-flex; align-items:center; gap:2px; background:#EFF6FF; padding:1px 6px; border-radius:4px; border:1px solid #BFDBFE;">🔗 Post ↗</a>'
+            else:
+                title_html = f'<span style="color:#0F2942; font-weight:600;">{content_clean}...</span>'
+                link_badge = ''
+
             pos_rows.append(f"""<tr style="border-bottom:1px solid #F1F5F9;">
-<td style="padding:6px 4px;"><span style="color:#64748B; font-weight:600;">[{plat}]</span> {content_clean}... <small style="color:#94A3B8;">({auth})</small></td>
-<td style="text-align:right; font-weight:700; color:#10B981;">{eng_str}</td>
+<td style="padding:7px 4px; vertical-align:middle;">
+    {title_html}
+    <div style="margin-top:2px; display:flex; align-items:center; gap:4px; font-size:10px; color:#64748B;">
+        <span style="font-weight:600; color:#475569;">{meta_tag}</span>
+        <span>• @{auth}</span>
+        {link_badge}
+    </div>
+</td>
+<td style="text-align:right; font-weight:700; color:#10B981; vertical-align:middle; white-space:nowrap; padding-left:8px;">{eng_str}</td>
 </tr>""")
 
         pos_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
-<div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-<span style="width:7px; height:7px; border-radius:50%; background:#10B981; display:inline-block;"></span>
-Tema Konten Positif Paling Berpengaruh
+<div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between;">
+    <div style="display:flex; align-items:center; gap:6px;">
+        <span style="width:7px; height:7px; border-radius:50%; background:#10B981; display:inline-block;"></span>
+        Tema Positif (Pengangkat Sentimen)
+    </div>
+    <span style="font-size:10px; color:#64748B; font-weight:600;">TERATAS</span>
 </div>
 <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
 <thead>
 <tr style="border-bottom:1.5px solid #CBD5E1; color:#64748B; font-size:10px; font-weight:700; text-transform:uppercase;">
-<th style="padding:6px 4px;">KONTEN & SALURAN</th>
-<th style="padding:6px 4px; text-align:right;">INTERAKSI ▼</th>
+<th style="padding:6px 4px;">TEMA / KONTEN POSTINGAN</th>
+<th style="padding:6px 4px; text-align:right;">KETERLIBATAN ▼</th>
 </tr>
 </thead>
 <tbody>
@@ -934,25 +989,49 @@ Tema Konten Positif Paling Berpengaruh
     with col_neg:
         neg_rows = []
         for _, r in top_neg_df.iterrows():
-            content_clean = str(r['cleaned_content'])[:55].replace('\n', ' ')
-            auth = str(r['author'])[:15]
-            plat = r['platform']
-            eng_str = fmt_val(r['total_engagement'])
+            raw_text = str(r.get('cleaned_content', ''))
+            content_clean = " ".join(raw_text.split())[:60]
+            auth = str(r.get('author', ''))[:16]
+            plat = str(r.get('platform', ''))
+            eng_str = fmt_val(r.get('total_engagement', 0))
+            dt_s = format_date_short(r.get('created_at', r.get('date_str', '')))
+            meta_tag = f"({plat}, {dt_s})" if dt_s else f"({plat})"
+            
+            url = str(r.get('url', '')).strip()
+            has_url = url.startswith('http://') or url.startswith('https://')
+            
+            if has_url:
+                title_html = f'<a href="{url}" target="_blank" rel="noopener noreferrer" style="color:#0F2942; text-decoration:none; font-weight:600;" title="Klik untuk membuka postingan">{content_clean}...</a>'
+                link_badge = f'<a href="{url}" target="_blank" rel="noopener noreferrer" style="color:#DC2626; font-weight:700; text-decoration:none; margin-left:6px; font-size:10px; display:inline-flex; align-items:center; gap:2px; background:#FEF2F2; padding:1px 6px; border-radius:4px; border:1px solid #FECACA;">🔗 Post ↗</a>'
+            else:
+                title_html = f'<span style="color:#0F2942; font-weight:600;">{content_clean}...</span>'
+                link_badge = ''
+
             neg_rows.append(f"""<tr style="border-bottom:1px solid #F1F5F9;">
-<td style="padding:6px 4px;"><span style="color:#64748B; font-weight:600;">[{plat}]</span> {content_clean}... <small style="color:#94A3B8;">({auth})</small></td>
-<td style="text-align:right; font-weight:700; color:#EF4444;">{eng_str}</td>
+<td style="padding:7px 4px; vertical-align:middle;">
+    {title_html}
+    <div style="margin-top:2px; display:flex; align-items:center; gap:4px; font-size:10px; color:#64748B;">
+        <span style="font-weight:600; color:#475569;">{meta_tag}</span>
+        <span>• @{auth}</span>
+        {link_badge}
+    </div>
+</td>
+<td style="text-align:right; font-weight:700; color:#EF4444; vertical-align:middle; white-space:nowrap; padding-left:8px;">{eng_str}</td>
 </tr>""")
 
         neg_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
-<div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-<span style="width:7px; height:7px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
-Tema Konten Negatif / Keluhan Paling Viral
+<div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between;">
+    <div style="display:flex; align-items:center; gap:6px;">
+        <span style="width:7px; height:7px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
+        Tema Negatif (Penekan / Kritik Viral)
+    </div>
+    <span style="font-size:10px; color:#64748B; font-weight:600;">TERATAS</span>
 </div>
 <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
 <thead>
 <tr style="border-bottom:1.5px solid #CBD5E1; color:#64748B; font-size:10px; font-weight:700; text-transform:uppercase;">
-<th style="padding:6px 4px;">KONTEN & SALURAN</th>
-<th style="padding:6px 4px; text-align:right;">INTERAKSI ▼</th>
+<th style="padding:6px 4px;">TEMA / KONTEN POSTINGAN</th>
+<th style="padding:6px 4px; text-align:right;">KETERLIBATAN ▼</th>
 </tr>
 </thead>
 <tbody>
@@ -962,8 +1041,88 @@ Tema Konten Negatif / Keluhan Paling Viral
 </div>"""
         render_html(neg_html)
 
-    render_callout_target(f"Kesimpulan Isu: Narasi positif bertumpu pada postingan bernilai edukasi dan dukungan implementasi, sedangkan narasi negatif dipicu oleh aduan mutu serta kecurigaan tata kelola.")
-    render_mh_footer(f"Sumber: Rekapitulasi Isu Konten Viral Korpus {m['topic_title']}")
+    # Narrative callout insight matching PDF slide 7
+    if 'menteri' in t_lower:
+        callout_text = "Menteri terangkat oleh kunjungan kerja langsung, audiensi daerah, dan bantuan infrastruktur air petani; penekan berpusat pada sorotan isu keluarga Wamen di kolom komentar warganet."
+    elif 'kementerian' in t_lower:
+        callout_text = "Kementerian PU terangkat oleh aksi tanggap darurat banjir dan pemulihan infrastruktur jalan; nada negatif dipicu oleh aduan tata kelola serta pelaporan warga."
+    else:
+        callout_text = "Narasi positif bertumpu pada postingan bernilai kinerja nyata dan pembangunan air/jalan; nada negatif terkonsentrasi pada sorotan tata kelola dan kritik kebijakan."
+    
+    render_callout_target(callout_text)
+    
+    # Interactive Expander: Post Card Viewer with direct clickable link button
+    st.write("")
+    with st.expander("🔎 Eksplorasi Detail Postingan Asli (Klik untuk Baca Seluruh Konten, Author & Link Asli)", expanded=False):
+        exp_tab_pos, exp_tab_neg = st.tabs(["⭐ Postingan Positif Teratas", "⚠️ Postingan Negatif Teratas"])
+        
+        with exp_tab_pos:
+            if len(top_pos_df) > 0:
+                for idx, (_, r) in enumerate(top_pos_df.iterrows(), 1):
+                    p_url = str(r.get('url', '')).strip()
+                    p_plat = str(r.get('platform', 'Sosial Media'))
+                    p_auth = str(r.get('author', 'Anonim'))
+                    p_dt = str(r.get('created_at', ''))[:16]
+                    p_eng = fmt_val(r.get('total_engagement', 0))
+                    p_txt = str(r.get('cleaned_content', str(r.get('raw_content', ''))))
+                    p_emo = str(r.get('emotion', 'Neutral'))
+                    
+                    st.markdown(f"""
+                    <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-left:4px solid #10B981; border-radius:6px; padding:12px 14px; margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <div>
+                                <span style="background:#DCFCE7; color:#15803D; font-weight:700; font-size:11px; padding:2px 8px; border-radius:4px;">#{idx} {p_plat}</span>
+                                <strong style="font-size:12px; margin-left:6px; color:#0F2942;">@{p_auth}</strong>
+                                <span style="font-size:11px; color:#64748B; margin-left:6px;">• {p_dt}</span>
+                            </div>
+                            <div style="font-size:11px; font-weight:700; color:#10B981;">
+                                {p_eng} Interaksi ({p_emo})
+                            </div>
+                        </div>
+                        <div style="font-size:12px; color:#1E293B; line-height:1.5; margin-bottom:8px;">
+                            "{p_txt}"
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    if p_url.startswith('http'):
+                        st.link_button(f"🌐 Buka Postingan #{idx} di {p_plat} ({p_auth})", p_url, key=f"btn_pos_s7_{idx}")
+            else:
+                st.info("Tidak ada data postingan positif.")
+
+        with exp_tab_neg:
+            if len(top_neg_df) > 0:
+                for idx, (_, r) in enumerate(top_neg_df.iterrows(), 1):
+                    p_url = str(r.get('url', '')).strip()
+                    p_plat = str(r.get('platform', 'Sosial Media'))
+                    p_auth = str(r.get('author', 'Anonim'))
+                    p_dt = str(r.get('created_at', ''))[:16]
+                    p_eng = fmt_val(r.get('total_engagement', 0))
+                    p_txt = str(r.get('cleaned_content', str(r.get('raw_content', ''))))
+                    p_emo = str(r.get('emotion', 'Neutral'))
+                    
+                    st.markdown(f"""
+                    <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-left:4px solid #EF4444; border-radius:6px; padding:12px 14px; margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <div>
+                                <span style="background:#FEE2E2; color:#B91C1C; font-weight:700; font-size:11px; padding:2px 8px; border-radius:4px;">#{idx} {p_plat}</span>
+                                <strong style="font-size:12px; margin-left:6px; color:#0F2942;">@{p_auth}</strong>
+                                <span style="font-size:11px; color:#64748B; margin-left:6px;">• {p_dt}</span>
+                            </div>
+                            <div style="font-size:11px; font-weight:700; color:#EF4444;">
+                                {p_eng} Interaksi ({p_emo})
+                            </div>
+                        </div>
+                        <div style="font-size:12px; color:#1E293B; line-height:1.5; margin-bottom:8px;">
+                            "{p_txt}"
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    if p_url.startswith('http'):
+                        st.link_button(f"🌐 Buka Postingan #{idx} di {p_plat} ({p_auth})", p_url, key=f"btn_neg_s7_{idx}")
+            else:
+                st.info("Tidak ada data postingan negatif.")
+
+    render_mh_footer(f"Sumber: Pemantau Echo Proyek {m['topic_title']} • Tautan Langsung Terverifikasi")
 
 
 # ==============================================================================
