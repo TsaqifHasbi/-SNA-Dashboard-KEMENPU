@@ -75,23 +75,11 @@ def extract_emojis(text):
 
 @st.cache_resource(show_spinner=False)
 def _load_main_data_cached(file_mtime: float):
-    needed_cols = [
-        'post_id', 'platform', 'author', 'handle', 'created_at',
-        'likes', 'comments', 'shares', 'reposts', 'views', 'url',
-        'keyword', 'topic', 'cleaned_content', 'total_engagement',
-        'reach', 'sentiment_label', 'predicted_sentiment', 'sentiment_score',
-        'sentiment_name', 'emotion', 'emotion_confidence', 'emotion_sentiment',
-        'date', 'date_str', 'year_month'
-    ]
-
     if os.path.exists(PARQUET_PATH):
         try:
-            df = pd.read_parquet(PARQUET_PATH, columns=needed_cols, engine='pyarrow', use_threads=False)
+            df = pd.read_parquet(PARQUET_PATH, engine='pyarrow')
         except Exception:
-            try:
-                df = pd.read_parquet(PARQUET_PATH, columns=needed_cols)
-            except Exception:
-                df = pd.read_parquet(PARQUET_PATH)
+            df = pd.read_parquet(PARQUET_PATH)
     elif os.path.exists(CSV_PATH):
         df = pd.read_csv(CSV_PATH, low_memory=False)
     else:
