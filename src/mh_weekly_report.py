@@ -368,10 +368,10 @@ def render_slide_3_chapter_1(df, selected_topic='Semua', topic_label=None, **kwa
         f"Volume dan dinamika persepsi warganet pada {m['topic_title']} di 7 saluran komunikasi digital, awan kata, serta komparasi isu positif-negatif.",
         1,
         [
-            (4, "Overall Media & Social - Tren Lembaga & Menteri"),
-            (5, "Platform Review - Tujuh Saluran Multiplatform"),
-            (6, "Suara Teratas & Dua Awan Kata"),
-            (7, "Isu Positif dan Negatif - Analisis Mendalam")
+            # (4, "Overall Media & Social - Tren Lembaga & Menteri"),
+            (4, "Platform Review - Tujuh Saluran"),
+            (5, "Suara Teratas & Dua Awan Kata"),
+            (6, "Isu Positif dan Negatif - Analisis Mendalam")
         ]
     )
     render_mh_footer("Bab Pembuka Tinjauan Komprehensif")
