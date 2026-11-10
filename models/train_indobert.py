@@ -21,7 +21,7 @@ if sys.platform == 'win32':
         pass
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data')
-MODEL_SAVE_DIR = os.path.join(os.path.dirname(__file__), 'best_indobert_sentiment')
+MODEL_SAVE_DIR = os.path.join(os.path.dirname(__file__), 'best_indobert_sentiment_v2')
 os.makedirs(MODEL_SAVE_DIR, exist_ok=True)
 
 # Model resmi IndoBERT dari IndoBenchmark (Phase 1 Base)

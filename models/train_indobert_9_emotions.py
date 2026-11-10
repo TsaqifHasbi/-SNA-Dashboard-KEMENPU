@@ -25,8 +25,8 @@ if sys.platform == 'win32':
     except Exception:
         pass
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), '..', '..', 'IndoBERT_SNA_MT_PP', 'data')
-MODEL_SAVE_DIR = os.path.join(os.path.dirname(__file__), '..', '..', 'IndoBERT_SNA_MT_PP', 'models', 'best_indobert_emotion_9')
+DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data')
+MODEL_SAVE_DIR = os.path.join(os.path.dirname(__file__), 'best_indobert_emotion')
 os.makedirs(MODEL_SAVE_DIR, exist_ok=True)
 
 MODEL_NAME = "indobenchmark/indobert-base-p1"
