@@ -29,3 +29,4 @@ for fpath in files_to_clean:
         print(f"No match in: {fpath}")
 
 print("Secret scrubbing complete!")
+
