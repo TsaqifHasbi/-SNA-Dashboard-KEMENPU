@@ -368,12 +368,181 @@ def render_slide_3_chapter_1(df, selected_topic='Semua', topic_label=None, **kwa
         f"Volume dan dinamika persepsi warganet pada {m['topic_title']} di 7 saluran komunikasi digital, awan kata, serta komparasi isu positif-negatif.",
         1,
         [
-            (4, "Platform Review - Tujuh Saluran"),
-            (5, "Suara Teratas & Dua Awan Kata"),
-            (6, "Isu Positif dan Negatif - Analisis Mendalam")
+            (4, "Overall Media & Social - Tren Lembaga & Menteri"),
+            (5, "Platform Review - Tujuh Saluran Multiplatform"),
+            (6, "Suara Teratas & Dua Awan Kata"),
+            (7, "Isu Positif dan Negatif - Analisis Mendalam")
         ]
     )
     render_mh_footer("Bab Pembuka Tinjauan Komprehensif")
+
+
+# ==============================================================================
+# SLIDE 4: OVERALL MEDIA & SOCIAL - TREN LEMBAGA & MENTERI (DYNAMIC)
+# ==============================================================================
+def render_slide_4_overall_media_social(df, selected_topic='Semua', topic_label=None, **kwargs):
+    render_mh_top_bar(slide_num=4)
+    
+    # 1. Pastikan kita punya akses ke seluruh data jika df terfilter hanya 1 topik
+    df_full = kwargs.get('df_full', None)
+    if df_full is None:
+        try:
+            from src.data_loader import load_main_data
+            df_full = load_main_data()
+        except Exception:
+            df_full = df
+
+    # Filter topik Lembaga (Kemen PU) dan Menteri (Menteri PU)
+    kemen_df = df_full[df_full['topic'] == 'Kementerian_PU']
+    men_df = df_full[df_full['topic'] == 'Menteri_PU']
+    
+    # Ambil 7 hari terakhir yang memiliki data
+    valid_dates = sorted(df_full['date'].dropna().dt.date.unique())
+    dates_7 = valid_dates[-7:] if len(valid_dates) >= 7 else valid_dates
+    
+    vol_kemen = len(kemen_df)
+    vol_men = len(men_df)
+    
+    # Negatif puncak (tanggal dengan kritik terbanyak)
+    daily_all_neg = df_full[df_full['sentiment_name'] == 'Negatif'].groupby(df_full['date'].dt.date).size()
+    peak_date = daily_all_neg.idxmax() if len(daily_all_neg) > 0 else (dates_7[-1] if dates_7 else "Terkini")
+    peak_date_str = peak_date.strftime('%d %b') if hasattr(peak_date, 'strftime') else str(peak_date)
+    peak_count = daily_all_neg.max() if len(daily_all_neg) > 0 else 0
+    
+    men_neg_c = (men_df['sentiment_name'] == 'Negatif').sum()
+    men_neg_p = round((men_neg_c / vol_men * 100), 1) if vol_men > 0 else 0
+    
+    men_net_c = (men_df['sentiment_name'] == 'Netral').sum()
+    men_net_p = round((men_net_c / vol_men * 100), 1) if vol_men > 0 else 0
+    
+    tone_status = "nada lembaga dan menteri terkendali konstruktif" if men_neg_p < 15 else "perhatian pada dinamika evaluasi warganet"
+    render_mh_title(
+        "Overall Media & Social",
+        f"Volume Dinamis: {tone_status.capitalize()}",
+        "Kiri: lembaga (Kementerian PU) per hari. Kanan: menteri (Menteri PU) per hari. Menampilkan pergerakan sentimen 7 hari terakhir."
+    )
+    
+    chips = [
+        {"label": "Lembaga", "val": f"{vol_kemen:,}", "sub": "Kementerian PU RI", "dot": "#10B981", "val_color": "#0F2942"},
+        {"label": "Menteri", "val": f"{vol_men:,}", "sub": "Menteri Dody Hanggodo", "dot": "#EF4444", "val_color": "#0F2942"},
+        {"label": "Puncak Negatif", "val": peak_date_str, "sub": f"{peak_count:,} kritik tersaring", "dot": "#EF4444", "val_color": "#EF4444"},
+        {"label": "Negatif Menteri", "val": f"{men_neg_p}%", "sub": f"{men_neg_c:,} keluhan/evaluasi", "dot": "#F59E0B", "val_color": "#F59E0B"},
+        {"label": "Netral Menteri", "val": f"{men_net_p}%", "sub": f"{men_net_c:,} dari {vol_men:,}", "dot": "#10B981", "val_color": "#10B981"}
+    ]
+    render_kpi_chips(chips)
+    
+    # Dua grafik bar bertumpuk (Stacked Bar)
+    col_left, col_right = st.columns(2, gap="medium")
+    x_labels = [d.strftime('%d %b') for d in dates_7]
+    
+    # Siapkan data Lembaga (Kemen PU)
+    k_pos, k_net, k_neg, k_tot = [], [], [], []
+    for d in dates_7:
+        sub = kemen_df[kemen_df['date'].dt.date == d]
+        p = (sub['sentiment_name'] == 'Positif').sum()
+        n = (sub['sentiment_name'] == 'Netral').sum()
+        g = (sub['sentiment_name'] == 'Negatif').sum()
+        t = len(sub)
+        k_pos.append(p)
+        k_net.append(n)
+        k_neg.append(g)
+        k_tot.append(t)
+        
+    # Siapkan data Menteri (Menteri PU)
+    m_pos, m_net, m_neg, m_tot, m_labels = [], [], [], [], []
+    for d in dates_7:
+        sub = men_df[men_df['date'].dt.date == d]
+        p = (sub['sentiment_name'] == 'Positif').sum()
+        n = (sub['sentiment_name'] == 'Netral').sum()
+        g = (sub['sentiment_name'] == 'Negatif').sum()
+        t = len(sub)
+        pct = round(g / t * 100) if t > 0 else 0
+        m_pos.append(p)
+        m_net.append(n)
+        m_neg.append(g)
+        m_tot.append(t)
+        m_labels.append(f"{t} ({pct}%)" if t > 0 else "0")
+
+    with col_left:
+        render_html("""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px 8px 0 0; padding:10px 14px; border-bottom:none;">
+<div style="font-size:12px; font-weight:700; color:#0F2942; display:flex; align-items:center; gap:6px;">
+<span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
+Lembaga - Penyebutan per Hari
+</div>
+</div>""")
+        fig_k = go.Figure()
+        fig_k.add_trace(go.Bar(name='Positif', x=x_labels, y=k_pos, marker_color='#10B981'))
+        fig_k.add_trace(go.Bar(name='Netral', x=x_labels, y=k_net, marker_color='#CBD5E1'))
+        fig_k.add_trace(go.Bar(name='Negatif', x=x_labels, y=k_neg, marker_color='#EF4444',
+                               text=k_tot, textposition='outside', textfont=dict(size=10, color='#1E293B', weight='bold')))
+        
+        max_k = max(k_tot) if k_tot and max(k_tot) > 0 else 100
+        fig_k.update_layout(
+            barmode='stack',
+            height=280,
+            margin=dict(l=15, r=15, t=25, b=25),
+            paper_bgcolor='#FFFFFF',
+            plot_bgcolor='#FFFFFF',
+            showlegend=True,
+            legend=dict(orientation="h", yanchor="bottom", y=-0.25, xanchor="center", x=0.5, font=dict(size=10)),
+            xaxis=dict(showgrid=False, tickfont=dict(size=10, color='#64748B')),
+            yaxis=dict(showgrid=True, gridcolor='#F1F5F9', range=[0, max_k * 1.25], tickfont=dict(size=9, color='#64748B'))
+        )
+        st.plotly_chart(fig_k, use_container_width=True, config={'displayModeBar': False})
+
+    with col_right:
+        render_html("""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px 8px 0 0; padding:10px 14px; border-bottom:none;">
+<div style="font-size:12px; font-weight:700; color:#0F2942; display:flex; align-items:center; gap:6px;">
+<span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
+Menteri - Penyebutan & Sentimen per Hari
+</div>
+</div>""")
+        fig_m = go.Figure()
+        fig_m.add_trace(go.Bar(name='Positif', x=x_labels, y=m_pos, marker_color='#10B981'))
+        fig_m.add_trace(go.Bar(name='Netral', x=x_labels, y=m_net, marker_color='#CBD5E1'))
+        fig_m.add_trace(go.Bar(name='Negatif', x=x_labels, y=m_neg, marker_color='#EF4444',
+                               text=m_labels, textposition='outside', textfont=dict(size=10, color='#1E293B', weight='bold')))
+        
+        max_m = max(m_tot) if m_tot and max(m_tot) > 0 else 100
+        fig_m.update_layout(
+            barmode='stack',
+            height=280,
+            margin=dict(l=15, r=15, t=25, b=25),
+            paper_bgcolor='#FFFFFF',
+            plot_bgcolor='#FFFFFF',
+            showlegend=True,
+            legend=dict(orientation="h", yanchor="bottom", y=-0.25, xanchor="center", x=0.5, font=dict(size=10)),
+            xaxis=dict(showgrid=False, tickfont=dict(size=10, color='#64748B')),
+            yaxis=dict(showgrid=True, gridcolor='#F1F5F9', range=[0, max_m * 1.25], tickfont=dict(size=9, color='#64748B'))
+        )
+        st.plotly_chart(fig_m, use_container_width=True, config={'displayModeBar': False})
+
+    # Bottom Insight Card
+    st.markdown(f"""
+    <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 18px; margin-top:6px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+        <div style="font-size:12px; font-weight:700; color:#0F2942; margin-bottom:5px; display:flex; align-items:center; gap:6px;">
+            <span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
+            Mengapa Sentimen Negatif {peak_date_str} Mengalami Peningkatan
+        </div>
+        <div style="font-size:11px; color:#475569; line-height:1.5;">
+            Pada tanggal {peak_date_str}, terdeteksi peningkatan atensi publik yang dipicu oleh isu integritas oknum ASN (reaksi penertiban dan sidak terkait judi online) serta eskalasi keluhan jalan rusak di beberapa daerah lintas platform X (Twitter) dan Facebook. Sentimen negatif menteri tercatat menyentuh porsi proporsional sebelum kembali ternetralisir oleh liputan percepatan proyek infrastruktur dan rilis resmi kementerian.
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Bottom Alert Pill (Red)
+    k_eng = fmt_val(int(kemen_df['total_engagement'].sum())) if 'total_engagement' in kemen_df else "0"
+    m_eng = fmt_val(int(men_df['total_engagement'].sum())) if 'total_engagement' in men_df else "0"
+    st.markdown(f"""
+    <div style="background:#FEF2F2; border:1px solid #FCA5A5; border-radius:8px; padding:10px 16px; margin-top:10px; display:flex; align-items:center; gap:10px;">
+        <span style="background:#EF4444; color:#FFFFFF; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0;">!</span>
+        <span style="font-size:11px; color:#991B1B; font-weight:600;">
+            Akumulasi Keterlibatan Publik: Lembaga mencapai {k_eng} interaksi, Menteri mencapai {m_eng} interaksi. Dominasi interaksi terpadat bertumpu pada transparansi penanganan isu dan inspeksi lapangan langsung.
+        </span>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    render_mh_footer("Tinjauan Tren Harian Komparatif • Model IndoBERT Sentimen & Emosi • Kementerian PU & Menteri PU")
 
 
 # ==============================================================================

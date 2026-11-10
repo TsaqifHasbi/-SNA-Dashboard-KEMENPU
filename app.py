@@ -71,6 +71,7 @@ from src.mh_weekly_report import (
     render_slide_1_cover,
     render_slide_2_executive_summary,
     render_slide_3_chapter_1,
+    render_slide_4_overall_media_social,
     render_slide_5_platform_review,
     render_slide_6_two_wordclouds,
     render_slide_7_issues_minister,
@@ -569,9 +570,10 @@ if "Format Laporan Harian" in view_mode or "Laporan Harian" in view_mode or "Sli
         },
         "Bab 1: Tinjauan Multiplatform (The Overview)": {
             "Slide 3: Pembuka Bab 1 (The Overview)": render_slide_3_chapter_1,
-            "Slide 4: Tinjauan Percakapan 7 Saluran Multiplatform": render_slide_5_platform_review,
-            "Slide 5: Analisis Suara Teratas & Dua Awan Kata": render_slide_6_two_wordclouds,
-            "Slide 6: Pemetaan Isu Positif & Negatif Terbesar": render_slide_7_issues_minister,
+            "Slide 4: Tren Harian Lembaga & Menteri (Overall Media & Social)": render_slide_4_overall_media_social,
+            "Slide 5: Tinjauan Percakapan 7 Saluran Multiplatform": render_slide_5_platform_review,
+            "Slide 6: Analisis Suara Teratas & Dua Awan Kata": render_slide_6_two_wordclouds,
+            "Slide 7: Pemetaan Isu Positif & Negatif Terbesar": render_slide_7_issues_minister,
         },
         "Bab 2: Analisis Mendalam (The Deep Dive)": {
             "Slide 7: Pembuka Bab 2 (The Deep Dive)": render_slide_8_chapter_2,
