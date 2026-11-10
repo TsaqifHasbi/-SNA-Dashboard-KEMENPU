@@ -269,6 +269,12 @@ def build_sna_graphs(df_corpus):
             export_graph_for_topic(sub, t_name)
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Pipeline Inferensi IndoBERT & SNA Kemen PU")
+    parser.add_argument('--force-all', '--no-cache', action='store_true', dest='force_all', help="Paksa inferensi ulang seluruh korpus (tanpa cache)")
+    parser.add_argument('--batch-size', type=int, default=64, help="Batch size inferensi (default: 64)")
+    args = parser.parse_args()
+
     print("=" * 75)
     print("🚀 PIPELINE INFERENSI LOKAL INDOBERT & GENERATOR SNA KEMEN PU")
     print("=" * 75)
@@ -285,8 +291,8 @@ def main():
 
     pred_cols = ['sentiment_label', 'predicted_sentiment', 'sentiment_score', 'sentiment_name', 'emotion', 'emotion_confidence', 'emotion_sentiment']
 
-    # Cek cache dari enriched corpus yang sudah ada untuk mempercepat inferensi
-    if os.path.exists(OUT_CSV):
+    # Cek cache dari enriched corpus yang sudah ada untuk mempercepat inferensi (kecuali jika dipaksa ulang)
+    if not args.force_all and os.path.exists(OUT_CSV):
         try:
             df_prev = pd.read_csv(OUT_CSV, low_memory=False)
             valid_prev_url = df_prev[['url'] + pred_cols].dropna(subset=['url', 'predicted_sentiment']).drop_duplicates(subset=['url'])
@@ -310,6 +316,8 @@ def main():
             print(f"[WARN] Gagal membaca cache existing enriched corpus: {e}")
             needed_count = len(df)
     else:
+        if args.force_all:
+            print("[INFO] Mode --force-all aktif: Mengabaikan cache dan menginferensi ulang seluruh 21.047 data dari awal.")
         needed_count = len(df)
 
     needed_mask = df['predicted_sentiment'].isna() if 'predicted_sentiment' in df.columns else pd.Series(True, index=df.index)
@@ -324,8 +332,8 @@ def main():
         s_mod = AutoModelForSequenceClassification.from_pretrained(SENT_DIR).to(device)
         s_mod.eval()
 
-        print(f"Memulai Inferensi Sentimen untuk {len(unpred_texts):,} teks baru...")
-        sp, sprob = batch_predict(s_mod, s_tok, unpred_texts, device, batch_size=64, desc="Sentimen Baru")
+        print(f"Memulai Inferensi Sentimen untuk {len(unpred_texts):,} teks...")
+        sp, sprob = batch_predict(s_mod, s_tok, unpred_texts, device, batch_size=args.batch_size, desc="Sentimen")
         df.loc[needed_indices, 'sentiment_label'] = sp
         df.loc[needed_indices, 'predicted_sentiment'] = pd.Series(sp, index=needed_indices).map({0: 'Negatif', 1: 'Netral', 2: 'Positif'}).values
         df.loc[needed_indices, 'sentiment_score'] = sprob[:, 2] - sprob[:, 0]
@@ -341,8 +349,8 @@ def main():
         e_mod = AutoModelForSequenceClassification.from_pretrained(EMO_DIR).to(device)
         e_mod.eval()
 
-        print(f"Memulai Inferensi 9 Emosi untuk {len(unpred_texts):,} teks baru...")
-        ep, eprob = batch_predict(e_mod, e_tok, unpred_texts, device, batch_size=64, desc="9 Emosi Baru")
+        print(f"Memulai Inferensi 9 Emosi untuk {len(unpred_texts):,} teks...")
+        ep, eprob = batch_predict(e_mod, e_tok, unpred_texts, device, batch_size=args.batch_size, desc="9 Emosi")
         df.loc[needed_indices, 'emotion'] = pd.Series(ep, index=needed_indices).map({i: l for i, l in enumerate(EMOTION_9_CLASSES)}).values
         df.loc[needed_indices, 'emotion_confidence'] = np.max(eprob, axis=1)
         df.loc[needed_indices, 'emotion_sentiment'] = df.loc[needed_indices, 'emotion'].map(EMOTION_TO_SENTIMENT)

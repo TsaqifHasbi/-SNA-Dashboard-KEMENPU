@@ -77,10 +77,11 @@ def check_dependencies():
         return False
     return True
 
-def run_training_pipeline(epochs=4, batch_size=16, learning_rate=2e-5, max_length=128):
+def run_training_pipeline(epochs=4, batch_size=None, learning_rate=2e-5, max_length=128, accum_steps=4, limit_samples=None):
     if not check_dependencies():
         return
         
+    import gc
     import torch
     from torch.utils.data import Dataset, DataLoader
     from transformers import AutoTokenizer, AutoModelForSequenceClassification, get_linear_schedule_with_warmup
@@ -95,6 +96,15 @@ def run_training_pipeline(epochs=4, batch_size=16, learning_rate=2e-5, max_lengt
     if device.type == 'cuda':
         print(f"GPU: {torch.cuda.get_device_name(0)}")
         print(f"VRAM: {torch.cuda.get_device_properties(0).total_memory / (1024**3):.2f} GB")
+        if batch_size is None:
+            batch_size = 16
+            accum_steps = 1
+    else:
+        print("   [INFO] Berjalan pada CPU.")
+        print("   [RAM SAFE] Mengaktifkan mode hemat RAM CPU (batch kecil + akumulasi gradien).")
+        if batch_size is None:
+            batch_size = 4
+            accum_steps = 4
     print("=" * 70)
 
     # 1. Load Data
@@ -111,6 +121,12 @@ def run_training_pipeline(epochs=4, batch_size=16, learning_rate=2e-5, max_lengt
     train_df = pd.read_csv(train_file)
     val_df = pd.read_csv(val_file)
     test_df = pd.read_csv(test_file)
+
+    if limit_samples and limit_samples > 0:
+        print(f"   [PENGUJIAN CEPAT] Membatasi data latih menjadi {limit_samples} baris.")
+        train_df = train_df.head(limit_samples)
+        val_df = val_df.head(max(50, int(limit_samples * 0.2)))
+        test_df = test_df.head(max(50, int(limit_samples * 0.2)))
 
     print(f"\n📊 Data loaded:")
     print(f"  Train : {len(train_df):,} rows")
@@ -169,29 +185,36 @@ def run_training_pipeline(epochs=4, batch_size=16, learning_rate=2e-5, max_lengt
 
     # 4. Training Loop
     best_f1 = 0.0
-    print(f"\n🏋️ Training {epochs} Epochs...")
+    print(f"\n🏋️ Training {epochs} Epochs (Batch: {batch_size}, Akumulasi: {accum_steps})...")
     for epoch in range(epochs):
         t0 = time.time()
         model.train()
         train_loss = 0.0
+        optimizer.zero_grad(set_to_none=True)
 
         for step, batch in enumerate(train_loader):
-            optimizer.zero_grad()
             input_ids = batch['input_ids'].to(device)
             attention_mask = batch['attention_mask'].to(device)
             labels = batch['labels'].to(device)
 
             outputs = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
-            loss = outputs.loss
-            train_loss += loss.item()
+            loss = outputs.loss / accum_steps
+            train_loss += outputs.loss.item()
 
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-            optimizer.step()
-            scheduler.step()
+            
+            if (step + 1) % accum_steps == 0 or (step + 1) == len(train_loader):
+                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+                optimizer.step()
+                scheduler.step()
+                optimizer.zero_grad(set_to_none=True)
+
+            del input_ids, attention_mask, labels, outputs, loss
+            if (step + 1) % 25 == 0:
+                gc.collect()
 
             if (step + 1) % 100 == 0 or (step + 1) == len(train_loader):
-                print(f"  Ep {epoch+1}/{epochs} | Step {step+1}/{len(train_loader)} | Loss: {loss.item():.4f}")
+                print(f"  Ep {epoch+1}/{epochs} | Step {step+1}/{len(train_loader)} | Loss: {train_loss/(step+1):.4f}")
 
         avg_train_loss = train_loss / len(train_loader)
 
@@ -201,7 +224,7 @@ def run_training_pipeline(epochs=4, batch_size=16, learning_rate=2e-5, max_lengt
         val_preds, val_targets = [], []
 
         with torch.no_grad():
-            for batch in val_loader:
+            for step_val, batch in enumerate(val_loader):
                 input_ids = batch['input_ids'].to(device)
                 attention_mask = batch['attention_mask'].to(device)
                 labels = batch['labels'].to(device)
@@ -211,6 +234,10 @@ def run_training_pipeline(epochs=4, batch_size=16, learning_rate=2e-5, max_lengt
                 preds = torch.argmax(outputs.logits, dim=1).cpu().numpy()
                 val_preds.extend(preds)
                 val_targets.extend(labels.cpu().numpy())
+
+                del input_ids, attention_mask, labels, outputs
+                if (step_val + 1) % 25 == 0:
+                    gc.collect()
 
         avg_val_loss = val_loss / len(val_loader)
         val_acc = accuracy_score(val_targets, val_preds)
@@ -300,4 +327,21 @@ def run_training_pipeline(epochs=4, batch_size=16, learning_rate=2e-5, max_lengt
     print(f"📝 Metrik evaluasi lengkap tersimpan di: {metrics_path}")
 
 if __name__ == '__main__':
-    run_training_pipeline()
+    import argparse
+    parser = argparse.ArgumentParser(description="Training IndoBERT 9 Emosi")
+    parser.add_argument('--epochs', type=int, default=4, help="Jumlah epoch (default: 4)")
+    parser.add_argument('--batch-size', type=int, default=None, help="Batch size (default: auto: 4 utk CPU, 16 utk GPU)")
+    parser.add_argument('--accum-steps', type=int, default=4, help="Gradient accumulation steps (default: 4)")
+    parser.add_argument('--lr', type=float, default=2e-5, help="Learning rate (default: 2e-5)")
+    parser.add_argument('--max-length', type=int, default=128, help="Max length token (default: 128)")
+    parser.add_argument('--limit-samples', type=int, default=None, help="Batasi baris train data (opsional)")
+    args = parser.parse_args()
+
+    run_training_pipeline(
+        epochs=args.epochs,
+        batch_size=args.batch_size,
+        learning_rate=args.lr,
+        max_length=args.max_length,
+        accum_steps=args.accum_steps,
+        limit_samples=args.limit_samples
+    )
