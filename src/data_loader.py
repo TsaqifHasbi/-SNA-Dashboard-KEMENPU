@@ -74,7 +74,7 @@ def extract_emojis(text):
     return [c for c in text if c in emoji.EMOJI_DATA]
 
 @st.cache_resource(show_spinner=False)
-def load_main_data():
+def _load_main_data_cached(file_mtime: float):
     needed_cols = [
         'post_id', 'platform', 'author', 'handle', 'created_at',
         'likes', 'comments', 'shares', 'reposts', 'views', 'url',
@@ -196,6 +196,11 @@ def load_main_data():
     gc.collect()
 
     return df
+
+def load_main_data():
+    target_path = PARQUET_PATH if os.path.exists(PARQUET_PATH) else CSV_PATH
+    mtime = os.path.getmtime(target_path) if os.path.exists(target_path) else 0.0
+    return _load_main_data_cached(mtime)
 
 def filter_dataset(df, selected_topic='Semua', selected_platform='Semua', start_date=None, end_date=None):
     mask = None
