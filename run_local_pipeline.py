@@ -31,6 +31,8 @@ if sys.platform == 'win32':
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, 'data')
 MODELS_DIR = os.path.join(BASE_DIR, 'models')
+SNA_OUT_DIR = os.path.join(BASE_DIR, 'sna', 'output')
+os.makedirs(SNA_OUT_DIR, exist_ok=True)
 
 MASTER_PATH = os.path.join(DATA_DIR, 'master_scraped_corpus.csv')
 OUT_CSV = os.path.join(DATA_DIR, 'enriched_corpus_for_sna.csv')
@@ -231,18 +233,30 @@ def build_sna_graphs(df_corpus):
         gexf_file = os.path.join(DATA_DIR, f"{prefix}_sna_by_sentiment.gexf")
         json_file = os.path.join(DATA_DIR, f"{prefix}_sna_summary.json")
 
+        summary_data = {
+            'topic': topic_name, 'total_nodes': G.number_of_nodes(),
+            'total_edges': G.number_of_edges(), 'top_influencers': top_summary,
+            'edge_layers': {
+                'mention_edges': mention_edge_count,
+                'co_keyword_edges': co_keyword_count
+            }
+        }
+
         nx.write_gexf(G, gexf_file)
         with open(json_file, 'w', encoding='utf-8') as fj:
-            json.dump({
-                'topic': topic_name, 'total_nodes': G.number_of_nodes(),
-                'total_edges': G.number_of_edges(), 'top_influencers': top_summary,
-                'edge_layers': {
-                    'mention_edges': mention_edge_count,
-                    'co_keyword_edges': co_keyword_count
-                }
-            }, fj, indent=2, ensure_ascii=False)
+            json.dump(summary_data, fj, indent=2, ensure_ascii=False)
 
-        print(f"  [EXPORT] Gephi GEXF -> {gexf_file}")
+        # Timpa langsung juga ke sna/output agar sinkron di semua folder
+        gexf_sna = os.path.join(SNA_OUT_DIR, f"{prefix}_sna_by_sentiment.gexf")
+        json_sna = os.path.join(SNA_OUT_DIR, f"{prefix}_sna_summary.json")
+        try:
+            nx.write_gexf(G, gexf_sna)
+            with open(json_sna, 'w', encoding='utf-8') as fj:
+                json.dump(summary_data, fj, indent=2, ensure_ascii=False)
+        except Exception:
+            pass
+
+        print(f"  [EXPORT] Gephi GEXF -> {gexf_file} & {gexf_sna}")
         print(f"  [EXPORT] Summary JSON -> {json_file}")
 
     # Export All Topics
@@ -268,40 +282,76 @@ def main():
     print(f"Membaca data master: {MASTER_PATH}")
     df = pd.read_csv(MASTER_PATH, low_memory=False)
     print(f"Total baris data yang akan diproses: {len(df):,} baris")
-    
-    # 1. Inferensi Sentimen
-    print("\n--- 1. Memuat Model IndoBERT Sentimen V2 ---")
-    s_tok = AutoTokenizer.from_pretrained(SENT_DIR)
-    s_mod = AutoModelForSequenceClassification.from_pretrained(SENT_DIR).to(device)
-    s_mod.eval()
-    
-    print("Memulai Inferensi Sentimen (Negatif, Netral, Positif)...")
-    sp, sprob = batch_predict(s_mod, s_tok, df['cleaned_content'].values, device, batch_size=64, desc="Sentimen")
-    df['sentiment_label'] = sp
-    df['predicted_sentiment'] = pd.Series(sp).map({0: 'Negatif', 1: 'Netral', 2: 'Positif'}).values
-    df['sentiment_score'] = sprob[:, 2] - sprob[:, 0]
-    df['sentiment_name'] = df['predicted_sentiment']
-    
-    # Free memory
-    del s_mod
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
-        
-    # 2. Inferensi 9 Emosi
-    print("\n--- 2. Memuat Model IndoBERT 9 Emosi Plutchik ---")
-    e_tok = AutoTokenizer.from_pretrained(EMO_DIR)
-    e_mod = AutoModelForSequenceClassification.from_pretrained(EMO_DIR).to(device)
-    e_mod.eval()
-    
-    print("Memulai Inferensi 9 Emosi Plutchik...")
-    ep, eprob = batch_predict(e_mod, e_tok, df['cleaned_content'].values, device, batch_size=64, desc="9 Emosi ")
-    df['emotion'] = pd.Series(ep).map({i: l for i, l in enumerate(EMOTION_9_CLASSES)}).values
-    df['emotion_confidence'] = np.max(eprob, axis=1)
-    df['emotion_sentiment'] = df['emotion'].map(EMOTION_TO_SENTIMENT)
-    
-    del e_mod
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
+
+    pred_cols = ['sentiment_label', 'predicted_sentiment', 'sentiment_score', 'sentiment_name', 'emotion', 'emotion_confidence', 'emotion_sentiment']
+
+    # Cek cache dari enriched corpus yang sudah ada untuk mempercepat inferensi
+    if os.path.exists(OUT_CSV):
+        try:
+            df_prev = pd.read_csv(OUT_CSV, low_memory=False)
+            valid_prev_url = df_prev[['url'] + pred_cols].dropna(subset=['url', 'predicted_sentiment']).drop_duplicates(subset=['url'])
+            df = pd.merge(df, valid_prev_url, on='url', how='left')
+
+            still_missing = df['predicted_sentiment'].isna()
+            if still_missing.any():
+                valid_prev_text = df_prev[['cleaned_content'] + pred_cols].dropna(subset=['cleaned_content', 'predicted_sentiment']).drop_duplicates(subset=['cleaned_content'])
+                text_cols_map = {col: f"{col}_text" for col in pred_cols}
+                valid_prev_text = valid_prev_text.rename(columns=text_cols_map)
+                df = pd.merge(df, valid_prev_text, on='cleaned_content', how='left')
+                for col in pred_cols:
+                    df[col] = df[col].fillna(df[f"{col}_text"])
+                    df.drop(columns=[f"{col}_text"], inplace=True)
+
+            cached_count = df['predicted_sentiment'].notna().sum()
+            needed_count = df['predicted_sentiment'].isna().sum()
+            print(f"[CACHE] Ditemukan {cached_count:,} baris yang sudah terprediksi.")
+            print(f"[CACHE] {needed_count:,} baris baru membutuhkan inferensi IndoBERT.")
+        except Exception as e:
+            print(f"[WARN] Gagal membaca cache existing enriched corpus: {e}")
+            needed_count = len(df)
+    else:
+        needed_count = len(df)
+
+    needed_mask = df['predicted_sentiment'].isna() if 'predicted_sentiment' in df.columns else pd.Series(True, index=df.index)
+
+    if needed_mask.any():
+        needed_indices = df[needed_mask].index
+        unpred_texts = df.loc[needed_mask, 'cleaned_content'].fillna('').astype(str).values
+
+        # 1. Inferensi Sentimen untuk data baru
+        print("\n--- 1. Memuat Model IndoBERT Sentimen V2 ---")
+        s_tok = AutoTokenizer.from_pretrained(SENT_DIR)
+        s_mod = AutoModelForSequenceClassification.from_pretrained(SENT_DIR).to(device)
+        s_mod.eval()
+
+        print(f"Memulai Inferensi Sentimen untuk {len(unpred_texts):,} teks baru...")
+        sp, sprob = batch_predict(s_mod, s_tok, unpred_texts, device, batch_size=64, desc="Sentimen Baru")
+        df.loc[needed_indices, 'sentiment_label'] = sp
+        df.loc[needed_indices, 'predicted_sentiment'] = pd.Series(sp, index=needed_indices).map({0: 'Negatif', 1: 'Netral', 2: 'Positif'}).values
+        df.loc[needed_indices, 'sentiment_score'] = sprob[:, 2] - sprob[:, 0]
+        df.loc[needed_indices, 'sentiment_name'] = df.loc[needed_indices, 'predicted_sentiment']
+
+        del s_mod
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+        # 2. Inferensi 9 Emosi untuk data baru
+        print("\n--- 2. Memuat Model IndoBERT 9 Emosi Plutchik ---")
+        e_tok = AutoTokenizer.from_pretrained(EMO_DIR)
+        e_mod = AutoModelForSequenceClassification.from_pretrained(EMO_DIR).to(device)
+        e_mod.eval()
+
+        print(f"Memulai Inferensi 9 Emosi untuk {len(unpred_texts):,} teks baru...")
+        ep, eprob = batch_predict(e_mod, e_tok, unpred_texts, device, batch_size=64, desc="9 Emosi Baru")
+        df.loc[needed_indices, 'emotion'] = pd.Series(ep, index=needed_indices).map({i: l for i, l in enumerate(EMOTION_9_CLASSES)}).values
+        df.loc[needed_indices, 'emotion_confidence'] = np.max(eprob, axis=1)
+        df.loc[needed_indices, 'emotion_sentiment'] = df.loc[needed_indices, 'emotion'].map(EMOTION_TO_SENTIMENT)
+
+        del e_mod
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+    else:
+        print("\n[OK] Seluruh data sudah memiliki prediksi sentimen dan emosi yang valid!")
 
     # 3. Metrik Tanggal & Engagement
     print("\n--- 3. Menghitung Metrik Analitik & Engagement ---")

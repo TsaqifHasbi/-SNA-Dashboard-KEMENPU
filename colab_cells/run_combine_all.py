@@ -47,14 +47,35 @@ if not all_files:
     sys.exit(0)
 
 dataframes = []
+all_urls = set()
 for file in all_files:
     path = os.path.join(OUTPUT_DIR, file)
     print(f"Membaca {file}...")
     try:
         df = pd.read_csv(path, low_memory=False)
         dataframes.append(df)
+        if 'url' in df.columns:
+            all_urls.update(df['url'].dropna().astype(str))
     except Exception as e:
         print(f"Gagal membaca {file}: {e}")
+
+# Periksa juga DATA_YANG_DIBUANG_CLEANING.csv jika ada data historis yang belum tercatat di file _Only.csv
+dropped_file_path = os.path.join(OUTPUT_DIR, "DATA_YANG_DIBUANG_CLEANING.csv")
+if os.path.exists(dropped_file_path):
+    print(f"Memeriksa {os.path.basename(dropped_file_path)}...")
+    try:
+        df_prev_dropped = pd.read_csv(dropped_file_path, low_memory=False)
+        if 'url' in df_prev_dropped.columns:
+            new_unique_dropped = df_prev_dropped[~df_prev_dropped['url'].astype(str).isin(all_urls)].copy()
+            if len(new_unique_dropped) > 0:
+                cols_to_drop = [c for c in ['alasan_dibuang', 'cleaned_content', 'raw_content'] if c in new_unique_dropped.columns]
+                new_unique_dropped.drop(columns=cols_to_drop, inplace=True)
+                dataframes.append(new_unique_dropped)
+                print(f"   -> Menambahkan {len(new_unique_dropped):,} baris data unik dari riwayat data terbuang untuk dievaluasi.")
+            else:
+                print(f"   -> [OK] Seluruh {len(df_prev_dropped):,} baris di file terbuang sudah tercakup lengkap di file _Only.csv.")
+    except Exception as e:
+        print(f"   [!] Gagal memuat riwayat data yang dibuang: {e}")
 
 if not dataframes:
     print("Semua file CSV kosong.")
@@ -112,7 +133,19 @@ def normalize_text_for_eval(text):
     t = re.sub(r'[\u00a0\u200b\u200c\u200d\u202f\ufeff]', ' ', t)
     return t
 
-eval_text = combined_df['raw_content'].apply(normalize_text_for_eval)
+parts = [combined_df['raw_content'].fillna('').astype(str)]
+if 'description' in combined_df.columns:
+    parts.append(combined_df['description'].fillna('').astype(str))
+if 'author' in combined_df.columns:
+    parts.append(combined_df['author'].fillna('').astype(str))
+if 'handle' in combined_df.columns:
+    parts.append(combined_df['handle'].fillna('').astype(str))
+
+eval_raw = parts[0]
+for p in parts[1:]:
+    eval_raw = eval_raw + ' ' + p
+
+eval_text = eval_raw.apply(normalize_text_for_eval)
 
 match_menpu = eval_text.str.contains(pat_menpu_core) | eval_text.str.contains(pat_menpu_cooccur)
 match_kemenpu = eval_text.str.contains(pat_kemenpu_core) | eval_text.str.contains(pat_kemenpu_cooccur)
@@ -126,6 +159,19 @@ hits_noise = hits_fatal | (hits_context & (~has_strong_core))
 
 keep_topic_mask = has_any_topic & (~hits_noise)
 discard_topic_mask = ~keep_topic_mask
+
+# Audit Khusus Kata Judi / Judol
+judi_mask = eval_text.str.contains(r'\b(?:judi|judol|judi\s+online)\b', case=False)
+total_judi = int(judi_mask.sum())
+kept_judi = int((judi_mask & keep_topic_mask).sum())
+dropped_judi = int((judi_mask & discard_topic_mask).sum())
+
+print("\n" + "-"*60)
+print(f"🔍 AUDIT KHUSUS KONTEN BERKATA 'JUDI' / 'JUDOL':")
+print(f"   - Total Postingan Ditemukan    : {total_judi:,}")
+print(f"   - Disimpan (Relevan PU/Menteri): {kept_judi:,} (Berita/Disiplin ASN/PPATK/Sidak)")
+print(f"   - Dibuang (Spam Slot / Non-PU) : {dropped_judi:,}")
+print("-"*60 + "\n")
 
 if discard_topic_mask.any():
     dropped_topic = combined_df[discard_topic_mask].copy()
@@ -161,16 +207,28 @@ if too_short_mask.any():
 
 combined_df = combined_df[~too_short_mask].copy()
 
-# 7. Deduplikasi Lanjutan: Postingan persis sama oleh akun yang sama
-dup_author_content = combined_df.duplicated(subset=['author', 'cleaned_content'], keep='first')
-if dup_author_content.any():
-    dropped_dup = combined_df[dup_author_content].copy()
-    dropped_dup['alasan_dibuang'] = 'Duplikat Teks dari Keyword Lain'
-    dropped_records.extend(dropped_dup.to_dict(orient='records'))
-
-before_author_dup = len(combined_df)
-combined_df = combined_df[~dup_author_content].copy()
-print(f"Dihapus {before_author_dup - len(combined_df):,} salinan duplikat per author. Sisa: {len(combined_df):,} baris")
+# 7. Deduplikasi Lanjutan: Postingan persis sama tanpa URL
+# Sesuai prinsip URL sebagai Primary Key: Postingan dengan URL berbeda TETAP DISIMPAN (KEEP).
+# Deduplikasi berbasis konten hanya berlaku jika URL kosong/NaN.
+if 'url' in combined_df.columns:
+    has_no_url = combined_df['url'].isna() | (combined_df['url'].astype(str).str.strip().isin(['', 'nan', 'none']))
+    if has_no_url.any():
+        df_no_url = combined_df[has_no_url]
+        dup_no_url = df_no_url.duplicated(subset=['author', 'cleaned_content'], keep='first')
+        if dup_no_url.any():
+            dropped_dup = df_no_url[dup_no_url].copy()
+            dropped_dup['alasan_dibuang'] = 'Duplikat Teks Tanpa URL'
+            dropped_records.extend(dropped_dup.to_dict(orient='records'))
+            combined_df = combined_df.drop(dropped_dup.index).copy()
+            print(f"Dihapus {len(dropped_dup):,} duplikat postingan tanpa URL. Sisa: {len(combined_df):,} baris")
+else:
+    dup_author_content = combined_df.duplicated(subset=['author', 'cleaned_content'], keep='first')
+    if dup_author_content.any():
+        dropped_dup = combined_df[dup_author_content].copy()
+        dropped_dup['alasan_dibuang'] = 'Duplikat Teks Lintas Keyword'
+        dropped_records.extend(dropped_dup.to_dict(orient='records'))
+        combined_df = combined_df[~dup_author_content].copy()
+        print(f"Dihapus {len(dropped_dup):,} duplikat teks. Sisa: {len(combined_df):,} baris")
 
 # Sinkronkan kolom content dengan cleaned_content
 combined_df['content'] = combined_df['cleaned_content']
@@ -206,6 +264,13 @@ df_master = combined_df[available_cols].copy()
 df_master.to_csv(master_corpus_path, index=False, encoding='utf-8-sig')
 
 df_dropped = pd.DataFrame(dropped_records)
+
+# Pastikan data yang berhasil diselamatkan dan ada di combined_df TIDAK muncul di file buangan
+if 'url' in df_dropped.columns:
+    clean_urls = set(combined_df['url'].dropna())
+    df_dropped = df_dropped[~df_dropped['url'].isin(clean_urls)].copy()
+    df_dropped = df_dropped.drop_duplicates(subset=['url'], keep='first').copy()
+
 df_dropped.to_csv(dropped_path, index=False, encoding='utf-8-sig')
 
 print("\n" + "="*60)

@@ -87,6 +87,8 @@ TOPICS = {
     # 1. TOPIK 1: KEMENTERIAN PEKERJAAN UMUM (Fokus 5 Keyword Inti)
     "Kementerian_PU": [
         "Kementerian Pekerjaan Umum",
+        "Kementerian PU",
+        "Kementerian PU RI",
         "Kemen PU",
         "Kemen PU RI",
         "Kementerian Pekerjaan Umum Republik Indonesia",
@@ -130,40 +132,44 @@ for topic, keywords in TOPICS.items():
 
 # 1. Pola Tokoh & Kepemimpinan (Menteri PU / Wamen / Dody Hanggodo)
 pat_menpu_core = re.compile(
-    r'\b(?:menteri[\s-]+(?:pekerjaan[\s-]+umum|pu)|menpu|wamen[\s-]+pu|wakil[\s-]+menteri[\s-]+(?:pekerjaan[\s-]+umum|pu))\b|'
+    r'\b(?:ment(?:eri|ri)[\s-]+(?:pekerjaan[\s-]+umum|pu(?:\w*))|menpu|wamen[\s-]+pu|wakil[\s-]+menteri[\s-]+(?:pekerjaan[\s-]+umum|pu))\b|'
     r'#\w*(?:menteripu|menteripekerjaanumum|dodyhanggodo|menpu)\w*|'
-    r'\bdody[\s-]+hanggodo\b|'
-    r'\bdiana[\s-]+kusumastuti\b.{0,40}(?:pu|menteri|wamen|kementerian)|'
-    r'(?:pu|wamen|menteri).{0,40}\bdiana[\s-]+kusumastuti\b|'
-    r'\bpak[\s-]+menteri[\s-]+pu\b|'
-    r'\bmenteri[\s-]+dody\b|'
-    r'(?:menteri|wamen).{0,30}(?:basuki|hadimuljono)',
+    r'\bdod+y[\s-]+hanggodo\b|'
+    r'\b(?:menteri|mentri)[\s-]+dod+y\b|'
+    r'\bdiana[\s-]+kusumastuti\b.{0,40}(?:pu|menteri|wamen|kementerian|kementrian)|'
+    r'(?:pu|wamen|menteri|mentri).{0,40}\bdiana[\s-]+kusumastuti\b|'
+    r'\bpak[\s-]+ment(?:eri|ri)[\s-]+pu\b|'
+    r'(?:ment(?:eri|ri)|wamen).{0,30}(?:basuki|hadimuljono)',
     re.I
 )
 
 pat_menpu_cooccur = re.compile(
-    r'(?:menteri|menpu|wamen).{0,60}(?:pekerjaan\s+umum|dody|hanggodo|diana\s+kusumastuti|komisi\s+v|sidak|kunker|tinjau\s+proyek|jalan\s+rusak|tanggul|bendungan|anggaran\s+infrastruktur)|'
-    r'(?:dody\s+hanggodo|diana\s+kusumastuti).{0,60}(?:infrastruktur|jalan|jembatan|bendungan|proyek|dpr|kabinet|prabowo|kementerian|pu\b)',
+    r'(?:ment(?:eri|ri)|menpu|wamen).{0,60}(?:pekerjaan\s+umum|dod+y|hanggodo|diana\s+kusumastuti|komisi\s+v|sidak|kunker|tinjau\s+proyek|jalan\s+rusak|tanggul|bendungan|anggaran\s+infrastruktur)|'
+    r'(?:dod+y\s+hanggodo|diana\s+kusumastuti).{0,60}(?:infrastruktur|jalan|jembatan|bendungan|proyek|dpr|kabinet|prabowo|kementerian|kementrian|\bpu\b)',
     re.I
 )
 
 # 2. Pola Institusi & Proyek (Kementerian PU / Ditjen / Infrastruktur)
 pat_kemenpu_core = re.compile(
-    r'\b(?:kemen[\s-]*pu|kementerian[\s-]+pekerjaan[\s-]+umum|kemenpu(?:\s*ri)?|kementerian[\s-]+pu|pu[\s-]+ri|pupr|kemenpupr|kementerian[\s-]+pupr)\b|'
-    r'#\w*(?:kemenpu|kemenpuri|kementerianpekerjaanumum|pekerjaanumum|pupr|kemenpupr)\w*|'
+    r'\b(?:kemen[\s-]*pu(?:pr)?(?:\w*)|kement(?:eri|ri)an[\s-]+pekerjaan[\s-]+umum(?:\s+republik\s+indonesia|\s+ri)?|kemenpu(?:pr)?(?:\w*)|kement(?:eri|ri)an[\s-]+pu(?:pr)?(?:\s*ri)?|pu[\s-]+ri|pupr|kemenpupr)\b|'
+    r'\b(?:departemen|dinas|sektor|instansi|lingkup|bidang|kantor)?[\s-]*pekerjaan[\s-]+umum\b|'
+    r'#\w*(?:kemenpu|kemenpuri|kementerianpu|kementrianpu|kementerianpekerjaanumum|kementrianpekerjaanumum|pekerjaanumum|pupr|kemenpupr|bpsdmpu)\w*|'
+    r'@\w*(?:kemenpu|kemenpu_|pupr|pekerjaanumum|binamarga|ciptakarya)\w*|'
     r'pu\.go\.id|'
-    r'\bditjen[\s-]+(?:bina[\s-]+marga|sumber[\s-]+daya[\s-]+air|cipta[\s-]+karya|bina[\s-]+konstruksi)\b|'
-    r'\bbina[\s-]+marga\b.{0,30}(?:pu|kementerian|jalan|jembatan)|'
-    r'\bcipta[\s-]+karya\b.{0,30}(?:pu|kementerian|sanitasi|gedung)|'
-    r'\bsumber[\s-]+daya[\s-]+air\b.{0,30}(?:pu|kementerian|bendungan|irigasi)|'
-    r'\b(?:bbws|bbpjn)\b',
+    r'\b(?:politeknik[\s-]+pekerjaan[\s-]+umum|politeknik[\s-]+pu|k?dpupr|dinas[\s-]+pu(?:pr)?|kadis[\s-]*pu(?:pr)?\w*)\b|'
+    r'\bditjen[\s-]+(?:bina[\s-]+marga|sumber[\s-]+daya[\s-]+air|cipta[\s-]+karya|bina[\s-]+konstruksi|pembiayaan[\s-]+infrastruktur)\b|'
+    r'\bbina[\s-]+marga\b.{0,30}(?:pu|kementerian|kementrian|jalan|jembatan)|'
+    r'\bcipta[\s-]+karya\b.{0,30}(?:pu|kementerian|kementrian|sanitasi|gedung)|'
+    r'\bsumber[\s-]+daya[\s-]+air\b.{0,30}(?:pu|kementerian|kementrian|bendungan|irigasi)|'
+    r'\b(?:bbws|bws|bbpjn|bpjn|bpsdm[\s-]+pu|bp2jk)\b',
     re.I
 )
 
 pat_kemenpu_cooccur = re.compile(
-    r'(?:kementerian|dinas|kantor|balai).{0,40}(?:pekerjaan\s+umum|pu\b|bina\s+marga|sda\b|cipta\s+karya)|'
-    r'(?:pekerjaan\s+umum).{0,60}(?:republik\s+indonesia|ri\b|jalan\s+tol|jalan\s+nasional|jembatan|bendungan|irigasi|tanggul|banjir|infrastruktur|proyek|anggaran|tender|apbn|prabowo)|'
-    r'(?:infrastruktur|proyek|preservasi\s+jalan|normalisasi\s+sungai|penanganan\s+banjir).{0,50}(?:kemen\s*pu|pu\s*ri|kementerian\s*pu)',
+    r'(?:kementerian|kementrian|dinas|kantor|balai).{0,40}(?:pekerjaan\s+umum|\bpu\b|bina\s+marga|sda\b|cipta\s+karya)|'
+    r'(?:pegawai|asn|pejabat|staf|inspektorat|lingkungan|internal|vendor|orang).{0,25}(?:kemen[\s-]*pu|\bpu\b|\bpupr\b|pekerjaan\s+umum)|'
+    r'(?:pekerjaan\s+umum).{0,60}(?:republik\s+indonesia|ri\b|jalan\s+tol|jalan\s+nasional|jembatan|bendungan|irigasi|tanggul|banjir|infrastruktur|proyek|anggaran|tender|apbn|prabowo|tenaga)|'
+    r'(?:infrastruktur|proyek|preservasi\s+jalan|normalisasi\s+sungai|penanganan\s+banjir).{0,50}(?:kemen\s*pu|pu\s*ri|kementerian\s*pu|kementrian\s*pu)',
     re.I
 )
 
