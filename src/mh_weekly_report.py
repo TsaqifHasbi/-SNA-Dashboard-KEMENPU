@@ -924,12 +924,23 @@ def render_slide_7_issues_minister(df, selected_topic='Semua', topic_label=None,
     top_neg_df = _get_top_unique_posts(df[df['sentiment_name'] == 'Negatif'], n=7) if m['vol'] > 0 else pd.DataFrame()
 
     def format_date_short(raw_d):
-        if pd.isna(raw_d) or not str(raw_d).strip():
+        if not raw_d or pd.isna(raw_d) or str(raw_d).lower() == 'nan':
             return ""
+        s = str(raw_d).replace(' WIB', '').replace(' WITA', '').replace(' WIT', '').strip()
         try:
-            return pd.to_datetime(raw_d).strftime('%d %b')
-        except:
-            return str(raw_d)[:6]
+            dt = pd.to_datetime(s, errors='coerce')
+            if pd.notna(dt):
+                return dt.strftime('%d %b %Y')
+        except Exception:
+            pass
+        m = re.search(r'(\d{4})[-/](\d{1,2})[-/](\d{1,2})', s)
+        if m:
+            try:
+                dt = pd.to_datetime(f"{m.group(1)}-{m.group(2)}-{m.group(3)}")
+                return dt.strftime('%d %b %Y')
+            except Exception:
+                pass
+        return s[:10]
 
     with col_pos:
         pos_rows = []
@@ -1062,7 +1073,7 @@ def render_slide_7_issues_minister(df, selected_topic='Semua', topic_label=None,
                     p_url = str(r.get('url', '')).strip()
                     p_plat = str(r.get('platform', 'Sosial Media'))
                     p_auth = str(r.get('author', 'Anonim'))
-                    p_dt = str(r.get('created_at', ''))[:16]
+                    p_dt = format_date_short(r.get('created_at', r.get('date_str', '')))
                     p_eng = fmt_val(r.get('total_engagement', 0))
                     p_txt = str(r.get('cleaned_content', str(r.get('raw_content', ''))))
                     p_emo = str(r.get('emotion', 'Neutral'))
@@ -1095,7 +1106,7 @@ def render_slide_7_issues_minister(df, selected_topic='Semua', topic_label=None,
                     p_url = str(r.get('url', '')).strip()
                     p_plat = str(r.get('platform', 'Sosial Media'))
                     p_auth = str(r.get('author', 'Anonim'))
-                    p_dt = str(r.get('created_at', ''))[:16]
+                    p_dt = format_date_short(r.get('created_at', r.get('date_str', '')))
                     p_eng = fmt_val(r.get('total_engagement', 0))
                     p_txt = str(r.get('cleaned_content', str(r.get('raw_content', ''))))
                     p_emo = str(r.get('emotion', 'Neutral'))

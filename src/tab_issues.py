@@ -81,6 +81,26 @@ def render_tab_issues(df_filtered):
     df_pos = df_filtered[df_filtered[col_sentiment] == 'Positif'] if col_sentiment in df_filtered.columns else pd.DataFrame()
     df_neg = df_filtered[df_filtered[col_sentiment] == 'Negatif'] if col_sentiment in df_filtered.columns else pd.DataFrame()
     
+    def _format_date_clean(raw_d):
+        if not raw_d or pd.isna(raw_d) or str(raw_d).lower() == 'nan':
+            return ""
+        s = str(raw_d).replace(' WIB', '').replace(' WITA', '').replace(' WIT', '').strip()
+        try:
+            dt = pd.to_datetime(s, errors='coerce')
+            if pd.notna(dt):
+                return dt.strftime('%d %b %Y')
+        except Exception:
+            pass
+        import re
+        m = re.search(r'(\d{4})[-/](\d{1,2})[-/](\d{1,2})', s)
+        if m:
+            try:
+                dt = pd.to_datetime(f"{m.group(1)}-{m.group(2)}-{m.group(3)}")
+                return dt.strftime('%d %b %Y')
+            except Exception:
+                pass
+        return s[:10]
+
     top_pos_df = _get_top_posts_with_links(df_pos, n=10)
     top_neg_df = _get_top_posts_with_links(df_neg, n=10)
     
@@ -90,7 +110,7 @@ def render_tab_issues(df_filtered):
                 p_url = str(r.get('url', '')).strip()
                 p_plat = str(r.get('platform', 'Sosial Media'))
                 p_auth = str(r.get('author', 'Anonim'))
-                p_dt = str(r.get('created_at', str(r.get('date_str', ''))))[:16]
+                p_dt = _format_date_clean(r.get('created_at', str(r.get('date_str', ''))))
                 p_eng = fmt_val(r.get('total_engagement', 0))
                 p_txt = str(r.get('cleaned_content', str(r.get('raw_content', ''))))
                 p_emo = str(r.get('emotion', 'Neutral'))
@@ -132,7 +152,7 @@ def render_tab_issues(df_filtered):
                 p_url = str(r.get('url', '')).strip()
                 p_plat = str(r.get('platform', 'Sosial Media'))
                 p_auth = str(r.get('author', 'Anonim'))
-                p_dt = str(r.get('created_at', str(r.get('date_str', ''))))[:16]
+                p_dt = _format_date_clean(r.get('created_at', str(r.get('date_str', ''))))
                 p_eng = fmt_val(r.get('total_engagement', 0))
                 p_txt = str(r.get('cleaned_content', str(r.get('raw_content', ''))))
                 p_emo = str(r.get('emotion', 'Neutral'))
