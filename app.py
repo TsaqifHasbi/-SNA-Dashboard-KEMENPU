@@ -387,7 +387,6 @@ with st.sidebar:
         <span>{curr_caption}</span>
     </div>
     """)
-    st.sidebar.caption(f"⚡ Korpus Terkini: **{len(df_raw):,}** Rekaman (Update 10 Nov)")
     
     # Mode Switcher
     MODE_OPTIONS = [
