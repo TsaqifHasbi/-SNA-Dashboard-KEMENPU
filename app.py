@@ -125,6 +125,14 @@ elif _qp_page in ["privacy", "privacy_policy", "privacy-policy"]:
     render_privacy_policy()
     st.stop()
 
+# -------------------------------------------------------------
+# AUTHENTICATION GUARDIAN (PORTAL AKSES KEMENTERIAN PU)
+# -------------------------------------------------------------
+from src.auth import check_authentication, render_user_sidebar_profile
+
+if not check_authentication():
+    st.stop()
+
 # Standalone st.logo removed per user preference; logo is integrated into the header bar and cards.
 
 # Executive Clean Light Styling
@@ -381,6 +389,9 @@ with st.sidebar:
         </div>
     </div>
     """)
+    
+    # Widget Profil Pengguna & Tombol Logout
+    render_user_sidebar_profile()
     curr_caption = st.session_state.get('current_date_display', 'Periode Pemantauan Terkini')
     render_html(f"""
     <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:6px; padding:7px 10px; font-size:10px; color:#475569; font-weight:600; display:flex; align-items:center; gap:7px; margin-bottom:14px; box-shadow:0 1px 2px rgba(0,0,0,0.02);">

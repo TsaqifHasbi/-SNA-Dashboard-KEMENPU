@@ -87,17 +87,18 @@ TOPICS = {
     # 1. TOPIK 1: KEMENTERIAN PEKERJAAN UMUM (Fokus 5 Keyword Inti)
     "Kementerian_PU": [
         "Kementerian Pekerjaan Umum",
+        "Kementerian Pekerjaan Umum Republik Indonesia",
         "Kementerian PU",
         "Kementerian PU RI",
         "Kemen PU",
         "Kemen PU RI",
-        "Kementerian Pekerjaan Umum Republik Indonesia",
-        "KemenPU",
+        # "KemenPU",
     ],
 
     # 2. TOPIK 2: MENTERI PU / MENTERI PEKERJAAN UMUM (Fokus 5 Keyword Inti)
     "Menteri_PU": [
         "Menteri Pekerjaan Umum",
+        "Menteri Pekerjaan Umum Dody Hanggodo",
         "Menteri PU",
         "Menteri PU Dody Hanggodo",
         "Menteri Dody Hanggodo",
