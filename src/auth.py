@@ -6,8 +6,9 @@ Menyediakan fitur:
 1. Verifikasi kredensial login berbasis enkripsi SHA-256
 2. Pengelolaan pengguna & kata sandi khusus Super Admin (Ubah UN & Kata Sandi)
 3. Manajemen sesi (session state) aman
-4. Tampilan antarmuka login eksekutif terpusat Kementerian PU (Clean, No-Glitch)
+4. Tampilan antarmuka login eksekutif terpusat Kementerian PU (Bebas Glitch)
 5. Widget profil pengguna aktif dan tombol Logout di sidebar
+6. Desain profesional murni berbasis Vector SVG (Tanpa Emoji)
 ================================================================================
 """
 
@@ -31,7 +32,6 @@ DEFAULT_USERS = {
         "name": "Administrator Sistem",
         "role": "Super Admin",
         "badge_color": "#2563EB",  # Biru Kementerian
-        "icon": "🛡️",
         "email": "admin.policy@pu.go.id"
     },
     "pimpinan": {
@@ -39,7 +39,6 @@ DEFAULT_USERS = {
         "name": "Pimpinan Eksekutif",
         "role": "Pimpinan Kementerian",
         "badge_color": "#D97706",  # Emas / Amber
-        "icon": "🏛️",
         "email": "pimpinan@pu.go.id"
     },
     "analis": {
@@ -47,7 +46,6 @@ DEFAULT_USERS = {
         "name": "Analis Kebijakan Publik",
         "role": "Tim Analis Data & AI",
         "badge_color": "#059669",  # Hijau Zamrud
-        "icon": "📊",
         "email": "analis.kebijakan@pu.go.id"
     }
 }
@@ -56,6 +54,19 @@ DEFAULT_USERS = {
 def _hash_string(val: str) -> str:
     """Mengembalikan hash SHA-256 dari string."""
     return hashlib.sha256(val.encode("utf-8")).hexdigest()
+
+
+def get_role_icon_svg(role: str, color: str = "currentColor", size: int = 12) -> str:
+    """Mengembalikan icon SVG vektor sesuai peran pengguna tanpa menggunakan emoji."""
+    r = (role or "").lower()
+    if "admin" in r:
+        return f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>'
+    elif "pimpinan" in r:
+        return f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle;"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M9 10v11M14 10v11M4 10l8-6 8 6"></path></svg>'
+    elif "analis" in r:
+        return f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
+    else:
+        return f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>'
 
 
 def _load_stored_credentials() -> dict:
@@ -103,7 +114,6 @@ def get_all_users() -> dict:
                         "name": u_data.get("name", u_id),
                         "role": u_data.get("role", "User"),
                         "badge_color": u_data.get("badge_color", "#2563EB"),
-                        "icon": u_data.get("icon", "👤"),
                         "email": u_data.get("email", f"{u_id}@pu.go.id")
                     }
     except Exception:
@@ -170,14 +180,13 @@ def update_user_credentials(target_key: str, new_username: str, new_password: st
     if new_role:
         user_record["role"] = new_role
         role_badges = {
-            "Super Admin": {"badge_color": "#2563EB", "icon": "🛡️"},
-            "Pimpinan Kementerian": {"badge_color": "#D97706", "icon": "🏛️"},
-            "Tim Analis Data & AI": {"badge_color": "#059669", "icon": "📊"},
-            "Aparatur Sipil Negara": {"badge_color": "#475569", "icon": "🏢"}
+            "Super Admin": {"badge_color": "#2563EB"},
+            "Pimpinan Kementerian": {"badge_color": "#D97706"},
+            "Tim Analis Data & AI": {"badge_color": "#059669"},
+            "Aparatur Sipil Negara": {"badge_color": "#475569"}
         }
         if new_role in role_badges:
             user_record["badge_color"] = role_badges[new_role]["badge_color"]
-            user_record["icon"] = role_badges[new_role]["icon"]
             
     if new_password and len(new_password.strip()) > 0:
         if len(new_password.strip()) < 6:
@@ -218,19 +227,18 @@ def create_new_user_by_admin(username: str, full_name: str, password: str, role:
         return False, f"Username '{u_clean}' sudah digunakan."
         
     role_badges = {
-        "Super Admin": {"badge_color": "#2563EB", "icon": "🛡️"},
-        "Pimpinan Kementerian": {"badge_color": "#D97706", "icon": "🏛️"},
-        "Tim Analis Data & AI": {"badge_color": "#059669", "icon": "📊"},
-        "Aparatur Sipil Negara": {"badge_color": "#475569", "icon": "🏢"}
+        "Super Admin": {"badge_color": "#2563EB"},
+        "Pimpinan Kementerian": {"badge_color": "#D97706"},
+        "Tim Analis Data & AI": {"badge_color": "#059669"},
+        "Aparatur Sipil Negara": {"badge_color": "#475569"}
     }
-    meta = role_badges.get(role, {"badge_color": "#2563EB", "icon": "👤"})
+    meta = role_badges.get(role, {"badge_color": "#2563EB"})
     
     users[u_clean] = {
         "password_hash": _hash_string(password.strip()),
         "name": name_clean,
         "role": role,
         "badge_color": meta["badge_color"],
-        "icon": meta["icon"],
         "email": email.strip() if email else f"{u_clean}@pu.go.id",
         "created_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S WIB")
     }
@@ -342,7 +350,8 @@ def render_login_page():
         
         /* Input Container BaseWeb & Focus State */
         div[data-testid="stForm"] div[data-baseweb="input"],
-        div[data-testid="stForm"] div[data-baseweb="base-input"] {
+        div[data-testid="stForm"] div[data-baseweb="base-input"],
+        div[data-testid="stForm"] div[data-baseweb="select"] > div {
             background-color: #FAFCFE !important;
             border: 1.5px solid #CBD5E1 !important;
             border-radius: 9px !important;
@@ -350,7 +359,8 @@ def render_login_page():
             box-shadow: none !important;
         }
         div[data-testid="stForm"] div[data-baseweb="input"]:focus-within,
-        div[data-testid="stForm"] div[data-baseweb="base-input"]:focus-within {
+        div[data-testid="stForm"] div[data-baseweb="base-input"]:focus-within,
+        div[data-testid="stForm"] div[data-baseweb="select"] > div:focus-within {
             border-color: #2563EB !important;
             background-color: #FFFFFF !important;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
@@ -374,6 +384,8 @@ def render_login_page():
         }
         
         /* Reset tombol ikon bawaan Streamlit (mata password & tooltip) */
+        div[data-testid="stForm"] button[aria-label*="password" i],
+        div[data-testid="stForm"] button[aria-label*="sandi" i],
         div[data-testid="stForm"] div[data-baseweb="input"] button,
         div[data-testid="stForm"] div[data-baseweb="base-input"] button,
         div[data-testid="stForm"] button[data-testid="stTooltipIconButton"] {
@@ -387,18 +399,20 @@ def render_login_page():
             width: auto !important;
             min-width: unset !important;
         }
+        div[data-testid="stForm"] button[aria-label*="password" i]:hover,
         div[data-testid="stForm"] div[data-baseweb="input"] button:hover {
             background: transparent !important;
             color: #2563EB !important;
             box-shadow: none !important;
             transform: none !important;
         }
+        div[data-testid="stForm"] button[aria-label*="password" i] svg,
         div[data-testid="stForm"] div[data-baseweb="input"] button svg,
         div[data-testid="stForm"] button[data-testid="stTooltipIconButton"] svg {
             fill: currentColor !important;
         }
         
-        /* Tombol Submit Khusus Form */
+        /* Tombol Submit Khusus Form (Hanya Tombol Utama) */
         div[data-testid="stFormSubmitButton"] > button {
             background: linear-gradient(135deg, #0F2942 0%, #1E3A8A 100%) !important;
             color: #FFFFFF !important;
@@ -447,7 +461,7 @@ def render_login_page():
     </div>
     """, unsafe_allow_html=True)
 
-    # 2. Card Form Terpadu (Satu Kotak Utuh Tanpa Fragmentasi)
+    # 2. Card Form Terpadu
     with st.form("login_form", clear_on_submit=False):
         st.markdown("""
         <div style="margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #F1F5F9;">
@@ -475,13 +489,14 @@ def render_login_page():
         submitted = st.form_submit_button(
             "Masuk ke Sistem (Sign In)",
             use_container_width=True,
-            type="primary"
+            type="primary",
+            icon=":material/login:"
         )
         
         if submitted:
             user_match = verify_credentials(username_val, password_val)
             if user_match:
-                st.toast(f"Selamat datang, {user_match['name']}!", icon="✅")
+                st.toast(f"Selamat datang, {user_match['name']}!")
                 login_user(username_val, user_match)
             else:
                 st.error("Nama pengguna atau kata sandi tidak sesuai. Silakan periksa kembali.")
@@ -500,7 +515,7 @@ def render_login_page():
 
 def render_user_sidebar_profile():
     """
-    Merender widget identitas pengguna aktif dan tombol Logout di Sidebar.
+    Merender widget identitas pengguna aktif dan tombol Logout di Sidebar (Menggunakan Vector SVG, Tanpa Emoji).
     """
     from src.clean_header_footer import render_html
 
@@ -511,11 +526,11 @@ def render_user_sidebar_profile():
     name = user.get("name", "Pengguna Terdaftar")
     role = user.get("role", "Aparatur Sipil Negara")
     badge_color = user.get("badge_color", "#2563EB")
-    icon = user.get("icon", "👤")
     login_time = st.session_state.get("login_time", "Sesi Aktif")
 
     # Ambil inisial nama
     initials = "".join([part[0].upper() for part in name.split()[:2]]) if name else "PU"
+    role_svg = get_role_icon_svg(role, color=badge_color, size=11)
 
     render_html(f"""
     <div style="background: #FFFFFF; border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
@@ -528,42 +543,51 @@ def render_user_sidebar_profile():
                     {name}
                 </div>
                 <div style="display: flex; align-items: center; gap: 4px; margin-top: 3px;">
-                    <span style="font-size: 9.5px; font-weight: 700; color: {badge_color}; background: {badge_color}18; padding: 1.5px 6px; border-radius: 4px; border: 1px solid {badge_color}33;">
-                        {icon} {role}
+                    <span style="font-size: 9.5px; font-weight: 700; color: {badge_color}; background: {badge_color}18; padding: 2px 6px; border-radius: 4px; border: 1px solid {badge_color}33; display: inline-flex; align-items: center; gap: 4px;">
+                        {role_svg}
+                        <span>{role}</span>
                     </span>
                 </div>
             </div>
         </div>
         <div style="font-size: 9px; color: #94A3B8; margin-top: 8px; padding-top: 6px; border-top: 1px solid #F1F5F9; display: flex; justify-content: space-between; align-items: center;">
             <span>Sesi: {login_time}</span>
-            <span style="color: #10B981; font-weight: 700;">● Online</span>
+            <span style="color: #10B981; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                <span style="display:inline-block; width:5px; height:5px; border-radius:50%; background:#10B981;"></span>
+                <span>Online</span>
+            </span>
         </div>
     </div>
     """)
 
     # Tombol Logout Elegan
-    if st.sidebar.button("Keluar dari Sistem (Logout)", key="btn_logout_sidebar", use_container_width=True, type="secondary"):
+    if st.sidebar.button("Keluar dari Sistem (Logout)", key="btn_logout_sidebar", use_container_width=True, type="secondary", icon=":material/logout:"):
         logout_user()
 
 
 # ==============================================================================
-# PANEL MANAJEMEN PENGGUNA (SUPER ADMIN)
+# PANEL MANAJEMEN PENGGUNA (SUPER ADMIN) - DENGAN ICON VEKTOR SVG (TANPA EMOJI)
 # ==============================================================================
 def render_user_management_panel():
     """
     Panel administrasi khusus Super Admin untuk melihat seluruh akun pengguna,
     serta mengubah Username (UN) dan Kata Sandi (PW) secara langsung dan aman.
+    Semua elemen visual menggunakan Icon Vektor SVG resmi (Bebas Emoji).
     """
     user_info = st.session_state.get("user_info", {})
     if user_info.get("role") != "Super Admin" and st.session_state.get("username") != "admin":
         st.error("Akses Ditolak: Halaman ini hanya dapat diakses oleh Administrator Sistem (Super Admin).")
         return
 
+    # Header Panel Eksekutif dengan Icon SVG Setting/Users
     st.markdown("""
     <div style="background: linear-gradient(135deg, #0F2942 0%, #1E3A8A 100%); border-radius: 14px; padding: 22px 26px; color: #FFFFFF; margin-bottom: 22px; box-shadow: 0 4px 16px rgba(15,41,66,0.12);">
-        <div style="display:flex; align-items:center; gap:12px;">
-            <div style="background: rgba(255,255,255,0.15); width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px;">
-                ⚙️
+        <div style="display:flex; align-items:center; gap:14px;">
+            <div style="background: rgba(255,255,255,0.14); width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.15);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
             </div>
             <div>
                 <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.3px; line-height: 1.2;">
@@ -579,10 +603,11 @@ def render_user_management_panel():
 
     users = get_all_users()
     
+    # Tab Navigasi Bersih Berbasis Icon Material & SVG (Tanpa Emoji)
     tab_edit, tab_add, tab_list = st.tabs([
-        "✏️ Ubah Username & Kata Sandi",
-        "➕ Tambah Akun Baru",
-        "📋 Daftar Seluruh Akun"
+        ":material/manage_accounts: Ubah Kredensial",
+        ":material/person_add: Tambah Pengguna Baru",
+        ":material/group: Daftar Akun Pengguna"
     ])
 
     # -------------------------------------------------------------
@@ -590,8 +615,9 @@ def render_user_management_panel():
     # -------------------------------------------------------------
     with tab_edit:
         st.markdown("""
-        <div style="font-size:14px; font-weight:700; color:#0F2942; margin-bottom:12px;">
-            Pilih Akun yang Ingin Diperbarui Kredensialnya:
+        <div style="font-size:14px; font-weight:700; color:#0F2942; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            <span>Pilih Akun yang Ingin Diperbarui Kredensialnya:</span>
         </div>
         """, unsafe_allow_html=True)
 
@@ -616,8 +642,7 @@ def render_user_management_panel():
                 )
                 edit_username = st.text_input(
                     "ID Pengguna / Username Baru (UN):",
-                    value=selected_user_key,
-                    help="Ubah ID ini jika ingin mengganti username akun."
+                    value=selected_user_key
                 )
             with c2:
                 role_list = ["Super Admin", "Pimpinan Kementerian", "Tim Analis Data & AI", "Aparatur Sipil Negara"]
@@ -628,8 +653,9 @@ def render_user_management_panel():
 
             st.markdown("<hr style='border:none; border-top:1px dashed #E2E8F0; margin:16px 0;'>", unsafe_allow_html=True)
             st.markdown("""
-            <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:4px;">
-                Reset Kata Sandi (Opsional):
+            <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <span>Reset Kata Sandi (Opsional):</span>
             </div>
             <div style="font-size:11.5px; color:#64748B; margin-bottom:12px;">
                 Biarkan kedua kolom di bawah ini kosong jika <b>TIDAK</b> ingin mengubah kata sandi lama akun tersebut.
@@ -642,7 +668,7 @@ def render_user_management_panel():
             with c_p2:
                 edit_conf_pass = st.text_input("Konfirmasi Kata Sandi Baru:", type="password", placeholder="Ketik ulang sandi baru...")
 
-            btn_save = st.form_submit_button("💾 Simpan Perubahan Kredensial", use_container_width=True, type="primary")
+            btn_save = st.form_submit_button("Simpan Perubahan Kredensial", use_container_width=True, type="primary", icon=":material/save:")
             
             if btn_save:
                 if edit_new_pass and edit_new_pass != edit_conf_pass:
@@ -657,7 +683,7 @@ def render_user_management_panel():
                     )
                     if success:
                         st.success(msg)
-                        st.toast(msg, icon="✅")
+                        st.toast(msg)
                         # Jika admin mengubah username dirinya sendiri saat login
                         if selected_user_key == st.session_state.get("username") and edit_username != selected_user_key:
                             st.session_state["username"] = edit_username.strip().lower()
@@ -670,8 +696,9 @@ def render_user_management_panel():
     # -------------------------------------------------------------
     with tab_add:
         st.markdown("""
-        <div style="font-size:14px; font-weight:700; color:#0F2942; margin-bottom:12px;">
-            Daftarkan Akun Pengguna Baru ke Lingkungan Kementerian PU:
+        <div style="font-size:14px; font-weight:700; color:#0F2942; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+            <span>Daftarkan Akun Pengguna Baru ke Lingkungan Kementerian PU:</span>
         </div>
         """, unsafe_allow_html=True)
 
@@ -694,7 +721,7 @@ def render_user_management_panel():
             with col_ap2:
                 add_conf = st.text_input("Konfirmasi Kata Sandi:", type="password", placeholder="Ketik ulang sandi...")
 
-            btn_create = st.form_submit_button("➕ Tambahkan Pengguna Baru", use_container_width=True, type="primary")
+            btn_create = st.form_submit_button("Tambahkan Pengguna Baru", use_container_width=True, type="primary", icon=":material/person_add:")
             
             if btn_create:
                 if add_pass != add_conf:
@@ -709,7 +736,7 @@ def render_user_management_panel():
                     )
                     if ok_add:
                         st.success(msg_add)
-                        st.toast(msg_add, icon="🎉")
+                        st.toast(msg_add)
                         st.rerun()
                     else:
                         st.error(msg_add)
@@ -719,8 +746,9 @@ def render_user_management_panel():
     # -------------------------------------------------------------
     with tab_list:
         st.markdown("""
-        <div style="font-size:14px; font-weight:700; color:#0F2942; margin-bottom:14px;">
-            Daftar Akun Terdaftar & Status Keamanan Sistem:
+        <div style="font-size:14px; font-weight:700; color:#0F2942; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            <span>Daftar Akun Terdaftar & Status Keamanan Sistem:</span>
         </div>
         """, unsafe_allow_html=True)
 
@@ -728,14 +756,13 @@ def render_user_management_panel():
             u_name = u_info.get("name", u_id)
             u_role = u_info.get("role", "User")
             u_color = u_info.get("badge_color", "#2563EB")
-            u_icon = u_info.get("icon", "👤")
             u_email = u_info.get("email", "-")
-            hash_display = u_info.get("password_hash", "")[:12] + "..." if u_info.get("password_hash") else "Tersimpan"
+            role_icon_svg = get_role_icon_svg(u_role, color=u_color, size=11)
 
             st.markdown(f"""
             <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; padding:14px 18px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
                 <div style="display:flex; align-items:center; gap:14px;">
-                    <div style="width:40px; height:40px; border-radius:50%; background:{u_color}; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px;">
+                    <div style="width:40px; height:40px; border-radius:50%; background:{u_color}; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; letter-spacing:0.5px; box-shadow:0 2px 4px rgba(0,0,0,0.12);">
                         {u_name[:2].upper()}
                     </div>
                     <div>
@@ -743,14 +770,18 @@ def render_user_management_panel():
                             {u_name} <span style="font-size:12px; font-weight:500; color:#64748B;">(@{u_id})</span>
                         </div>
                         <div style="font-size:11.5px; color:#475569; display:flex; align-items:center; gap:8px; margin-top:3px;">
-                            <span style="font-weight:700; color:{u_color}; background:{u_color}18; padding:2px 7px; border-radius:4px;">{u_icon} {u_role}</span>
+                            <span style="font-weight:700; color:{u_color}; background:{u_color}18; padding:2px 7px; border-radius:4px; display:inline-flex; align-items:center; gap:4px; border:1px solid {u_color}33;">
+                                {role_icon_svg}
+                                <span>{u_role}</span>
+                            </span>
                             <span>• {u_email}</span>
                         </div>
                     </div>
                 </div>
                 <div style="text-align:right;">
-                    <div style="font-size:10.5px; color:#10B981; font-weight:700; background:#ECFDF5; border:1px solid #A7F3D0; padding:3px 8px; border-radius:6px; display:inline-block;">
-                        🛡️ SHA-256 Aktif
+                    <div style="font-size:10.5px; color:#059669; font-weight:700; background:#ECFDF5; border:1px solid #A7F3D0; padding:3px 9px; border-radius:6px; display:inline-flex; align-items:center; gap:4px;">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <span>SHA-256 Aktif</span>
                     </div>
                 </div>
             </div>
