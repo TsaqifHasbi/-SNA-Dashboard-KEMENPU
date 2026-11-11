@@ -6,15 +6,15 @@ Sistem analitik sentimen berbasis **Deep Learning IndoBERT (3-Kelas Sentimen & 9
 
 ## 🔐 Kredensial & Akses Login Sistem
 
-Aplikasi ini dilindungi oleh gerbang autentikasi berbasis sesi (Session State) dan enkripsi hash SHA-256. Tersedia 3 akun kedinasan bawaan untuk keperluan evaluasi dan demonstrasi:
+Aplikasi ini dilindungi oleh gerbang autentikasi berbasis sesi (Session State) dan enkripsi hash SHA-256. Tersedia 3 level peran akun pengguna kedinasan:
 
-| Peran Pengguna | ID / Username | Kata Sandi | Deskripsi Hak Akses |
-| :--- | :--- | :--- | :--- |
-| **Super Admin** | `admin` | `kemenpu2026` | Akses menyeluruh: Laporan Harian, Dashboard SNA, Cockpit AI, Evaluasi |
-| **Pimpinan** | `pimpinan` | `pu2026` | Akses Eksekutif: Slide Deck Laporan Harian & Ringkasan Kebijakan |
-| **Tim Analis** | `analis` | `analis2026` | Akses Analitik Multiplatform, Dinamika Emosi & SNA |
+| Peran Pengguna | ID / Username | Deskripsi Hak Akses |
+| :--- | :--- | :--- |
+| **Super Admin** | `admin` | Akses menyeluruh: Laporan Harian, Dashboard SNA, Cockpit AI, Evaluasi |
+| **Pimpinan** | `pimpinan` | Akses Eksekutif: Slide Deck Laporan Harian & Ringkasan Kebijakan |
+| **Tim Analis** | `analis` | Akses Analitik Multiplatform, Dinamika Emosi & SNA |
 
-*(Catatan: Anda juga dapat menggunakan tombol **Akses Cepat / Quick Login** pada layar login untuk masuk secara instan).*
+*(Kata sandi tersimpan secara aman dalam format hash enkripsi SHA-256).*
 
 ---
 

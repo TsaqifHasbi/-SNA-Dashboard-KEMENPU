@@ -35,7 +35,7 @@ DEFAULT_USERS = {
         "email": "pimpinan@pu.go.id"
     },
     "analis": {
-        "password_hash": hashlib.sha256("analis2026".encode("utf-8")).hexdigest(),
+        "password_hash": hashlib.sha256("analispu2026".encode("utf-8")).hexdigest(),
         "name": "Analis Kebijakan Publik",
         "role": "Tim Analis Data & AI",
         "badge_color": "#059669",  # Hijau Zamrud
@@ -197,7 +197,7 @@ def render_login_page():
             with st.form("login_form", clear_on_submit=False):
                 username_val = st.text_input(
                     "ID Pengguna / Username",
-                    placeholder="Contoh: admin / pimpinan / analis",
+                    placeholder="Masukkan ID pengguna...",
                     help="Gunakan akun kedinasan yang terdaftar."
                 )
                 password_val = st.text_input(
@@ -221,33 +221,7 @@ def render_login_page():
                     else:
                         st.error("Nama pengguna atau kata sandi tidak sesuai. Silakan periksa kembali.")
 
-        # Informasi Kredensial Default (Accordion Bantuan)
-        with st.expander("🔑 Informasi Akun Pengguna Bawaan (Default / Demo Access)", expanded=False):
-            st.markdown("""
-            Sistem telah dilengkapi 3 akun simulasi kedinasan:
-            
-            | Hak Akses | Username | Password | Deskripsi Wewenang |
-            | :--- | :--- | :--- | :--- |
-            | **Super Admin** | `admin` | `kemenpu2026` | Akses penuh seluruh modul, cockpit AI & evaluasi |
-            | **Pimpinan** | `pimpinan` | `pu2026` | Fokus Laporan Harian Eksekutif & Ringkasan Kebijakan |
-            | **Tim Analis** | `analis` | `analis2026` | Akses Analisis Multiplatform, Emosi & SNA |
-            
-            *Tip: Anda juga dapat menggunakan tombol pintas di bawah ini untuk masuk secara instan.*
-            """)
-            
-            c1, c2, c3 = st.columns(3)
-            with c1:
-                if st.button("Masuk sbg Admin", use_container_width=True, key="quick_admin"):
-                    u = DEFAULT_USERS["admin"]
-                    login_user("admin", u)
-            with c2:
-                if st.button("Masuk sbg Pimpinan", use_container_width=True, key="quick_pimpinan"):
-                    u = DEFAULT_USERS["pimpinan"]
-                    login_user("pimpinan", u)
-            with c3:
-                if st.button("Masuk sbg Analis", use_container_width=True, key="quick_analis"):
-                    u = DEFAULT_USERS["analis"]
-                    login_user("analis", u)
+
 
         # Footer Keamanan
         render_html("""
@@ -307,3 +281,4 @@ def render_user_sidebar_profile():
     # Tombol Logout Elegan
     if st.sidebar.button("Keluar dari Sistem (Logout)", key="btn_logout_sidebar", use_container_width=True, type="secondary"):
         logout_user()
+
