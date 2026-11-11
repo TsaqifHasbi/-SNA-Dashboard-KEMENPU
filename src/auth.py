@@ -132,107 +132,170 @@ def check_authentication() -> bool:
 
 def render_login_page():
     """Merender halaman Login bertema elegan Kementerian PU."""
-    from src.clean_header_footer import render_html
     from src.mh_style import render_logo_badge
 
     logo_svg = render_logo_badge(size=44)
     
-    # Styling khusus halaman login
-    render_html("""
+    # Styling khusus halaman login - Eksekutif, Rapi & Terpusat
+    st.markdown("""
     <style>
-        /* Sembunyikan sidebar di halaman login agar fokus */
-        [data-testid="stSidebar"] {
+        /* Sembunyikan sidebar dan header bawaan streamlit di halaman login */
+        [data-testid="stSidebar"], 
+        [data-testid="stHeader"] {
             display: none !important;
         }
+        
+        /* Background gradient elegan */
         .stApp {
-            background: linear-gradient(180deg, #F1F5F9 0%, #E2E8F0 100%) !important;
+            background: linear-gradient(180deg, #F8FAFC 0%, #EEF2F6 100%) !important;
+            min-height: 100vh !important;
         }
-        .login-card {
-            background: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            border-radius: 16px;
-            padding: 32px 36px 28px 36px;
-            box-shadow: 0 10px 25px -5px rgba(15, 41, 66, 0.08), 0 8px 10px -6px rgba(15, 41, 66, 0.04);
-            margin-top: 10px;
+        
+        /* Kunci lebar container di tengah layar agar tidak melebar di layar desktop */
+        .block-container,
+        [data-testid="stAppViewBlockContainer"] {
+            max-width: 460px !important;
+            padding-top: 48px !important;
+            padding-bottom: 40px !important;
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+            margin: 0 auto !important;
+        }
+        
+        /* Card Form Terpadu */
+        div[data-testid="stForm"] {
+            background: #FFFFFF !important;
+            border: 1px solid #E2E8F0 !important;
+            border-radius: 16px !important;
+            padding: 26px 30px 22px 30px !important;
+            box-shadow: 0 10px 25px -5px rgba(15, 41, 66, 0.08), 0 8px 10px -6px rgba(15, 41, 66, 0.04) !important;
+        }
+        
+        /* Label Input */
+        div[data-testid="stForm"] label p {
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            color: #1E293B !important;
+            margin-bottom: 3px !important;
+        }
+        
+        /* Input Box */
+        div[data-testid="stForm"] input {
+            border-radius: 9px !important;
+            border: 1.5px solid #CBD5E1 !important;
+            font-size: 13.5px !important;
+            color: #0F172A !important;
+            padding: 10px 14px !important;
+            background-color: #FAFCFE !important;
+            transition: all 0.2s ease !important;
+        }
+        div[data-testid="stForm"] input:focus {
+            border-color: #2563EB !important;
+            background-color: #FFFFFF !important;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+        }
+        
+        /* Tombol Sign In Elegan */
+        div[data-testid="stForm"] button[kind="primary"],
+        div[data-testid="stForm"] button {
+            background: linear-gradient(135deg, #0F2942 0%, #1E3A8A 100%) !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 9px !important;
+            font-size: 13.5px !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.3px !important;
+            padding: 11px 20px !important;
+            box-shadow: 0 4px 14px rgba(15, 41, 66, 0.22) !important;
+            transition: all 0.2s ease !important;
+            margin-top: 8px !important;
+        }
+        div[data-testid="stForm"] button[kind="primary"]:hover,
+        div[data-testid="stForm"] button:hover {
+            background: linear-gradient(135deg, #1A365D 0%, #2563EB 100%) !important;
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35) !important;
+            transform: translateY(-1px) !important;
+        }
+        
+        /* Error Alert Box */
+        div[data-testid="stAlert"] {
+            border-radius: 9px !important;
+            font-size: 12px !important;
+            padding: 10px 14px !important;
+            margin-top: 10px !important;
         }
     </style>
-    """)
+    """, unsafe_allow_html=True)
 
-    # Pusatkan tampilan login di tengah layar
-    col_l, col_center, col_r = st.columns([1, 1.8, 1])
-    
-    with col_center:
-        # Header Kementerian
-        render_html(f"""
-        <div style="text-align: center; margin-bottom: 22px; margin-top: 20px;">
-            <div style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border-radius: 16px; background: linear-gradient(135deg, #0F2942 0%, #1E3A8A 100%); box-shadow: 0 8px 16px rgba(15, 41, 66, 0.2); margin-bottom: 14px;">
-                {logo_svg}
+    # 1. Header Kementerian Resmi (Di Luar & Di Atas Card)
+    st.markdown(f"""
+    <div style="text-align: center; margin-bottom: 22px;">
+        <div style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border-radius: 16px; background: linear-gradient(135deg, #0F2942 0%, #1A365D 100%); box-shadow: 0 8px 18px rgba(15, 41, 66, 0.2); margin-bottom: 12px; border: 1.5px solid rgba(255,255,255,0.15);">
+            {logo_svg}
+        </div>
+        <div style="font-size: 10.5px; font-weight: 800; color: #D97706; text-transform: uppercase; letter-spacing: 1.8px; margin-bottom: 3px;">
+            REPUBLIK INDONESIA
+        </div>
+        <div style="font-size: 21px; font-weight: 800; color: #0F2942; line-height: 1.25; letter-spacing: -0.4px;">
+            KEMENTERIAN PEKERJAAN UMUM
+        </div>
+        <div style="font-size: 12px; font-weight: 600; color: #64748B; margin-top: 4px;">
+            Portal Intelijen Kebijakan Publik & IndoBERT-SNA
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # 2. Card Form Terpadu (Satu Kotak Utuh Tanpa Fragmentasi)
+    with st.form("login_form", clear_on_submit=False):
+        st.markdown("""
+        <div style="margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #F1F5F9;">
+            <div style="font-size: 15px; font-weight: 800; color: #0F2942; display: flex; align-items: center; gap: 8px;">
+                <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#2563EB;"></span>
+                Autentikasi Akses Sistem
             </div>
-            <div style="font-size: 11px; font-weight: 800; color: #D97706; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px;">
-                REPUBLIK INDONESIA
-            </div>
-            <div style="font-size: 22px; font-weight: 800; color: #0F2942; line-height: 1.25; letter-spacing: -0.3px;">
-                KEMENTERIAN PEKERJAAN UMUM
-            </div>
-            <div style="font-size: 13px; font-weight: 500; color: #64748B; margin-top: 6px;">
-                Portal Intelijen Kebijakan Publik & Deep Learning IndoBERT-SNA
+            <div style="font-size: 11.5px; color: #64748B; margin-top: 3px; line-height: 1.4;">
+                Silakan masukkan akun kedinasan Anda untuk mengakses data analitik.
             </div>
         </div>
-        """)
+        """, unsafe_allow_html=True)
 
-        # Container Card Form Login
-        with st.container():
-            render_html("""
-            <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 24px 26px 14px 26px; box-shadow: 0 4px 16px rgba(15,41,66,0.06);">
-                <div style="font-size: 15px; font-weight: 700; color: #0F2942; display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                    <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#2563EB;"></span>
-                    Autentikasi Akses Sistem
-                </div>
-                <div style="font-size: 12px; color: #64748B; margin-bottom: 16px;">
-                    Silakan masukkan akun kedinasan Anda untuk mengakses data analitik.
-                </div>
-            </div>
-            """)
+        username_val = st.text_input(
+            "ID Pengguna / Username",
+            placeholder="Masukkan ID pengguna...",
+            help="Gunakan akun kedinasan yang terdaftar."
+        )
+        password_val = st.text_input(
+            "Kata Sandi / Password",
+            type="password",
+            placeholder="••••••••••••",
+            help="Kata sandi bersifat rahasia."
+        )
+        
+        st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+        submitted = st.form_submit_button(
+            "Masuk ke Sistem (Sign In)",
+            use_container_width=True,
+            type="primary"
+        )
+        
+        if submitted:
+            user_match = verify_credentials(username_val, password_val)
+            if user_match:
+                st.toast(f"Selamat datang, {user_match['name']}!", icon="✅")
+                login_user(username_val, user_match)
+            else:
+                st.error("Nama pengguna atau kata sandi tidak sesuai. Silakan periksa kembali.")
 
-            with st.form("login_form", clear_on_submit=False):
-                username_val = st.text_input(
-                    "ID Pengguna / Username",
-                    placeholder="Masukkan ID pengguna...",
-                    help="Gunakan akun kedinasan yang terdaftar."
-                )
-                password_val = st.text_input(
-                    "Kata Sandi / Password",
-                    type="password",
-                    placeholder="Masukkan kata sandi...",
-                    help="Kata sandi bersifat rahasia."
-                )
-                
-                submitted = st.form_submit_button(
-                    "Masuk ke Sistem (Sign In)",
-                    use_container_width=True,
-                    type="primary"
-                )
-                
-                if submitted:
-                    user_match = verify_credentials(username_val, password_val)
-                    if user_match:
-                        st.toast(f"Selamat datang, {user_match['name']}!", icon="✅")
-                        login_user(username_val, user_match)
-                    else:
-                        st.error("Nama pengguna atau kata sandi tidak sesuai. Silakan periksa kembali.")
-
-
-
-        # Footer Keamanan
-        render_html("""
-        <div style="text-align: center; margin-top: 24px; padding-top: 14px; border-top: 1px solid #CBD5E1; font-size: 11px; color: #64748B;">
-            <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:4px;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                <span style="font-weight:600;">Sistem Terproteksi Protokol Keamanan Internal</span>
-            </div>
-            <div>Kementerian Pekerjaan Umum Republik Indonesia • 2026</div>
+    # 3. Footer Keamanan
+    st.markdown("""
+    <div style="text-align: center; margin-top: 22px; font-size: 11px; color: #64748B;">
+        <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:4px; font-weight:600; color:#475569;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span>Sistem Informasi Terbatas • Terproteksi SHA-256</span>
         </div>
-        """)
+        <div>Kementerian Pekerjaan Umum Republik Indonesia • 2026</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 def render_user_sidebar_profile():
