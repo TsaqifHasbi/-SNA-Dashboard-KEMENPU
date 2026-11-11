@@ -50,6 +50,8 @@ ScrapeData_TA_Elektrifikasi/
 !data/enriched_corpus_for_sna.parquet
 !data/gold_standard_sample_1000.csv
 !data/*.json
+data/registered_users.json
+data/user_credentials.json
 !data/*.gexf
 !sna/output/*.gexf
 !sna/output/*.json

@@ -128,7 +128,7 @@ elif _qp_page in ["privacy", "privacy_policy", "privacy-policy"]:
 # -------------------------------------------------------------
 # AUTHENTICATION GUARDIAN (PORTAL AKSES KEMENTERIAN PU)
 # -------------------------------------------------------------
-from src.auth import check_authentication, render_user_sidebar_profile
+from src.auth import check_authentication, render_user_sidebar_profile, render_user_management_panel
 
 if not check_authentication():
     st.stop()
@@ -406,6 +406,9 @@ with st.sidebar:
         "Dashboard Analisis Multi Platform",
         "Cockpit Analisis & Evaluasi Model"
     ]
+    is_admin = st.session_state.get("user_info", {}).get("role") == "Super Admin" or st.session_state.get("username") == "admin"
+    if is_admin:
+        MODE_OPTIONS.append("Manajemen Pengguna & Akses")
     
     # Auto-sanitize any previous session state key containing legacy option string
     for k in list(st.session_state.keys()):
@@ -931,7 +934,7 @@ elif "Dashboard Analisis Multi Platform" in view_mode or "Katalog Analisis Multi
             if idx < len(pages_in_cat):
                 st.markdown("<div style='margin: 40px 0; border-bottom: 2px dashed #CBD5E1;'></div>", unsafe_allow_html=True)
 
-else:
+elif "Cockpit Analisis" in view_mode or "Evaluasi Model" in view_mode:
     # ---------------------------------------------------------
     # MODE 3: COCKPIT ANALISIS & EVALUASI MODEL
     # ---------------------------------------------------------
@@ -959,5 +962,8 @@ else:
         render_tab_wordcloud(df_filtered)
     with tabs[6]:
         render_tab_evaluation(current_dir)
+
+elif "Manajemen Pengguna" in view_mode:
+    render_user_management_panel()
 
 # Refreshed for emotion & sentiment integration
