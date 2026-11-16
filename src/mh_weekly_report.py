@@ -431,7 +431,7 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
         """
 
         guide_text = "Enam temuan utama sepekan dari Pemantau Echo (279, 280), Pemantau Delta, dan media. Pita biru: prioritas tindakan."
-        card_title = "Enam Temuan Utama Sepekan"
+        card_title = f"Enam Temuan Utama: {m['topic_title']}"
 
         findings_col1 = """
             <div style="margin-bottom:12px;">
@@ -532,7 +532,7 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
         """
 
         guide_text = f"Enam bahasan teratas hasil klasterisasi leksikal korpus {m['topic_title']} ({m['vol']:,} data). Pita biru: prioritas tindakan."
-        card_title = f"Enam Bahasan Isu Teratas: {m['topic_title']}"
+        card_title = f"Enam Temuan Utama: {m['topic_title']}"
 
         # 6 bahasan teratas: 1, 3, 5 di kolom kiri, 2, 4, 6 di kolom kanan
         f0 = dynamic_findings[0] if len(dynamic_findings) > 0 else {'title': 'Bencana Banjir', 'statement': 'Data belum tersedia'}
@@ -643,7 +643,7 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
         """
 
         guide_text = "Enam temuan dari Pemantau Echo (279, 280), Pemantau Delta, dan media. Pita biru: prioritas."
-        card_title = "Enam Temuan Utama"
+        card_title = f"Enam Temuan Utama: {m['topic_title']}"
 
         findings_col1 = """
             <div style="margin-bottom:12px;">
