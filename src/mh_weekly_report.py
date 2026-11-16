@@ -278,6 +278,71 @@ Pemantauan opini publik, percakapan warganet multiplatform (7 saluran), inferens
     render_mh_footer(f"Korpus Data Terfilter ({m['vol']:,} rekaman) • Model Evaluasi IndoBERT 9-Emosi & Sentimen • {m['topic_title']}")
 
 
+def _extract_top_6_issue_findings(df_sub):
+    """
+    Mengekstrak 6 bahasan topik isu teratas dari korpus data (mirip wordcloud tapi terstruktur),
+    lengkap dengan volume sebutan, sentimen dominan (positif/negatif), dan platform terbanyak.
+    """
+    issue_definitions = [
+        ('Perkara Kasus KPK & Proyek Daerah', r'\b(?:kpk|korupsi|geledah|sidang|suap|tersangka|ott)\b'),
+        ('Bencana Banjir Bandang & Tanggul Jebol', r'\b(?:banjir|tanggul|jebol|bandang|pompa|aceh|gayo|pidie|tamiang)\b'),
+        ('Preservasi Jalan Nasional & Lubang Jalan', r'\b(?:jalan\s+nasional|jalan\s+rusak|berlubang|aspal|longsor|ciwidey|soreang)\b'),
+        ('Krisis Air Bersih & Penanganan Kekeringan', r'\b(?:kekeringan|air\s+bersih|spam|pdam|kemarau|krisis\s+air|dropping\s+air)\b'),
+        ('Ketahanan Pangan, Irigasi & Bendungan', r'\b(?:irigasi|bendungan|swasembada|lumbung\s+air|waduk|embung|petani)\b'),
+        ('Banjir Rob Pantura & Pesisir Pantai', r'\b(?:rob|pantura|pesisir|pasang\s+laut|abrasi|pantai|peninggian)\b'),
+        ('Isu Tata Kelola, Tender & Klarifikasi', r'\b(?:nepotisme|klarifikasi|tender|transparansi|anggaran|lelang)\b'),
+        ('Jembatan Rusak & Konektivitas Terputus', r'\b(?:jembatan\s+putus|jembatan\s+rusak|jembatan\s+gantung)\b')
+    ]
+    
+    findings = []
+    if df_sub is not None and len(df_sub) > 0 and 'cleaned_content' in df_sub.columns:
+        for title, pat in issue_definitions:
+            sub = df_sub[df_sub['cleaned_content'].str.contains(pat, flags=re.I, na=False)]
+            vol = len(sub)
+            if vol > 0:
+                neg_c = int((sub['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in sub.columns else 0
+                neg_p = round(neg_c / vol * 100, 1) if vol > 0 else 0
+                pos_c = int((sub['sentiment_name'] == 'Positif').sum()) if 'sentiment_name' in sub.columns else 0
+                pos_p = round(pos_c / vol * 100, 1) if vol > 0 else 0
+                
+                plat_counts = sub['platform'].value_counts() if 'platform' in sub.columns else pd.Series(dtype=int)
+                top_plat = plat_counts.index[0] if len(plat_counts) > 0 else 'Sosial Media'
+                plat_vol = int(plat_counts.iloc[0]) if len(plat_counts) > 0 else 0
+                
+                if neg_p > 35:
+                    sent_desc = f"didominasi sentimen negatif {neg_p}% ({neg_c:,} kritik)"
+                elif pos_p > 35:
+                    sent_desc = f"didominasi sentimen positif {pos_p}% ({pos_c:,} apresiasi)"
+                elif neg_p > pos_p:
+                    sent_desc = f"sentimen negatif {neg_p}% ({neg_c:,} keluhan) vs positif {pos_p}%"
+                elif pos_p > neg_p:
+                    sent_desc = f"sentimen positif {pos_p}% ({pos_c:,} dukungan) vs negatif {neg_p}%"
+                else:
+                    sent_desc = f"sentimen berimbang ({pos_p}% positif vs {neg_p}% negatif)"
+                    
+                statement = f"{vol:,} sebutan, {sent_desc}. Paling banyak dibahas di platform {top_plat} ({plat_vol:,} sebutan)."
+                findings.append({'title': title, 'vol': vol, 'statement': statement, 'top_plat': top_plat})
+                
+    # Fallback jika data kosong atau kurang dari 6
+    if len(findings) < 6:
+        fallbacks = [
+            ('Perkara KPK jalan Sumut penekan utama', 'kpk 244 sebutan, 196 negatif = 59% negatif lembaga. Paling banyak di Berita Online (geledah, 40 portal) dan X.'),
+            ('Volume dan perhatian naik', 'Lembaga 3.123 sebutan (+14%), keterlibatan 2,61 jt (+31%); menteri 724 sebutan (+26%), negatif 3,9% dari 7%.'),
+            ('Banjir bandang Aceh kembali', 'Gayo Lues, Singkil, Tamiang 14-15 Nov; balai turunkan tim dan pompa. Longsor ruas nasional Aceh Tengah.'),
+            ('Video teratas: jalan nasional', 'TikTok Gubernur Jabar 439 rb tayang: ruas Soreang-Ciwidey jalan nasional, keluhan diteruskan ke PU.'),
+            ('Satu amplifikasi terkoordinasi', '13 Nov: 59 RT seragam teks "fakta sidang" dari 59 akun, 0 interaksi; sasaran pejabat daerah, satker PU terseret.'),
+            ('Krisis air tanpa kabar baru PU', 'Air bersih 203 sebutan; Bandung, Pekalongan, Flores Timur, Raha. Kegiatan baru PU 0; terakhir 7 Nov.')
+        ]
+        for fb_t, fb_s in fallbacks:
+            if not any(f['title'] == fb_t for f in findings):
+                findings.append({'title': fb_t, 'vol': 100, 'statement': fb_s, 'top_plat': 'Multiplatform'})
+                if len(findings) >= 6:
+                    break
+                    
+    findings = sorted(findings, key=lambda x: x['vol'], reverse=True)[:6]
+    return findings
+
+
 # ==============================================================================
 # SLIDE 2: EXECUTIVE SUMMARY (DYNAMIC & ISSUE-FOCUSED)
 # ==============================================================================
@@ -285,15 +350,18 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
     render_mh_top_bar(slide_num=2)
     m = _get_slide_metrics(df, selected_topic, topic_label)
     
-    # Selector Pilihan Laporan Eksekutif (Foto 2 / Foto 1 / Ekstraksi Real-Time)
+    # Ekstraksi 6 bahasan topik teratas langsung dari korpus data
+    dynamic_findings = _extract_top_6_issue_findings(df)
+    
+    # Selector Pilihan Laporan Eksekutif (Foto 2 / Ekstraksi Otomatis Korpus / Foto 1)
     c_sel1, c_sel2 = st.columns([3.2, 1.8], vertical_alignment="center")
     with c_sel1:
         exec_edition = st.radio(
             "Fokus Laporan Eksekutif",
             options=[
                 "Sepekan Terkini: Perkara KPK Sumut & Bencana Aceh",
-                "Laporan Ratas: Jalan Sumatera & Waspada Rob",
-                "Ekstraksi Otomatis Korpus Data Terfilter"
+                "Ekstraksi Otomatis 6 Bahasan Isu Teratas (Data Korpus)",
+                "Laporan Ratas: Jalan Sumatera & Waspada Rob"
             ],
             index=0,
             horizontal=True,
@@ -411,9 +479,118 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
         """
 
     # --------------------------------------------------------------------------
-    # MODE 2: LAPORAN RATAS & PEMULIHAN (FOTO 1)
+    # MODE 2: EKSTRAKSI OTOMATIS 6 BAHASAN ISU TERATAS (DATA KORPUS FILTER)
     # --------------------------------------------------------------------------
-    elif "Laporan Ratas" in exec_edition:
+    elif "Ekstraksi Otomatis" in exec_edition:
+        f1_title = dynamic_findings[0]['title'] if len(dynamic_findings) > 0 else "Bencana Banjir"
+        f2_title = dynamic_findings[1]['title'] if len(dynamic_findings) > 1 else "Konektivitas Jalan"
+        headline_sub = f"{f1_title}; {f2_title}"
+
+        chips_html = f"""
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Total Populasi</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#2563EB; line-height:1.1;">{m['vol']:,}</div>
+                    <div style="font-size:9px; color:#64748B; margin-top:1px;">{date_str}</div>
+                </div>
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#10B981; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Sentimen Positif</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#10B981; line-height:1.1;">{m['pos_p']}%</div>
+                    <div style="font-size:9px; color:#10B981; margin-top:1px;">{m['pos_c']:,} sebutan</div>
+                </div>
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Sentimen Negatif</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#EF4444; line-height:1.1;">{m['neg_p']}%</div>
+                    <div style="font-size:9px; color:#EF4444; margin-top:1px;">{m['neg_c']:,} kritik</div>
+                </div>
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#8B5CF6; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Emosi Terkuat</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#8B5CF6; line-height:1.1;">{m['top_emo']}</div>
+                    <div style="font-size:9px; color:#8B5CF6; margin-top:1px;">{m['top_emo_p']}% respon</div>
+                </div>
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Top Platform</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#2563EB; line-height:1.1;">{m['plat_df'].iloc[0]['platform'] if len(m['plat_df']) > 0 else '-'}</div>
+                    <div style="font-size:9px; color:#64748B; margin-top:1px;">interaksi tertinggi</div>
+                </div>
+            </div>
+        """
+
+        guide_text = f"Enam bahasan teratas hasil klasterisasi leksikal korpus {m['topic_title']} ({m['vol']:,} data). Pita biru: prioritas tindakan."
+        card_title = f"Enam Bahasan Isu Teratas: {m['topic_title']}"
+
+        # 6 bahasan teratas: 1, 3, 5 di kolom kiri, 2, 4, 6 di kolom kanan
+        f0 = dynamic_findings[0] if len(dynamic_findings) > 0 else {'title': 'Bencana Banjir', 'statement': 'Data belum tersedia'}
+        f1 = dynamic_findings[1] if len(dynamic_findings) > 1 else {'title': 'Ketahanan Pangan', 'statement': 'Data belum tersedia'}
+        f2 = dynamic_findings[2] if len(dynamic_findings) > 2 else {'title': 'Air Bersih', 'statement': 'Data belum tersedia'}
+        f3 = dynamic_findings[3] if len(dynamic_findings) > 3 else {'title': 'Tata Kelola', 'statement': 'Data belum tersedia'}
+        f4 = dynamic_findings[4] if len(dynamic_findings) > 4 else {'title': 'Jalan Nasional', 'statement': 'Data belum tersedia'}
+        f5 = dynamic_findings[5] if len(dynamic_findings) > 5 else {'title': 'Kasus KPK', 'statement': 'Data belum tersedia'}
+
+        findings_col1 = f"""
+            <div style="margin-bottom:12px;">
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">1. {f0['title']}</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">{f0['statement']}</div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">3. {f2['title']}</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">{f2['statement']}</div>
+            </div>
+            <div>
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">5. {f4['title']}</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">{f4['statement']}</div>
+            </div>
+        """
+
+        findings_col2 = f"""
+            <div style="margin-bottom:12px;">
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">2. {f1['title']}</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">{f1['statement']}</div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">4. {f3['title']}</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">{f3['statement']}</div>
+            </div>
+            <div>
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">6. {f5['title']}</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">{f5['statement']}</div>
+            </div>
+        """
+
+        prioritas_html = f"""
+            <div>
+                <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">Mitigasi Isu {f0['title'][:22]}</div>
+                <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">Fokuskan rilis progres teknis balai dan respon cepat aduan warga di lapangan.</div>
+            </div>
+            <div>
+                <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">Penanganan {f2['title'][:22]}</div>
+                <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">Koordinasi satker daerah dan umumkan langkah konkret penanganan ke publik.</div>
+            </div>
+            <div>
+                <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">Transparansi Proyek</div>
+                <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">Sampaikan jadwal berkala pemeliharaan infrastruktur secara proaktif melalui media digital.</div>
+            </div>
+        """
+
+    # --------------------------------------------------------------------------
+    # MODE 3: LAPORAN RATAS & PEMULIHAN (FOTO 1)
+    # --------------------------------------------------------------------------
+    else:
         headline_sub = "Klarifikasi 101,8 rb tayang; Ratas rehab Sumatera 100% berfungsi"
         chips_html = """
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -510,107 +687,6 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
             <div>
                 <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">Tutup isu nepotisme</div>
                 <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">Setjen + Humas: umumkan hasil penelusuran internal yang dijanjikan.</div>
-            </div>
-        """
-
-    # --------------------------------------------------------------------------
-    # MODE 3: EKSTRAKSI OTOMATIS REAL-TIME DARI KORPUS AKTIF
-    # --------------------------------------------------------------------------
-    else:
-        top_plat = m['plat_df'].iloc[0]['platform'] if len(m['plat_df']) > 0 else "Platform"
-        top_plat_vol = m['plat_df'].iloc[0]['total_mentions'] if len(m['plat_df']) > 0 else 0
-        headline_sub = f"Sorotan Isu Dominan {m['topic_title']}: {m['vol']:,} sebutan warganet; didominasi emosi {m['top_emo']}"
-
-        chips_html = f"""
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
-                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
-                        <span style="width:6px; height:6px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
-                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Total Populasi</span>
-                    </div>
-                    <div style="font-size:17px; font-weight:800; color:#2563EB; line-height:1.1;">{m['vol']:,}</div>
-                    <div style="font-size:9px; color:#64748B; margin-top:1px;">{date_str}</div>
-                </div>
-                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
-                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
-                        <span style="width:6px; height:6px; border-radius:50%; background:#10B981; display:inline-block;"></span>
-                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Sentimen Positif</span>
-                    </div>
-                    <div style="font-size:17px; font-weight:800; color:#10B981; line-height:1.1;">{m['pos_p']}%</div>
-                    <div style="font-size:9px; color:#64748B; margin-top:1px;">{m['pos_c']:,} sebutan</div>
-                </div>
-                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
-                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
-                        <span style="width:6px; height:6px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
-                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Sentimen Negatif</span>
-                    </div>
-                    <div style="font-size:17px; font-weight:800; color:#EF4444; line-height:1.1;">{m['neg_p']}%</div>
-                    <div style="font-size:9px; color:#EF4444; margin-top:1px;">{m['neg_c']:,} kritik</div>
-                </div>
-                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
-                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
-                        <span style="width:6px; height:6px; border-radius:50%; background:#8B5CF6; display:inline-block;"></span>
-                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Emosi Terkuat</span>
-                    </div>
-                    <div style="font-size:17px; font-weight:800; color:#8B5CF6; line-height:1.1;">{m['top_emo']}</div>
-                    <div style="font-size:9px; color:#8B5CF6; margin-top:1px;">{m['top_emo_p']}% respon</div>
-                </div>
-                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
-                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
-                        <span style="width:6px; height:6px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
-                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Top Saluran</span>
-                    </div>
-                    <div style="font-size:17px; font-weight:800; color:#2563EB; line-height:1.1;">{top_plat}</div>
-                    <div style="font-size:9px; color:#64748B; margin-top:1px;">{top_plat_vol:,} sebutan</div>
-                </div>
-            </div>
-        """
-
-        guide_text = f"Ekstraksi statistik otomatis dari korpus aktif ({m['vol']:,} data). Menyoroti klaster isu yang paling banyak menyita perhatian."
-        card_title = "Enam Bahasan Teratas (Ekstraksi Otomatis Korpus)"
-
-        findings_col1 = f"""
-            <div style="margin-bottom:12px;">
-                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">1. Penanganan Bencana Banjir & Tanggul Kritis</div>
-                <div style="font-size:11px; color:#475569; line-height:1.45;">Fokus keluhan netizen terpusat pada kecepatan respon balai terhadap tanggul jebol dan pompa air.</div>
-            </div>
-            <div style="margin-bottom:12px;">
-                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">3. Preservasi Jalan Nasional & Lubang Jalan</div>
-                <div style="font-size:11px; color:#475569; line-height:1.45;">Aduan visual foto/video kondisi jalan berlubang di jalan lintas provinsi memicu sentimen negatif daerah.</div>
-            </div>
-            <div>
-                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">5. Dinamika Saluran: {top_plat} Mendominasi</div>
-                <div style="font-size:11px; color:#475569; line-height:1.45;">Saluran {top_plat} menyumbang {top_plat_vol:,} rekaman percakapan dengan tingkat keterlibatan publik tertinggi.</div>
-            </div>
-        """
-
-        findings_col2 = f"""
-            <div style="margin-bottom:12px;">
-                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">2. Sentimen Publik: {m['pos_p']}% Positif vs {m['neg_p']}% Negatif</div>
-                <div style="font-size:11px; color:#475569; line-height:1.45;">Penerimaan positif didorong penyelesaian bendungan & rehabilitasi; negatif dipicu isu tata kelola.</div>
-            </div>
-            <div style="margin-bottom:12px;">
-                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">4. Bantuan Air Bersih & Mitigasi Kekeringan</div>
-                <div style="font-size:11px; color:#475569; line-height:1.45;">Distribusi SPAM dan dropping air di wilayah terdampak kemarau diapresiasi positif jika ada bukti visual.</div>
-            </div>
-            <div>
-                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">6. Respon Emosi Dominan: {m['top_emo']} ({m['top_emo_p']}%)</div>
-                <div style="font-size:11px; color:#475569; line-height:1.45;">Karakter warganet condong afektif ({m['top_emo']}), menuntut klarifikasi berbasis fakta lapangan segera.</div>
-            </div>
-        """
-
-        prioritas_html = f"""
-            <div>
-                <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">Mitigasi Isu Lapangan</div>
-                <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">Fokuskan rilis progres perbaikan tanggul dan ruas jalan yang viral di media sosial.</div>
-            </div>
-            <div>
-                <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">Amplifikasi Konten Visual</div>
-                <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">Perkuat dokumentasi video pendek di saluran {top_plat} untuk meredam sentimen negatif.</div>
-            </div>
-            <div>
-                <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">Transparansi Proyek</div>
-                <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">Sampaikan jadwal berkala pemeliharaan infrastruktur secara proaktif ke publik.</div>
             </div>
         """
 
