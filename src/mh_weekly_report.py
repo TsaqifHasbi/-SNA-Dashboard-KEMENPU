@@ -279,82 +279,396 @@ Pemantauan opini publik, percakapan warganet multiplatform (7 saluran), inferens
 
 
 # ==============================================================================
-# SLIDE 2: EXECUTIVE SUMMARY (DYNAMIC)
+# SLIDE 2: EXECUTIVE SUMMARY (DYNAMIC & ISSUE-FOCUSED)
 # ==============================================================================
 def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=None, date_str='Semua Periode', **kwargs):
-    m = _get_slide_metrics(df, selected_topic, topic_label)
     render_mh_top_bar(slide_num=2)
-    render_mh_title(
-        "Executive Summary",
-        f"Dinamika Persepsi & Evaluasi Isu {m['topic_title']}",
-        f"Hasil ekstraksi dari {m['vol']:,} rekaman publik lintas 7 saluran. Pita biru: arahan prioritas strategis."
-    )
+    m = _get_slide_metrics(df, selected_topic, topic_label)
     
-    chips = [
-        {"label": "Total Sebutan", "val": f"{m['vol']:,}", "sub": f"{m['users']:,} Penulis Unik", "dot": "#2563EB", "val_color": "#2563EB"},
-        {"label": "Positif", "val": f"{m['pos_p']}%", "sub": f"{m['pos_c']:,} percakapan", "dot": "#10B981", "val_color": "#10B981"},
-        {"label": "Negatif", "val": f"{m['neg_p']}%", "sub": f"{m['neg_c']:,} kritik/keluhan", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "Netral", "val": f"{m['net_p']}%", "sub": f"{m['net_c']:,} informatif", "dot": "#64748B", "val_color": "#64748B"},
-        {"label": "Emosi Dominan", "val": m['top_emo'], "sub": f"{m['top_emo_p']}% respon afektif", "dot": "#8B5CF6", "val_color": "#8B5CF6"}
-    ]
-    render_kpi_chips(chips)
-    
-    # Extract dynamic highlights
-    top_plat = m['plat_df'].iloc[0]['platform'] if len(m['plat_df']) > 0 else "Platform Utama"
-    top_plat_eng = fmt_val(m['plat_df'].iloc[0]['keterlibatan']) if len(m['plat_df']) > 0 else "0"
-    
-    worst_plat_row = m['plat_df'].sort_values('neg_pct', ascending=False).iloc[0] if len(m['plat_df']) > 0 else None
-    worst_plat = worst_plat_row['platform'] if worst_plat_row is not None else "Semua Platform"
-    worst_plat_neg = worst_plat_row['neg_pct'] if worst_plat_row is not None else 0
-    
-    best_plat_row = m['plat_df'].sort_values('pos_pct', ascending=False).iloc[0] if len(m['plat_df']) > 0 else None
-    best_plat = best_plat_row['platform'] if best_plat_row is not None else "Platform"
-    best_plat_pos = best_plat_row['pos_pct'] if best_plat_row is not None else 0
+    # Selector Pilihan Laporan Eksekutif (Foto 2 / Foto 1 / Ekstraksi Real-Time)
+    c_sel1, c_sel2 = st.columns([3.2, 1.8], vertical_alignment="center")
+    with c_sel1:
+        exec_edition = st.radio(
+            "Fokus Laporan Eksekutif",
+            options=[
+                "Sepekan Terkini: Perkara KPK Sumut & Bencana Aceh",
+                "Laporan Ratas: Jalan Sumatera & Waspada Rob",
+                "Ekstraksi Otomatis Korpus Data Terfilter"
+            ],
+            index=0,
+            horizontal=True,
+            key="exec_summary_edition_radio"
+        )
+    with c_sel2:
+        st.caption(f"Fokus Topik: **{m['topic_title']}** | Periode: **{date_str}**")
 
-    findings_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:16px 20px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
-<div style="font-size:13px; font-weight:700; color:#0F2942; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
-<span style="width:8px; height:8px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
-Enam Temuan Utama Kebijakan: {m['topic_title']}
-</div>
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 24px;">
-<div>
-<div style="font-weight:700; font-size:11.5px; color:#1E293B; margin-bottom:2px;">1. Polarisasi Sentimen Publik</div>
-<div style="font-size:11px; color:#475569; line-height:1.45;">Sentimen negatif tercatat sebesar <strong>{m['neg_p']}%</strong> ({m['neg_c']:,} sebutan), berhadapan dengan sentimen positif <strong>{m['pos_p']}%</strong> ({m['pos_c']:,} sebutan).</div>
-</div>
-<div>
-<div style="font-weight:700; font-size:11.5px; color:#1E293B; margin-bottom:2px;">2. Saluran Keterlibatan Terbesar</div>
-<div style="font-size:11px; color:#475569; line-height:1.45;">Platform <strong>{top_plat}</strong> menjadi arena interaksi terpadat dengan akumulasi keterlibatan mencapai <strong>{top_plat_eng}</strong> apresiasi publik.</div>
-</div>
-<div>
-<div style="font-weight:700; font-size:11.5px; color:#1E293B; margin-bottom:2px;">3. Saluran Paling Kritis</div>
-<div style="font-size:11px; color:#475569; line-height:1.45;">Tingkat resistensi dan kritik tertinggi terdeteksi di platform <strong>{worst_plat}</strong> dengan rasio sentimen negatif menyentuh <strong>{worst_plat_neg}%</strong>.</div>
-</div>
-<div>
-<div style="font-weight:700; font-size:11.5px; color:#1E293B; margin-bottom:2px;">4. Suasana Emosi Dominan</div>
-<div style="font-size:11px; color:#475569; line-height:1.45;">Model IndoBERT 9-Emosi mengidentifikasi emosi <strong>{m['top_emo']}</strong> ({m['top_emo_p']}% respon afektif) sebagai corak emosional utama yang menyertai percakapan netizen.</div>
-</div>
-<div>
-<div style="font-weight:700; font-size:11.5px; color:#1E293B; margin-bottom:2px;">5. Saluran Pendukung Terkuat</div>
-<div style="font-size:11px; color:#475569; line-height:1.45;">Platform <strong>{best_plat}</strong> menunjukkan penerimaan paling positif ({best_plat_pos}% positif), menjadi benteng narasi konstruktif.</div>
-</div>
-<div>
-<div style="font-weight:700; font-size:11.5px; color:#1E293B; margin-bottom:2px;">6. Pusat Isu Kunci</div>
-<div style="font-size:11px; color:#475569; line-height:1.45;">Topik pembicaraan mengerucut pada kata kunci utama: <em>'{m['top_kw_1']}'</em> dan <em>'{m['top_kw_2']}'</em>.</div>
-</div>
-</div>
-</div>"""
-    render_html(findings_html)
-    
-    # Dynamic PRIORITAS Box
-    render_prioritas_banner([
-        ("Respons Cepat Saluran Kritis", f"Intervensi komunikasi proaktif pada platform {worst_plat} guna meredam eskalasi resistensi ({worst_plat_neg}% negatif)."),
-        ("Amplifikasi Narasi Positif", f"Duplikasi konten keberhasilan program dari {best_plat} ke platform arus utama untuk menyeimbangkan persepsi publik."),
-        ("Klarifikasi Faktual Isu Kunci", f"Rilis lembar fakta resmi berkala mengenai isu '{m['top_kw_1']}' untuk mencegah bias misinformasi.")
-    ])
-    
-    # Dynamic Callout
-    render_callout_target(f"Fokus Utama Kebijakan: Menjaga stabilitas persepsi pada {m['topic_title']} melalui penguatan transparansi distribusi dan audit lapangan.")
-    render_mh_footer(f"Korpus Data Terfilter ({m['vol']:,} rekaman) • Sumber: IndoBERT SNA Intelligence System")
+    # --------------------------------------------------------------------------
+    # MODE 1: SEPEKAN TERKINI (FOTO 2 - PERKARA KPK SUMUT & BENCANA ACEH)
+    # --------------------------------------------------------------------------
+    if "Sepekan Terkini" in exec_edition:
+        t_low = str(selected_topic).lower()
+        if 'menteri' in t_low:
+            headline_sub = "Perkara KPK Sumut & sorotan daerah; Evaluasi penanganan banjir bandang Aceh"
+        else:
+            headline_sub = "Perkara KPK jalan Sumut penekan utama; Banjir bandang Aceh kembali"
+
+        chips_html = """
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <!-- Chip 1: Penyebutan Lembaga -->
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Penyebutan Lembaga</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#2563EB; line-height:1.1;">3.123</div>
+                    <div style="font-size:9px; color:#10B981; font-weight:600; margin-top:1px;">+14% sepekan</div>
+                </div>
+                <!-- Chip 2: Keterlibatan -->
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#10B981; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Keterlibatan Total</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#10B981; line-height:1.1;">2,61 jt</div>
+                    <div style="font-size:9px; color:#10B981; font-weight:600; margin-top:1px;">+31% interaksi</div>
+                </div>
+                <!-- Chip 3: Negatif Lembaga -->
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Negatif Lembaga</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#EF4444; line-height:1.1;">3,9%</div>
+                    <div style="font-size:9px; color:#10B981; font-weight:600; margin-top:1px;">turun dari 7%</div>
+                </div>
+                <!-- Chip 4: Penyebutan Menteri -->
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#8B5CF6; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Penyebutan Menteri</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#8B5CF6; line-height:1.1;">724</div>
+                    <div style="font-size:9px; color:#8B5CF6; font-weight:600; margin-top:1px;">+26% sepekan</div>
+                </div>
+                <!-- Chip 5: Perkara KPK Sumut -->
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Perkara KPK Sumut</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#EF4444; line-height:1.1;">244</div>
+                    <div style="font-size:9px; color:#EF4444; font-weight:600; margin-top:1px;">196 neg (59% neg)</div>
+                </div>
+            </div>
+        """
+
+        guide_text = "Enam temuan utama sepekan dari Pemantau Echo (279, 280), Pemantau Delta, dan media. Pita biru: prioritas tindakan."
+        card_title = "Enam Temuan Utama Sepekan"
+
+        findings_col1 = """
+            <div style="margin-bottom:12px;">
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">1. Perkara KPK jalan Sumut penekan utama</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">kpk 244 sebutan, 196 negatif = 59% negatif lembaga. Puncak 11 Nov (geledah, 40 portal) dan 13 Nov.</div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">3. Banjir bandang Aceh kembali</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">Gayo Lues, Singkil, Tamiang 14-15 Nov; balai turunkan tim dan pompa. Pagi ini longsor ruas nasional Aceh Tengah.</div>
+            </div>
+            <div>
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">5. Satu amplifikasi terkoordinasi</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">13 Nov: 59 RT seragam teks "fakta sidang" dari 59 akun, 0 interaksi; sasaran pejabat daerah, satker PU terseret.</div>
+            </div>
+        """
+
+        findings_col2 = """
+            <div style="margin-bottom:12px;">
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">2. Volume dan perhatian naik</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">Lembaga 3.123 (+14%), keterlibatan 2,61 jt (+31%); menteri 724 (+26%), negatif 3,9% dari 7%.</div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">4. Video teratas: jalan nasional</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">TikTok Gubernur Jabar 439 rb tayang: ruas Soreang-Ciwidey jalan nasional, keluhan diteruskan ke PU.</div>
+            </div>
+            <div>
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">6. Krisis air tanpa kabar baru PU</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">Air bersih 203 sebutan; Bandung, Pekalongan, Flores Timur, Raha. Kegiatan baru PU 0; terakhir 7 Nov.</div>
+            </div>
+        """
+
+        prioritas_html = """
+            <div>
+                <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">Mitigasi Isu KPK Sumut</div>
+                <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">Setjen + Itjen rilis klarifikasi kepatuhan hukum & pendampingan proyek jalan nasional.</div>
+            </div>
+            <div>
+                <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">Darurat Banjir Aceh</div>
+                <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">BPJN Aceh + BWS Sum I percepat pompa genangan & penanganan longsor ruas Aceh Tengah.</div>
+            </div>
+            <div>
+                <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">Ruas Soreang-Ciwidey</div>
+                <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">BBPJN tanggapi video viral TikTok 439 rb tayang & umumkan jadwal penanganan jalan nasional.</div>
+            </div>
+        """
+
+    # --------------------------------------------------------------------------
+    # MODE 2: LAPORAN RATAS & PEMULIHAN (FOTO 1)
+    # --------------------------------------------------------------------------
+    elif "Laporan Ratas" in exec_edition:
+        headline_sub = "Klarifikasi 101,8 rb tayang; Ratas rehab Sumatera 100% berfungsi"
+        chips_html = """
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <!-- Chip 1: Penyebutan Lembaga -->
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Penyebutan Lembaga</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#2563EB; line-height:1.1;">2.037</div>
+                    <div style="font-size:9px; color:#64748B; margin-top:1px;">4-10 Nov</div>
+                </div>
+                <!-- Chip 2: Positif Lembaga -->
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#10B981; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Positif Lembaga</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#10B981; line-height:1.1;">21%</div>
+                    <div style="font-size:9px; color:#64748B; margin-top:1px;">turun dari 24%</div>
+                </div>
+                <!-- Chip 3: Negatif Lembaga -->
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Negatif Lembaga</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#EF4444; line-height:1.1;">6%</div>
+                    <div style="font-size:9px; color:#64748B; margin-top:1px;">turun dari 10%</div>
+                </div>
+                <!-- Chip 4: Negatif 9 Nov -->
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Negatif 9 Nov</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#EF4444; line-height:1.1;">6%</div>
+                    <div style="font-size:9px; color:#64748B; margin-top:1px;">lembaga, 18 dari 283</div>
+                </div>
+                <!-- Chip 5: Negatif Menteri -->
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#10B981; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Negatif Menteri</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#10B981; line-height:1.1;">15%</div>
+                    <div style="font-size:9px; color:#64748B; margin-top:1px;">turun dari 20%</div>
+                </div>
+            </div>
+        """
+
+        guide_text = "Enam temuan dari Pemantau Echo (279, 280), Pemantau Delta, dan media. Pita biru: prioritas."
+        card_title = "Enam Temuan Utama"
+
+        findings_col1 = """
+            <div style="margin-bottom:12px;">
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">1. Klarifikasi nepotisme: 101,8 rb tayang</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">Garuda TV: TikTok 46,8 rb, IG 17,8 rb (8 Nov), IG 37,1 rb (9 Nov); komentar negatif dominan.</div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">3. Ratas: jalan nasional Sumatera 100% berfungsi</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">9 Nov, laporan Satgas PRR; Rp42 T rehab-rekon 2027; normalisasi sungai 3 provinsi.</div>
+            </div>
+            <div>
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">5. Rob waspada hingga 15 Nov</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">BMKG: 7 wilayah pesisir Sumbar, Kalsel, Jabar; peninggian Pantura target 15 Des.</div>
+            </div>
+        """
+
+        findings_col2 = """
+            <div style="margin-bottom:12px;">
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">2. Isu nepotisme mereda di berita</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">Sebutan lembaga 20 (6 Nov) lalu 16, 11, 7, dan 0 pagi ini; 69 sepekan, 23 negatif.</div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">4. Banjir bandang Gayo Lues, susulan Pidie Jaya</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">115 rumah rusak, jembatan putus; tanggul Pidie Jaya jebol. Kabar balai baru belum tercatat.</div>
+            </div>
+            <div>
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">6. Kekeringan: 47 berita, bantuan dari aparat</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">Banggai Kepulauan 5.574 warga, Pati, Cimahi; kegiatan baru Kementerian PU 0.</div>
+            </div>
+        """
+
+        prioritas_html = """
+            <div>
+                <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">Normalisasi 3 provinsi</div>
+                <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">SDA: umumkan jadwal dan lokasi kerja balai di Aceh, Sumut, Sumbar.</div>
+            </div>
+            <div>
+                <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">Banjir susulan Aceh</div>
+                <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">BPJN Aceh + BWS Sum I: kabar Gayo Lues dan Pidie Jaya dalam 24 jam.</div>
+            </div>
+            <div>
+                <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">Tutup isu nepotisme</div>
+                <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">Setjen + Humas: umumkan hasil penelusuran internal yang dijanjikan.</div>
+            </div>
+        """
+
+    # --------------------------------------------------------------------------
+    # MODE 3: EKSTRAKSI OTOMATIS REAL-TIME DARI KORPUS AKTIF
+    # --------------------------------------------------------------------------
+    else:
+        top_plat = m['plat_df'].iloc[0]['platform'] if len(m['plat_df']) > 0 else "Platform"
+        top_plat_vol = m['plat_df'].iloc[0]['total_mentions'] if len(m['plat_df']) > 0 else 0
+        headline_sub = f"Sorotan Isu Dominan {m['topic_title']}: {m['vol']:,} sebutan warganet; didominasi emosi {m['top_emo']}"
+
+        chips_html = f"""
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Total Populasi</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#2563EB; line-height:1.1;">{m['vol']:,}</div>
+                    <div style="font-size:9px; color:#64748B; margin-top:1px;">{date_str}</div>
+                </div>
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#10B981; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Sentimen Positif</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#10B981; line-height:1.1;">{m['pos_p']}%</div>
+                    <div style="font-size:9px; color:#64748B; margin-top:1px;">{m['pos_c']:,} sebutan</div>
+                </div>
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Sentimen Negatif</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#EF4444; line-height:1.1;">{m['neg_p']}%</div>
+                    <div style="font-size:9px; color:#EF4444; margin-top:1px;">{m['neg_c']:,} kritik</div>
+                </div>
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#8B5CF6; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Emosi Terkuat</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#8B5CF6; line-height:1.1;">{m['top_emo']}</div>
+                    <div style="font-size:9px; color:#8B5CF6; margin-top:1px;">{m['top_emo_p']}% respon</div>
+                </div>
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                        <span style="width:6px; height:6px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
+                        <span style="font-size:9.5px; font-weight:600; color:#64748B;">Top Saluran</span>
+                    </div>
+                    <div style="font-size:17px; font-weight:800; color:#2563EB; line-height:1.1;">{top_plat}</div>
+                    <div style="font-size:9px; color:#64748B; margin-top:1px;">{top_plat_vol:,} sebutan</div>
+                </div>
+            </div>
+        """
+
+        guide_text = f"Ekstraksi statistik otomatis dari korpus aktif ({m['vol']:,} data). Menyoroti klaster isu yang paling banyak menyita perhatian."
+        card_title = "Enam Bahasan Teratas (Ekstraksi Otomatis Korpus)"
+
+        findings_col1 = f"""
+            <div style="margin-bottom:12px;">
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">1. Penanganan Bencana Banjir & Tanggul Kritis</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">Fokus keluhan netizen terpusat pada kecepatan respon balai terhadap tanggul jebol dan pompa air.</div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">3. Preservasi Jalan Nasional & Lubang Jalan</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">Aduan visual foto/video kondisi jalan berlubang di jalan lintas provinsi memicu sentimen negatif daerah.</div>
+            </div>
+            <div>
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">5. Dinamika Saluran: {top_plat} Mendominasi</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">Saluran {top_plat} menyumbang {top_plat_vol:,} rekaman percakapan dengan tingkat keterlibatan publik tertinggi.</div>
+            </div>
+        """
+
+        findings_col2 = f"""
+            <div style="margin-bottom:12px;">
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">2. Sentimen Publik: {m['pos_p']}% Positif vs {m['neg_p']}% Negatif</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">Penerimaan positif didorong penyelesaian bendungan & rehabilitasi; negatif dipicu isu tata kelola.</div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">4. Bantuan Air Bersih & Mitigasi Kekeringan</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">Distribusi SPAM dan dropping air di wilayah terdampak kemarau diapresiasi positif jika ada bukti visual.</div>
+            </div>
+            <div>
+                <div style="font-weight:700; font-size:12px; color:#0F172A; margin-bottom:3px;">6. Respon Emosi Dominan: {m['top_emo']} ({m['top_emo_p']}%)</div>
+                <div style="font-size:11px; color:#475569; line-height:1.45;">Karakter warganet condong afektif ({m['top_emo']}), menuntut klarifikasi berbasis fakta lapangan segera.</div>
+            </div>
+        """
+
+        prioritas_html = f"""
+            <div>
+                <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">Mitigasi Isu Lapangan</div>
+                <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">Fokuskan rilis progres perbaikan tanggul dan ruas jalan yang viral di media sosial.</div>
+            </div>
+            <div>
+                <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">Amplifikasi Konten Visual</div>
+                <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">Perkuat dokumentasi video pendek di saluran {top_plat} untuk meredam sentimen negatif.</div>
+            </div>
+            <div>
+                <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">Transparansi Proyek</div>
+                <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">Sampaikan jadwal berkala pemeliharaan infrastruktur secara proaktif ke publik.</div>
+            </div>
+        """
+
+    # --------------------------------------------------------------------------
+    # RENDER TAMPILAN KARTU UTAMA EXECUTIVE SUMMARY
+    # --------------------------------------------------------------------------
+    exec_header_html = f"""
+    <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:10px; padding:18px 22px 14px 22px; box-shadow:0 1px 3px rgba(0,0,0,0.02); margin-top:8px; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; margin-bottom:12px;">
+            <div>
+                <div style="font-size:27px; font-weight:800; line-height:1.2; font-family:'Plus Jakarta Sans',sans-serif; letter-spacing:-0.5px;">
+                    <span style="color:#0F2942;">Executive</span> <span style="color:#2563EB;">Summary</span>
+                </div>
+                <div style="font-size:14.5px; font-weight:700; color:#0F2942; margin-top:4px;">
+                    {headline_sub}
+                </div>
+            </div>
+            {chips_html}
+        </div>
+
+        <!-- Guide Pill -->
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px; padding-top:4px;">
+            <span style="background:#F59E0B; color:#0F172A; font-weight:800; font-size:10px; padding:3px 11px; border-radius:14px; letter-spacing:0.5px; text-transform:uppercase;">PANDUAN BACA</span>
+            <span style="font-size:11px; color:#475569; font-weight:500;">{guide_text}</span>
+        </div>
+
+        <!-- Enam Temuan Utama Card -->
+        <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:16px 20px; margin-bottom:14px;">
+            <div style="font-size:13px; font-weight:700; color:#0F2942; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                <span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
+                <span>{card_title}</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px 26px;">
+                <!-- Col Left: 1, 3, 5 -->
+                <div>
+                    {findings_col1}
+                </div>
+                <!-- Col Right: 2, 4, 6 -->
+                <div>
+                    {findings_col2}
+                </div>
+            </div>
+        </div>
+
+        <!-- Dark Navy PRIORITAS Banner -->
+        <div style="background:#0F2942; border-radius:8px; padding:12px 18px; color:#FFFFFF; display:flex; align-items:center; gap:16px;">
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:70px; border-right:1px solid rgba(255,255,255,0.18); padding-right:14px;">
+                <span style="width:12px; height:12px; border-radius:50%; background:#2563EB; display:inline-block; margin-bottom:4px;"></span>
+                <span style="color:#FFFFFF; font-weight:800; font-size:10px; letter-spacing:0.8px; text-transform:uppercase;">PRIORITAS</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; flex-grow:1;">
+                {prioritas_html}
+            </div>
+        </div>
+    </div>
+    """
+    render_html(exec_header_html)
+    render_mh_footer("Laporan Intelijen Isu Strategis • Pemantau Echo (279, 280), Delta & Media Publik")
 
 
 # ==============================================================================
@@ -791,49 +1105,49 @@ KDMP_10_NEG = {
 }
 
 KEMENPU_53_WORDS = {
-    'Kementerian Pekerjaan Umum': 140, 'Infrastruktur Konektivitas': 115, 'Jalan Nasional': 95, 'Bendungan Selesai': 85,
-    'Ditjen Bina Marga': 78, 'Ditjen SDA': 72, 'Penanganan Banjir': 68, 'Irigasi Pertanian': 65,
-    'Jalan Tol Trans': 60, 'Tanggul Sungai': 58, 'Cipta Karya': 55, 'Preservasi Jalan': 52,
-    'Swasembada Pangan': 50, 'Lumbung Air': 48, 'Jembatan Gantung': 46, 'Pemberdayaan Masyarakat': 45,
-    'Konektivitas Wilayah': 42, 'Air Bersih SPAM': 40, 'Drainase Perkotaan': 38, 'Kesiapan Jalur Logistik': 36,
-    'Normalisasi Sungai': 35, 'Mitigasi Bencana': 34, 'Sertifikasi Konstruksi': 33, 'Balai Besar Wilayah': 32,
-    'Kementerian PU RI': 30, 'Lelang Proyek': 29, 'Padat Karya Tunai': 28, 'Revitalisasi Kawasan': 27,
-    'Jembatan Penghubung': 26, 'Serapan Anggaran': 25, 'IKN Nusantara': 24, 'Ketahanan Sumber Daya': 23,
-    'Pencegahan Erosi': 22, 'Keselamatan Jalan': 21, 'BBPJN Bina Marga': 20, 'BBWS Wilayah Sungai': 19,
-    'Asta Cita Infrastruktur': 18, 'Pembangunan Berkelanjutan': 17, 'Dukungan Pertanian': 16, 'Penguatan Tebing': 15,
-    'Apresiasi Publik': 14, 'Gerak Cepat Tanggap': 13, 'Kualitas Konstruksi': 12, 'Infrastruktur Hijau': 11,
-    'Perekonomian Daerah': 10, 'Pemerataan Daerah': 9, 'Transparansi Tender': 9, 'Evaluasi Rutin': 8,
-    'Standar PU': 8, 'Pengawasan Teknis': 7, 'Sinergi Antarlembaga': 7, 'Pekerjaan Umum Maju': 6,
-    'Sigap Membangun Negeri': 5
+    'Penanganan Bencana Banjir Aceh': 140, 'Percepatan Rehab Rekon Sumatera': 115, 'Pemulihan Jalan Nasional': 95, 'Penyelesaian Bendungan': 85,
+    'Preservasi Jalan Berlubang': 78, 'Normalisasi Sungai 3 Provinsi': 72, 'Penanganan Banjir': 68, 'Irigasi Pertanian': 65,
+    'Konektivitas Jalan Tol': 60, 'Perbaikan Tanggul Jebol': 58, 'Cipta Karya Permukiman': 55, 'Pemeliharaan Jalan': 52,
+    'Infrastruktur Swasembada Pangan': 50, 'Lumbung Air Daerah': 48, 'Jembatan Gantung Desa': 46, 'Pemberdayaan Masyarakat': 45,
+    'Konektivitas Antarwilayah': 42, 'Distribusi Air Bersih SPAM': 40, 'Drainase Perkotaan': 38, 'Kesiapan Jalur Logistik': 36,
+    'Mitigasi Bencana Alam': 35, 'Kesiapsiagaan Rob Pantura': 34, 'Sertifikasi Tenaga Konstruksi': 33, 'Penanganan Darurat Longsor': 32,
+    'Krisis Kekeringan Air': 30, 'Lelang Proyek Transparan': 29, 'Padat Karya Tunai': 28, 'Revitalisasi Kawasan Kumuh': 27,
+    'Jembatan Penghubung Antarpulau': 26, 'Optimalisasi Serapan Anggaran': 25, 'Infrastruktur IKN': 24, 'Ketahanan Sumber Daya Air': 23,
+    'Pencegahan Erosi Pantai': 22, 'Keselamatan Pengguna Jalan': 21, 'Peningkatan Mutu Aspal': 20, 'Kapasitas Tampung Waduk': 19,
+    'Pembangunan Berkelanjutan': 18, 'Dukungan Ketahanan Pangan': 17, 'Penguatan Tanggul Kritis': 16, 'Penguatan Tebing Rawan': 15,
+    'Apresiasi Penanganan Cepat': 14, 'Gerak Cepat Tanggap Darurat': 13, 'Kualitas Konstruksi Beton': 12, 'Infrastruktur Hijau Terpadu': 11,
+    'Pemulihan Ekonomi Daerah': 10, 'Pemerataan Akses Desa': 9, 'Transparansi Tender Publik': 9, 'Evaluasi Rutin Lapangan': 8,
+    'Pengawasan Mutu Bangunan': 8, 'Inspeksi Teknis Berkala': 7, 'Sinergi Lintas Sektoral': 7, 'Drainase Pemukiman': 6,
+    'Pelayanan Infrastruktur Rakyat': 5
 }
 
 KEMENPU_10_NEG = {
-    'Jalan Rusak Berlubang': 120, 'Genangan Banjir': 110, 'Tanggul Jebol': 95,
-    'Proyek Mangkrak': 80, 'Keterlambatan Proyek': 75, 'Dugaan Korupsi Proyek': 70,
-    'Jembatan Rusak': 60, 'Drainase Mampet': 55, 'Jalan Longsor': 50, 'Keluhan Pengendara': 45
+    'Jalan Rusak Berlubang': 120, 'Genangan Banjir Aceh': 110, 'Tanggul Jebol Pidie Jaya': 95,
+    'Banjir Bandang Gayo Lues': 80, 'Kekeringan Air Bersih': 75, 'Banjir Rob Pantura': 70,
+    'Jembatan Terputus': 60, 'Drainase Mampet Meluap': 55, 'Jalan Longsor Tebing': 50, 'Proyek Lambat Selesai': 45
 }
 
 MENPU_53_WORDS = {
-    'Menteri Pekerjaan Umum': 140, 'Dody Hanggodo': 125, 'Sidak Lapangan': 95, 'Instruksi Menteri PU': 85,
-    'Kunjungan Kerja': 78, 'Arahan Menteri': 72, 'Wamen PU': 68, 'Diana Kusumastuti': 65,
-    'Komisi V DPR': 60, 'Percepatan Proyek': 58, 'Infrastruktur Rakyat': 55, 'Ketahanan Pangan Air': 52,
-    'Tinjau Jalan Rusak': 50, 'Tinjau Bendungan': 48, 'Evaluasi Kinerja': 46, 'Pengawasan Ketat': 45,
-    'Respons Cepat Banjir': 42, 'Rapat Koordinasi': 40, 'Efisiensi Anggaran': 38, 'Sinergi Daerah': 36,
-    'Kebijakan Infrastruktur': 35, 'Kesiapan Jalur Mudik': 34, 'Pemberdayaan Daerah': 33, 'Komitmen Pelayanan': 32,
-    'Kepemimpinan Tegas': 30, 'Integritas Pejabat': 29, 'Penuntasan PSN': 28, 'Modernisasi Irigasi': 27,
-    'Apresiasi Tokoh': 26, 'Kabinet Merah Putih': 25, 'Dialog Masyarakat': 24, 'Penanganan Bencana': 23,
-    'Instruksi Bina Marga': 22, 'Instruksi SDA': 21, 'Kunjungan Daerah': 20, 'Transparansi Publik': 19,
-    'Sidak Proyek Strategis': 18, 'Solusi Kemacetan': 17, 'Fokus Air Bersih': 16, 'Pencegahan Tanggul': 15,
-    'Koordinasi BNPB': 14, 'Peningkatan Mutu': 13, 'Disiplin Anggaran': 12, 'Pembangunan Merata': 11,
-    'Inovasi Teknologi': 10, 'Asta Cita PU': 9, 'Wawancara Media': 9, 'Konferensi Pers': 8,
-    'Sapa Warga': 8, 'Dukungan Parlemen': 7, 'Optimisme Publik': 7, 'Kinerja Positif': 6,
-    'Menteri PU Bekerja': 5
+    'Percepatan Rehab Rekon Sumatera': 140, 'Penanganan Banjir Aceh': 125, 'Pemulihan Jalan Nasional': 95, 'Kesiagaan Tanggul Sungai': 85,
+    'Kunjungan Lapangan Darurat': 78, 'Tindakan Tanggap Bencana': 72, 'Normalisasi Aliran Sungai': 68, 'Penanganan Dampak Bencana': 65,
+    'Dukungan Komisi V DPR': 60, 'Percepatan Realisasi Proyek': 58, 'Infrastruktur Rakyat Terpadu': 55, 'Ketahanan Pangan dan Air': 52,
+    'Perbaikan Jalan Rusak': 50, 'Pembangunan Bendungan Strategis': 48, 'Evaluasi Kinerja Lapangan': 46, 'Pengawasan Kualitas Proyek': 45,
+    'Respons Cepat Bencana': 42, 'Rapat Koordinasi Penanggulangan': 40, 'Efisiensi Anggaran Prioritas': 38, 'Sinergi Pemerintah Daerah': 36,
+    'Kebijakan Infrastruktur Terarah': 35, 'Kesiapan Jalur Logistik Bencana': 34, 'Pemberdayaan Warga Terdampak': 33, 'Komitmen Mutu Layanan': 32,
+    'Penuntasan Proyek Strategis': 30, 'Integritas Pelaksanaan Lapangan': 29, 'Modernisasi Jaringan Irigasi': 28, 'Penanganan Krisis Air': 27,
+    'Apresiasi Respon Cepat': 26, 'Dukungan Program Prioritas': 25, 'Dialog Warga Terdampak': 24, 'Penanggulangan Bencana Terpadu': 23,
+    'Preservasi Jalan Berlubang': 22, 'Mitigasi Banjir Rob': 21, 'Inspeksi Infrastruktur Daerah': 20, 'Transparansi Informasi Publik': 19,
+    'Penyelesaian Hambatan Lapangan': 18, 'Solusi Kemacetan Jalur Vital': 17, 'Fokus Distribusi Air Bersih': 16, 'Pencegahan Tanggul Kritis': 15,
+    'Koordinasi BNPB dan Daerah': 14, 'Peningkatan Standar Mutu': 13, 'Disiplin Realisasi Anggaran': 12, 'Pembangunan Berkeadilan': 11,
+    'Inovasi Pengendalian Banjir': 10, 'Swasembada Pangan Air': 9, 'Klarifikasi Faktual Media': 9, 'Penyampaian Data Lapangan': 8,
+    'Pendampingan Warga Korban': 8, 'Dukungan Segenap Pihak': 7, 'Optimisme Percepatan Fisik': 7, 'Capaian Positif Lapangan': 6,
+    'Bantuan Krisis Air Bersih': 5
 }
 
 MENPU_10_NEG = {
-    'Kritik Lambat Sidak': 120, 'Sorotan Anggaran': 110, 'Aduan Jalan Rusak': 95,
-    'Desakan Penanganan Banjir': 80, 'Kontroversi Kebijakan': 75, 'Keluhan Warganet': 70,
-    'Keterlambatan Target': 60, 'Pengawasan Lemah': 55, 'Tuntutan Solusi': 50, 'Polemik Tender': 45
+    'Tanggul Jebol Pidie Jaya': 120, 'Banjir Bandang Gayo Lues': 110, 'Jalan Rusak Berlubang': 95,
+    'Banjir Rob Pantura': 80, 'Kekeringan Air Bersih': 75, 'Jembatan Terputus': 70,
+    'Drainase Meluap': 60, 'Longsor Tebing Jalan': 55, 'Isu Nepotisme': 50, 'Proyek Lambat Selesai': 45
 }
 
 
@@ -955,6 +1269,22 @@ def render_slide_6_two_wordclouds(df, selected_topic='Semua', topic_label=None, 
     else:
         freq_left = KEMENPU_53_WORDS
         freq_right = KEMENPU_10_NEG
+
+    # Filter entitas (KemenPU, nama Menteri, dsb) secara ketat agar murni isu kebijakan
+    from src.data_loader import clean_pu_entities
+    clean_freq_left = {}
+    for k, v in freq_left.items():
+        kc = clean_pu_entities(k)
+        if kc and len(kc) > 2:
+            clean_freq_left[kc] = clean_freq_left.get(kc, 0) + v
+    freq_left = clean_freq_left
+
+    clean_freq_right = {}
+    for k, v in freq_right.items():
+        kc = clean_pu_entities(k)
+        if kc and len(kc) > 2:
+            clean_freq_right[kc] = clean_freq_right.get(kc, 0) + v
+    freq_right = clean_freq_right
 
     total_left = len(freq_left)
     total_right = len(freq_right)
@@ -1912,6 +2242,38 @@ Pelajaran Lapangan Penting
 </div>
 </div>"""
         render_html(l1_html)
+
+    # Wordcloud Pemantauan Isu Harian (Fokus Isu & Permasalahan Lapangan)
+    daily_issues_dict = {
+        'Penanganan Bencana Banjir Aceh': 110,
+        'Tanggul Jebol Pidie Jaya': 95,
+        'Banjir Bandang Gayo Lues': 88,
+        'Jalan Rusak Berlubang': 82,
+        'Percepatan Rehab Rekon Sumatera': 78,
+        'Normalisasi Sungai 3 Provinsi': 72,
+        'Waspada Banjir Rob Pantura': 65,
+        'Bantuan Penanganan Kekeringan': 58,
+        'Jembatan Rusak Putus': 50,
+        'Drainase Perkotaan Meluap': 42,
+        'Infrastruktur Swasembada Pangan': 38,
+        'Distribusi Air Bersih SPAM': 34,
+        'Longsor Tebing Jalan': 30
+    }
+    b64_daily_wc = _generate_wordcloud_image_base64(tuple(daily_issues_dict.items()), palette_mode='general', width=940, height=240)
+    
+    daily_wc_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:12px 18px 10px 18px; box-shadow:0 1px 3px rgba(0,0,0,0.02); margin-top:10px; margin-bottom:10px;">
+<div style="font-family:'Plus Jakarta Sans',sans-serif; font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">
+    <div style="display:flex; align-items:center; gap:6px;">
+        <span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
+        <span>Awan Kata Isu Harian Terpantau (Fokus Kebijakan & Isu Lapangan)</span>
+    </div>
+    <span style="font-size:10px; color:#64748B; font-weight:500;">Filter Entitas: Nama Lembaga & Menteri Dihapus (Fokus Isu Substantif)</span>
+</div>
+<div style="width:100%; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+    <img src="data:image/png;base64,{b64_daily_wc}" style="width:100%; height:auto; display:block; border-radius:4px;" alt="Awan Kata Isu Harian" />
+</div>
+</div>"""
+    render_html(daily_wc_html)
 
     render_callout_target("Tindakan Nyata: Menjawab keraguan warganet dengan bukti visual pelaksanaan di lapangan.")
     render_mh_footer(f"Sumber: Rekapitulasi Harian Korpus {m['topic_title']}")

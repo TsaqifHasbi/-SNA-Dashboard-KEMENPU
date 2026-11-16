@@ -25,10 +25,76 @@ STOPWORDS_ID = {
 
 TOPIC_STOPWORDS = {
     'kemenpu', 'kementerian', 'pekerjaan', 'umum', 'menteri', 'pu',
-    'kemenpupr', 'pupr', 'program', 'pemerintah', 'ri', 'indonesia'
+    'kemenpupr', 'pupr', 'program', 'pemerintah', 'ri', 'indonesia',
+    'dody', 'hanggodo', 'diana', 'kusumastuti', 'basuki', 'hadimuljono',
+    'wamen', 'pak', 'bapak', 'bu', 'ibu', 'pejabat', 'sekjen', 'balai'
 }
 
 ALL_STOPWORDS = STOPWORDS_ID | TOPIC_STOPWORDS
+
+def clean_pu_entities(text: str) -> str:
+    """
+    Membersihkan kata entitas (KemenPU, nama Menteri Dody Hanggodo, Wamen Diana, Pak Basuki)
+    dari teks agar WordCloud fokus pada ISU SUBSTANTIF yang dibahas masyarakat.
+    Contoh: 'kemenpu kurang andal dalam penanggulangan bencana banjir di aceh'
+    -> 'kurang andal dalam penanggulangan bencana banjir di aceh'
+    """
+    if not isinstance(text, str):
+        return ""
+    
+    patterns = [
+        r'\bkementerian\s+pekerjaan\s+umum\s+dan\s+perumahan\s+rakyat\b',
+        r'\bkementerian\s+pekerjaan\s+umum\s+ri\b',
+        r'\bkementerian\s+pekerjaan\s+umum\b',
+        r'\bkementerian\s+pupr\b',
+        r'\bkementerian\s+pu\b',
+        r'\bmenteri\s+pekerjaan\s+umum\b',
+        r'\bmenteri\s+dody\s+hanggodo\b',
+        r'\bmenteri\s+dody\b',
+        r'\bmenteri\s+pu\b',
+        r'\bmenteri\s+pupr\b',
+        r'\bpak\s+dody\s+hanggodo\b',
+        r'\bpak\s+dody\b',
+        r'\bbapak\s+dody\s+hanggodo\b',
+        r'\bbapak\s+dody\b',
+        r'\bpak\s+menteri\b',
+        r'\bbapak\s+menteri\b',
+        r'\bibu\s+wamen\b',
+        r'\bbu\s+wamen\b',
+        r'\bibu\s+diana\s+kusumastuti\b',
+        r'\bbu\s+diana\s+kusumastuti\b',
+        r'\bibu\s+diana\b',
+        r'\bbu\s+diana\b',
+        r'\bpak\b',
+        r'\bbapak\b',
+        r'\bbu\b',
+        r'\bibu\b',
+        r'\bmenteri\b',
+        r'\bdody\s+hanggodo\b',
+        r'\bdody\b',
+        r'\bhanggodo\b',
+        r'\bwamen\s+pu\b',
+        r'\bwakil\s+menteri\s+pu\b',
+        r'\bwakil\s+menteri\b',
+        r'\bwamen\b',
+        r'\bdiana\s+kusumastuti\b',
+        r'\bdiana\b',
+        r'\bkusumastuti\b',
+        r'\bbasuki\s+hadimuljono\b',
+        r'\bpak\s+basuki\b',
+        r'\bpak\s+bas\b',
+        r'\bbasuki\b',
+        r'\bhadimuljono\b',
+        r'\bkemenpupr\b',
+        r'\bkemenpu\b',
+        r'\bpupr\b',
+        r'\bpu\s+ri\b',
+        r'\bpu\b',
+    ]
+    cleaned = text
+    for pat in patterns:
+        cleaned = re.sub(pat, ' ', cleaned, flags=re.IGNORECASE)
+    return re.sub(r'\s+', ' ', cleaned).strip()
 
 EMOTION_LEXICON = {
     'Senang': ['senang', 'bahagia', 'gembira', 'sukacita', 'ceria', 'riang', 'puas',

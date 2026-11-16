@@ -90,7 +90,9 @@ STOPWORDS_ID = {
     'karena', 'oleh', 'saat', 'para', 'seperti', 'lebih', 'harus', 'kami', 'kita',
     'bagi', 'saja', 'masih', 'tentang', 'kemenpu', 'kementerian', 'pekerjaan', 'umum',
     'menteri', 'pu', 'pupr', 'kemenpupr', 'program', 'pemerintah', 'ri', 'indonesia',
-    'pemerintah', 'https', 'http', 'www', 'com', 'rt', 'amp', 'nan', 'none',
+    'dody', 'hanggodo', 'diana', 'kusumastuti', 'basuki', 'hadimuljono', 'wamen',
+    'pak', 'bapak', 'pejabat', 'sekjen', 'balai',
+    'https', 'http', 'www', 'com', 'rt', 'amp', 'nan', 'none',
     'telah', 'mereka', 'ia', 'tersebut', 'kata', 'agar', 'lalu', 'maka', 'namun',
     'serta', 'pun', 'yakni', 'antara', 'setiap', 'tetapi', 'hingga', 'secara',
     'bahwa', 'atas', 'nya', 'se', 'tak', 'yg', 'gak', 'ga', 'gk', 'udah', 'dah',
@@ -569,22 +571,26 @@ def get_top_terms(df, top_n=20):
 # 15. WORD CLOUDS (Dual: Frequency vs Reach)
 # ======================================================================
 def generate_wordcloud_base64(df, by='frequency', colormap='coolwarm'):
+    from src.data_loader import clean_pu_entities
     if by == 'reach':
         high_reach = df[df['reach'] > df['reach'].median()]
         text_source = high_reach if len(high_reach) > 100 else df
-        text = ' '.join(text_source['cleaned_content'].dropna().tolist()[:5000])
+        raw_text = ' '.join(text_source['cleaned_content'].dropna().tolist()[:5000])
+        text = clean_pu_entities(raw_text)
         colormap = 'winter'
     elif by == 'hashtag':
         all_tags = []
         for t in df['raw_content'].dropna().tolist()[:5000]:
             all_tags.extend(re.findall(r'#(\w+)', t))
         text = ' '.join([t.lower() for t in all_tags if t.lower() not in STOPWORDS_ID])
+        text = clean_pu_entities(text)
         colormap = 'plasma'
     else:
-        text = ' '.join(df['cleaned_content'].dropna().tolist()[:5000])
+        raw_text = ' '.join(df['cleaned_content'].dropna().tolist()[:5000])
+        text = clean_pu_entities(raw_text)
 
     if not text.strip():
-        text = 'sekolah rakyat pendidikan makan bergizi koperasi indonesia'
+        text = 'infrastruktur penanganan banjir jalan nasional jembatan irigasi air bersih'
 
     wc = WordCloud(
         width=800, height=400,
