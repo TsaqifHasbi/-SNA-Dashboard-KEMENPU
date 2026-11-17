@@ -377,8 +377,16 @@ def main():
     df['total_engagement'] = df['likes'] + df['comments'] + df['shares'] + df['reposts']
     df['reach'] = df['views'] + (df['likes'] * 3) + (df['comments'] * 5) + (df['shares'] * 10) + (df['reposts'] * 10)
 
-    # 4. Simpan ke CSV & Parquet
-    print(f"\nMenyimpan hasil ke:")
+    # 4. Simpan ke CSV & Parquet (dengan Auto-Backup Bertingkat)
+    try:
+        from tools.backup_manager import backup_incremental_file
+        print("\n📦 Memeriksa & Menjalankan Auto-Backup File Lama...")
+        backup_incremental_file(OUT_PQ)
+        backup_incremental_file(OUT_CSV)
+    except Exception as e:
+        print(f"[WARN] Gagal membuat auto-backup: {e}")
+
+    print(f"\nMenyimpan hasil terbaru ke:")
     print(f"  -> {OUT_CSV}")
     print(f"  -> {OUT_PQ}")
     df.to_csv(OUT_CSV, index=False, encoding='utf-8-sig')

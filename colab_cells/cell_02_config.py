@@ -30,6 +30,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Load environment variables dari .env (jika ada)
 try:
+    # pyrefly: ignore [missing-import]
     from dotenv import load_dotenv
     env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '.env')
     if os.path.exists(env_file):
@@ -48,9 +49,18 @@ else:
         os.environ.get('YOUTUBE_API_KEY'),
         os.environ.get('YOUTUBE_API_KEY_2'),
         os.environ.get('YOUTUBE_API_KEY_3'),
+        os.environ.get('YOUTUBE_API_KEY_4'),
     ] if k and k.strip()]
 
-YOUTUBE_API_KEY = YOUTUBE_API_KEYS[0] if YOUTUBE_API_KEYS else os.environ.get('YOUTUBE_API_KEY', 'YOUR_YOUTUBE_API_KEY_HERE')
+if not YOUTUBE_API_KEYS:
+    YOUTUBE_API_KEYS = [
+        "AIzaSyCyEyL9-0YNQ9qLW4TfLxwbvV9TAchvTSs",
+        "AIzaSyAmmygdW4JRlcFG99aVs_RBFJXAxRWD2yE",
+        "AIzaSyCmtOhwfwEsJ6meDsyJGFJAgujIkUYT564",
+        "AIzaSyAXkFS0Q7LdlTtfOlSsDE4EAzV7WSYTJwg"
+    ]
+
+YOUTUBE_API_KEY = YOUTUBE_API_KEYS[0]
 
 # ================================================================
 # TWITTER/X — Cookie dari browser

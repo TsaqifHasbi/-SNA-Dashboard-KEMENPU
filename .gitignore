@@ -47,11 +47,14 @@ ScrapeData_TA_Elektrifikasi/
 *.csv
 
 # Explicitly keep runtime data needed by Streamlit & SNA
+data/*(*).parquet
+data/*(*).csv
 !data/enriched_corpus_for_sna.parquet
 !data/gold_standard_sample_1000.csv
 !data/*.json
 data/registered_users.json
 data/user_credentials.json
+data/active_sessions.json
 !data/*.gexf
 !sna/output/*.gexf
 !sna/output/*.json

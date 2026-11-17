@@ -462,16 +462,18 @@ with st.sidebar:
     min_date = df_raw['date'].min().date()
     max_date = df_raw['date'].max().date()
     
-    # Default: 1 Januari 2025 s/d Sekarang (data terkini)
+    # Default: 1 Januari 2025 s/d 15 November 2026
     default_start = max(min_date, datetime.date(2025, 1, 1))
-    default_end = max_date
+    target_end = datetime.date(2026, 11, 15)
+    max_date_boundary = max(max_date, target_end)
+    default_end = min(max_date_boundary, target_end)
     
     date_range = st.date_input(
         "Rentang Waktu:",
         value=(default_start, default_end),
         min_value=min_date,
-        max_value=max_date,
-        help="Rentang waktu analisis data (default: 1 Januari 2025 s/d Sekarang)"
+        max_value=max_date_boundary,
+        help="Rentang waktu analisis data (default: 1 Januari 2025 s/d 15 November 2026)"
     )
     
     start_d, end_d = None, None
@@ -479,7 +481,7 @@ with st.sidebar:
         if len(date_range) == 2:
             start_d, end_d = date_range[0], date_range[1]
         elif len(date_range) == 1:
-            start_d, end_d = date_range[0], max_date
+            start_d, end_d = date_range[0], default_end
 
     def format_indo_date(d):
         if not d:
