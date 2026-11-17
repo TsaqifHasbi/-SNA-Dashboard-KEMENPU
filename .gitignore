@@ -28,11 +28,7 @@ Desktop.ini
 scratch/
 tools/__pycache__/
 models/__pycache__/
-colab_cells/__pycache__/
-colab_cells/*.html
-colab_cells/*.json
-colab_cells/*.png
-colab_cells/*.csv
+colab_cells/
 
 # Large Model Weights (> 100 MB - Excluded to respect GitHub limits)
 *.safetensors
