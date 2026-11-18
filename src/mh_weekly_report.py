@@ -636,15 +636,9 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
         </div>
 
         <!-- Guide Pill -->
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; padding-top:4px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px; padding-top:4px;">
             <span style="background:#F59E0B; color:#0F172A; font-weight:800; font-size:10px; padding:3px 11px; border-radius:14px; letter-spacing:0.5px; text-transform:uppercase;">PANDUAN BACA</span>
             <span style="font-size:11px; color:#475569; font-weight:500;">{guide_text}</span>
-        </div>
-
-        <!-- Cakupan Keyword Entitas Card -->
-        <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:6px; padding:6px 12px; margin-bottom:14px; font-size:10.5px; color:#1E40AF; display:flex; align-items:center; gap:8px;">
-            <span style="font-weight:800; font-size:11px; white-space:nowrap;">📌 Cakupan Entitas:</span>
-            <span style="font-weight:500; line-height:1.4;">{m.get('kw_note', '')}</span>
         </div>
 
         <!-- Enam Temuan Utama Card -->
