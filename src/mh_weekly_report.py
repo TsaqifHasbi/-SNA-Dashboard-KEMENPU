@@ -101,24 +101,29 @@ def _get_slide_metrics(df, selected_topic='Semua', topic_label=None):
     # Topic display title
     t_clean = str(topic_label).replace('_', ' ')
     if t_clean.lower() in ['semua', 'semua topik']:
-        t_clean = 'Kementerian Pekerjaan Umum & Menteri PU'
-        t_short = 'Kemen PU & Menteri PU'
-        t_sub = 'Kementerian PU • Menteri PU'
+        t_clean = 'Lembaga (Kemen PU) & Menteri PU'
+        t_short = 'Lembaga & Menteri'
+        t_sub = 'Lembaga (Kementerian PU) • Menteri PU'
+        kw_note = 'Mencakup 12 Keyword: 6 Keyword Lembaga (Kementerian Pekerjaan Umum, Kemen PU RI, dll) & 6 Keyword Menteri (Menteri PU, Dody Hanggodo, dll)'
     elif 'kementerian' in t_clean.lower():
-        t_clean = 'Kementerian Pekerjaan Umum (Kemen PU RI)'
-        t_short = 'Kementerian PU'
-        t_sub = 'Kemen PU RI • Proyek & Infrastruktur'
+        t_clean = 'Lembaga (Kementerian Pekerjaan Umum)'
+        t_short = 'Lembaga'
+        t_sub = 'Lembaga Kementerian PU RI (Keyword 1 s.d. 6)'
+        kw_note = 'Mencakup 6 Keyword Lembaga: Kementerian Pekerjaan Umum, Kementerian Pekerjaan Umum Republik Indonesia, Kementerian PU, Kementerian PU RI, Kemen PU, Kemen PU RI'
     elif 'menteri' in t_clean.lower():
-        t_clean = 'Menteri Pekerjaan Umum (Menteri PU)'
-        t_short = 'Menteri PU'
-        t_sub = 'Ir. Dody Hanggodo, M.P.E. & Jajaran'
+        t_clean = 'Menteri (Menteri Pekerjaan Umum)'
+        t_short = 'Menteri'
+        t_sub = 'Menteri PU Ir. Dody Hanggodo & Jajaran (Keyword 7 s.d. 12)'
+        kw_note = 'Mencakup 6 Keyword Menteri: Menteri Pekerjaan Umum, Menteri Pekerjaan Umum Dody Hanggodo, Menteri PU, Menteri PU Dody Hanggodo, Menteri Dody Hanggodo, Dody Hanggodo'
     elif t_clean == 'MBG':
         t_clean = 'Makan Bergizi Gratis (MBG)'
         t_short = 'Makan Bergizi Gratis'
         t_sub = 'Program MBG Nasional'
+        kw_note = 'Program MBG Nasional'
     else:
         t_short = t_clean
         t_sub = f"Fokus {t_clean}"
+        kw_note = f"Cakupan keyword untuk {t_clean}"
         
     return {
         'vol': vol,
@@ -142,7 +147,8 @@ def _get_slide_metrics(df, selected_topic='Semua', topic_label=None):
         'top_kw_2': top_kw_2,
         'topic_title': t_clean,
         'topic_short': t_short,
-        'topic_sub': t_sub
+        'topic_sub': t_sub,
+        'kw_note': kw_note
     }
 
 def _get_frequent_words(df, max_words=25, sentiment_filter=None):
@@ -519,7 +525,7 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
             <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:6px 10px; min-width:85px;">
                 <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
                     <span style="width:6px; height:6px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
-                    <span style="font-size:9.5px; font-weight:600; color:#64748B;">Penyebutan {m['topic_short'][:14]}</span>
+                    <span style="font-size:9.5px; font-weight:600; color:#64748B;">Penyebutan {m['topic_short']}</span>
                 </div>
                 <div style="font-size:17px; font-weight:800; color:#2563EB; line-height:1.1;">{m['vol']:,}</div>
                 <div style="font-size:9px; color:#64748B; margin-top:1px;">{date_str}</div>
@@ -630,9 +636,15 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
         </div>
 
         <!-- Guide Pill -->
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px; padding-top:4px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; padding-top:4px;">
             <span style="background:#F59E0B; color:#0F172A; font-weight:800; font-size:10px; padding:3px 11px; border-radius:14px; letter-spacing:0.5px; text-transform:uppercase;">PANDUAN BACA</span>
             <span style="font-size:11px; color:#475569; font-weight:500;">{guide_text}</span>
+        </div>
+
+        <!-- Cakupan Keyword Entitas Card -->
+        <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:6px; padding:6px 12px; margin-bottom:14px; font-size:10.5px; color:#1E40AF; display:flex; align-items:center; gap:8px;">
+            <span style="font-weight:800; font-size:11px; white-space:nowrap;">📌 Cakupan Entitas:</span>
+            <span style="font-weight:500; line-height:1.4;">{m.get('kw_note', '')}</span>
         </div>
 
         <!-- Enam Temuan Utama Card -->

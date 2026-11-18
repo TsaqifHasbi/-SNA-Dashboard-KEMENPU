@@ -1,12 +1,12 @@
 {
   "topic": "All_Topics",
-  "total_nodes": 7511,
-  "total_edges": 3811,
+  "total_nodes": 8070,
+  "total_edges": 3995,
   "top_influencers": [
     {
       "rank": 1,
       "user": "bakom.ri",
-      "in_degree": 883,
+      "in_degree": 954,
       "out_degree": 0,
       "sentiment": "Netral",
       "emotion": "Neutral",
@@ -14,38 +14,38 @@
       "platform": "TikTok",
       "engagement": 17873,
       "post_count": 4,
-      "composite_score": 8851.87
+      "composite_score": 9561.87
     },
     {
       "rank": 2,
       "user": "kementerianpu",
-      "in_degree": 633,
-      "out_degree": 303,
+      "in_degree": 704,
+      "out_degree": 334,
       "sentiment": "Netral",
       "emotion": "Neutral",
-      "nss": 23.75,
+      "nss": 21.53,
       "platform": "Threads",
-      "engagement": 331589,
-      "post_count": 379,
-      "composite_score": 7040.59
+      "engagement": 377411,
+      "post_count": 418,
+      "composite_score": 7835.41
     },
     {
       "rank": 3,
       "user": "kemenpu",
-      "in_degree": 478,
-      "out_degree": 294,
+      "in_degree": 506,
+      "out_degree": 316,
       "sentiment": "Netral",
       "emotion": "Neutral",
-      "nss": 14.06,
+      "nss": 13.98,
       "platform": "Twitter",
-      "engagement": 983427,
-      "post_count": 626,
-      "composite_score": 6389.43
+      "engagement": 1113474,
+      "post_count": 644,
+      "composite_score": 6817.47
     },
     {
       "rank": 4,
       "user": "sekretariat.kabinet",
-      "in_degree": 317,
+      "in_degree": 350,
       "out_degree": 3,
       "sentiment": "Netral",
       "emotion": "Neutral",
@@ -53,7 +53,7 @@
       "platform": "Instagram",
       "engagement": 312697,
       "post_count": 2,
-      "composite_score": 3484.7
+      "composite_score": 3814.7
     },
     {
       "rank": 5,
@@ -62,24 +62,24 @@
       "out_degree": 10,
       "sentiment": "Netral",
       "emotion": "Neutral",
-      "nss": -0.97,
+      "nss": -0.85,
       "platform": "News",
       "engagement": 0,
-      "post_count": 2056,
-      "composite_score": 2056.0
+      "post_count": 2590,
+      "composite_score": 2590.0
     },
     {
       "rank": 6,
       "user": "dody_hanggodo",
-      "in_degree": 199,
+      "in_degree": 233,
       "out_degree": 16,
       "sentiment": "Positif",
-      "emotion": "Neutral",
-      "nss": 50.0,
+      "emotion": "Joy",
+      "nss": 52.94,
       "platform": "Instagram",
-      "engagement": 43289,
-      "post_count": 16,
-      "composite_score": 2049.29
+      "engagement": 43325,
+      "post_count": 17,
+      "composite_score": 2390.32
     },
     {
       "rank": 7,
@@ -88,40 +88,53 @@
       "out_degree": 20,
       "sentiment": "Netral",
       "emotion": "Neutral",
-      "nss": 13.23,
+      "nss": 12.98,
       "platform": "News",
       "engagement": 0,
-      "post_count": 257,
-      "composite_score": 1307.0
+      "post_count": 262,
+      "composite_score": 1312.0
     },
     {
       "rank": 8,
       "user": "prabowo",
-      "in_degree": 107,
+      "in_degree": 112,
       "out_degree": 0,
       "sentiment": "Netral",
       "emotion": "Neutral",
-      "nss": 8.41,
+      "nss": 6.25,
       "platform": "Mentioned",
       "engagement": 0,
       "post_count": 0,
-      "composite_score": 1070.0
+      "composite_score": 1120.0
     },
     {
       "rank": 9,
       "user": "kemensetneg.ri",
-      "in_degree": 103,
+      "in_degree": 109,
       "out_degree": 0,
       "sentiment": "Netral",
       "emotion": "Neutral",
-      "nss": 11.65,
+      "nss": 11.01,
       "platform": "Mentioned",
       "engagement": 0,
       "post_count": 0,
-      "composite_score": 1030.0
+      "composite_score": 1090.0
     },
     {
       "rank": 10,
+      "user": "pandanganpublik",
+      "in_degree": 0,
+      "out_degree": 0,
+      "sentiment": "Netral",
+      "emotion": "Trust",
+      "nss": 25.0,
+      "platform": "Threads",
+      "engagement": 1037666,
+      "post_count": 8,
+      "composite_score": 1045.67
+    },
+    {
+      "rank": 11,
       "user": "pu_go_id",
       "in_degree": 68,
       "out_degree": 28,
@@ -134,20 +147,72 @@
       "composite_score": 737.0
     },
     {
-      "rank": 11,
-      "user": "badan",
-      "in_degree": 61,
+      "rank": 12,
+      "user": "kementerian",
+      "in_degree": 73,
       "out_degree": 0,
       "sentiment": "Netral",
       "emotion": "Neutral",
-      "nss": 19.67,
+      "nss": 15.07,
       "platform": "Mentioned",
       "engagement": 0,
       "post_count": 0,
-      "composite_score": 610.0
+      "composite_score": 730.0
     },
     {
-      "rank": 12,
+      "rank": 13,
+      "user": "badan",
+      "in_degree": 70,
+      "out_degree": 0,
+      "sentiment": "Netral",
+      "emotion": "Neutral",
+      "nss": 18.57,
+      "platform": "Mentioned",
+      "engagement": 0,
+      "post_count": 0,
+      "composite_score": 700.0
+    },
+    {
+      "rank": 14,
+      "user": "pu_bpsdm",
+      "in_degree": 48,
+      "out_degree": 68,
+      "sentiment": "Netral",
+      "emotion": "Neutral",
+      "nss": 14.0,
+      "platform": "Twitter",
+      "engagement": 27694,
+      "post_count": 150,
+      "composite_score": 657.69
+    },
+    {
+      "rank": 15,
+      "user": "ir.",
+      "in_degree": 64,
+      "out_degree": 0,
+      "sentiment": "Netral",
+      "emotion": "Neutral",
+      "nss": 14.06,
+      "platform": "Mentioned",
+      "engagement": 0,
+      "post_count": 0,
+      "composite_score": 640.0
+    },
+    {
+      "rank": 16,
+      "user": "distriksantai",
+      "in_degree": 0,
+      "out_degree": 0,
+      "sentiment": "Netral",
+      "emotion": "Joy",
+      "nss": 25.0,
+      "platform": "Threads",
+      "engagement": 608423,
+      "post_count": 8,
+      "composite_score": 616.42
+    },
+    {
+      "rank": 17,
       "user": "garudatv.official",
       "in_degree": 0,
       "out_degree": 0,
@@ -160,20 +225,20 @@
       "composite_score": 600.47
     },
     {
-      "rank": 13,
-      "user": "kementerian",
-      "in_degree": 60,
-      "out_degree": 0,
-      "sentiment": "Netral",
-      "emotion": "Neutral",
-      "nss": 20.0,
-      "platform": "Mentioned",
-      "engagement": 0,
-      "post_count": 0,
-      "composite_score": 600.0
+      "rank": 18,
+      "user": "dodyhanggodo",
+      "in_degree": 58,
+      "out_degree": 20,
+      "sentiment": "Positif",
+      "emotion": "Surprise",
+      "nss": 36.36,
+      "platform": "TikTok",
+      "engagement": 5155,
+      "post_count": 11,
+      "composite_score": 596.15
     },
     {
-      "rank": 14,
+      "rank": 19,
       "user": "ptjasamarga",
       "in_degree": 7,
       "out_degree": 0,
@@ -182,90 +247,25 @@
       "nss": 0.0,
       "platform": "Twitter",
       "engagement": 51,
-      "post_count": 515,
-      "composite_score": 585.05
-    },
-    {
-      "rank": 15,
-      "user": "dodyhanggodo",
-      "in_degree": 55,
-      "out_degree": 20,
-      "sentiment": "Positif",
-      "emotion": "Surprise",
-      "nss": 36.36,
-      "platform": "TikTok",
-      "engagement": 5155,
-      "post_count": 11,
-      "composite_score": 566.15
-    },
-    {
-      "rank": 16,
-      "user": "ir.",
-      "in_degree": 55,
-      "out_degree": 0,
-      "sentiment": "Netral",
-      "emotion": "Surprise",
-      "nss": 16.36,
-      "platform": "Mentioned",
-      "engagement": 0,
-      "post_count": 0,
-      "composite_score": 550.0
-    },
-    {
-      "rank": 17,
-      "user": "pandanganpublik",
-      "in_degree": 0,
-      "out_degree": 0,
-      "sentiment": "Netral",
-      "emotion": "Anticipation",
-      "nss": 16.67,
-      "platform": "Threads",
-      "engagement": 518837,
-      "post_count": 6,
-      "composite_score": 524.84
-    },
-    {
-      "rank": 18,
-      "user": "pu_bpsdm",
-      "in_degree": 37,
-      "out_degree": 60,
-      "sentiment": "Netral",
-      "emotion": "Neutral",
-      "nss": 15.45,
-      "platform": "Twitter",
-      "engagement": 26527,
-      "post_count": 123,
-      "composite_score": 519.53
-    },
-    {
-      "rank": 19,
-      "user": "tapberita",
-      "in_degree": 0,
-      "out_degree": 0,
-      "sentiment": "Positif",
-      "emotion": "Sadness",
-      "nss": 100.0,
-      "platform": "Instagram",
-      "engagement": 518470,
-      "post_count": 1,
-      "composite_score": 519.47
+      "post_count": 523,
+      "composite_score": 593.05
     },
     {
       "rank": 20,
-      "user": "kicaumedia_",
+      "user": "laporan8.id",
       "in_degree": 0,
       "out_degree": 0,
-      "sentiment": "Negatif",
-      "emotion": "Anger",
-      "nss": -100.0,
-      "platform": "Instagram",
-      "engagement": 506847,
-      "post_count": 1,
-      "composite_score": 507.85
+      "sentiment": "Netral",
+      "emotion": "Disgust",
+      "nss": 16.67,
+      "platform": "Threads",
+      "engagement": 548398,
+      "post_count": 6,
+      "composite_score": 554.4
     }
   ],
   "edge_layers": {
-    "mention_edges": 4765,
-    "co_keyword_edges": 2116
+    "mention_edges": 5233,
+    "co_keyword_edges": 2140
   }
 }

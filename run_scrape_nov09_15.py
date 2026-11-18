@@ -45,7 +45,7 @@ SCRAPE_DIR = os.path.join(BASE_DIR, 'ScrapeData')
 
 # Rentang Tanggal Default
 DEFAULT_SINCE = "2026-11-09"
-DEFAULT_UNTIL = "2026-11-15"
+DEFAULT_UNTIL = "2026-11-18"
 
 PLATFORM_MAP = {
     'twitter':   ('scraped_Twitter_Only.csv',   'run_twitter_only.py',   'Twitter / X'),
