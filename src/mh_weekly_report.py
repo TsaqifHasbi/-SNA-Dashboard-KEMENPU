@@ -665,9 +665,50 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
     render_mh_top_bar(slide_num=2)
     df_full = kwargs.get('df_full', None)
     m = _get_slide_metrics(df, selected_topic, topic_label, df_full=df_full)
-    
-    # Ekstraksi 6 temuan intelijen strategis sepekan
-    findings = _extract_top_6_issue_findings(df, m)
+
+    # ── Toggle: Laporan Resmi vs Kalkulasi Dinamis ──────────────────────
+    data_mode = st.radio(
+        "Sumber Data Executive Summary:",
+        ["📋 Laporan Resmi Pimpinan (9-15 Nov)", "📊 Kalkulasi Dinamis Korpus Aktif"],
+        index=0,
+        horizontal=True,
+        key="slide2_data_mode"
+    )
+    use_official = data_mode.startswith("📋")
+
+    # ── Angka Resmi (hardcoded sesuai laporan vendor 9-15 Nov) ──────────
+    if use_official:
+        badge_vol_lembaga_display = "3.123"
+        badge_vol_lembaga_sub = "naik dari 2.738"
+        badge_eng_display = "2,61 jt"
+        badge_eng_sub = "naik 31% dari 1,99 jt"
+        badge_neg_p_lembaga_display = "10,6"
+        badge_neg_lembaga_sub = "naik dari 8%"
+        badge_peak_neg_count = "120"
+        badge_peak_neg_sub = "lembaga, 13 Nov; RT seragam"
+        badge_neg_p_menteri_display = "3,9"
+        badge_neg_menteri_sub = "turun dari 7%"
+        badge_headline = "Perkara KPK menekan; banjir Aceh menguji balai"
+        badge_guide = "Enam temuan dari Pemantau Echo (279, 280), Pemantau Delta, dan media. Pita biru: prioritas."
+        # Force official findings
+        m_official = dict(m)
+        m_official['is_official_week'] = True
+        findings = _extract_top_6_issue_findings(df, m_official)
+    else:
+        badge_vol_lembaga_display = m['vol_lembaga_display']
+        badge_vol_lembaga_sub = m['vol_lembaga_sub']
+        badge_eng_display = m['eng_display']
+        badge_eng_sub = m['eng_sub']
+        badge_neg_p_lembaga_display = m['neg_p_lembaga_display']
+        badge_neg_lembaga_sub = m['neg_lembaga_sub']
+        badge_peak_neg_count = str(m['peak_neg_count'])
+        badge_peak_neg_sub = m['peak_neg_sub']
+        badge_neg_p_menteri_display = m['neg_p_menteri_display']
+        badge_neg_menteri_sub = m['neg_menteri_sub']
+        badge_headline = m['headline_title']
+        badge_guide = m['guide_text']
+        findings = _extract_top_6_issue_findings(df, m)
+
     f0, f1, f2, f3, f4, f5 = findings[0], findings[1], findings[2], findings[3], findings[4], findings[5]
 
     chips_html = f"""
@@ -678,8 +719,8 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
                     <span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
                     <span style="font-size:9.5px; font-weight:600; color:#475569;">Penyebutan Lembaga</span>
                 </div>
-                <div style="font-size:19px; font-weight:800; color:#2563EB; line-height:1.1;">{m['vol_lembaga_display']}</div>
-                <div style="font-size:9px; color:#64748B; margin-top:2px;">{m['vol_lembaga_sub']}</div>
+                <div style="font-size:19px; font-weight:800; color:#2563EB; line-height:1.1;">{badge_vol_lembaga_display}</div>
+                <div style="font-size:9px; color:#64748B; margin-top:2px;">{badge_vol_lembaga_sub}</div>
             </div>
             <!-- 2. Keterlibatan -->
             <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:7px 11px; min-width:98px;">
@@ -687,8 +728,8 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
                     <span style="width:7px; height:7px; border-radius:50%; background:#10B981; display:inline-block;"></span>
                     <span style="font-size:9.5px; font-weight:600; color:#475569;">Keterlibatan</span>
                 </div>
-                <div style="font-size:19px; font-weight:800; color:#10B981; line-height:1.1;">{m['eng_display']}</div>
-                <div style="font-size:9px; color:#64748B; margin-top:2px;">{m['eng_sub']}</div>
+                <div style="font-size:19px; font-weight:800; color:#10B981; line-height:1.1;">{badge_eng_display}</div>
+                <div style="font-size:9px; color:#64748B; margin-top:2px;">{badge_eng_sub}</div>
             </div>
             <!-- 3. Negatif Lembaga -->
             <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:7px 11px; min-width:98px;">
@@ -696,8 +737,8 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
                     <span style="width:7px; height:7px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
                     <span style="font-size:9.5px; font-weight:600; color:#475569;">Negatif Lembaga</span>
                 </div>
-                <div style="font-size:19px; font-weight:800; color:#EF4444; line-height:1.1;">{m['neg_p_lembaga_display']}%</div>
-                <div style="font-size:9px; color:#EF4444; margin-top:2px;">{m['neg_lembaga_sub']}</div>
+                <div style="font-size:19px; font-weight:800; color:#EF4444; line-height:1.1;">{badge_neg_p_lembaga_display}%</div>
+                <div style="font-size:9px; color:#EF4444; margin-top:2px;">{badge_neg_lembaga_sub}</div>
             </div>
             <!-- 4. Puncak Negatif -->
             <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:7px 11px; min-width:108px;">
@@ -705,8 +746,8 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
                     <span style="width:7px; height:7px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
                     <span style="font-size:9.5px; font-weight:600; color:#475569;">Puncak Negatif</span>
                 </div>
-                <div style="font-size:19px; font-weight:800; color:#EF4444; line-height:1.1;">{m['peak_neg_count']}</div>
-                <div style="font-size:9px; color:#64748B; margin-top:2px;">{m['peak_neg_sub']}</div>
+                <div style="font-size:19px; font-weight:800; color:#EF4444; line-height:1.1;">{badge_peak_neg_count}</div>
+                <div style="font-size:9px; color:#64748B; margin-top:2px;">{badge_peak_neg_sub}</div>
             </div>
             <!-- 5. Negatif Menteri -->
             <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:7px 11px; min-width:98px;">
@@ -714,8 +755,8 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
                     <span style="width:7px; height:7px; border-radius:50%; background:#10B981; display:inline-block;"></span>
                     <span style="font-size:9.5px; font-weight:600; color:#475569;">Negatif Menteri</span>
                 </div>
-                <div style="font-size:19px; font-weight:800; color:#10B981; line-height:1.1;">{m['neg_p_menteri_display']}%</div>
-                <div style="font-size:9px; color:#10B981; margin-top:2px;">{m['neg_menteri_sub']}</div>
+                <div style="font-size:19px; font-weight:800; color:#10B981; line-height:1.1;">{badge_neg_p_menteri_display}%</div>
+                <div style="font-size:9px; color:#10B981; margin-top:2px;">{badge_neg_menteri_sub}</div>
             </div>
         </div>
     """
@@ -729,7 +770,7 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
                     <span style="color:#0F2942;">Executive</span> <span style="color:#2563EB;">Summary</span>
                 </div>
                 <div style="font-size:15px; font-weight:700; color:#0F2942; margin-top:4px;">
-                    {m['headline_title']}
+                    {badge_headline}
                 </div>
             </div>
             {chips_html}
@@ -738,7 +779,7 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
         <!-- Yellow PANDUAN BACA Banner -->
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px; background:#FEF3C7; border:1px solid #FDE68A; padding:6px 14px; border-radius:8px;">
             <span style="background:#F59E0B; color:#0F172A; font-weight:800; font-size:10px; padding:3px 10px; border-radius:12px; letter-spacing:0.5px; text-transform:uppercase;">PANDUAN BACA</span>
-            <span style="font-size:11.5px; color:#78350F; font-weight:500;">{m['guide_text']}</span>
+            <span style="font-size:11.5px; color:#78350F; font-weight:500;">{badge_guide}</span>
         </div>
 
         <!-- Enam Temuan Utama Sepekan Card -->
