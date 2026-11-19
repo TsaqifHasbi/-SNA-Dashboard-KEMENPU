@@ -586,28 +586,28 @@ if "Format Laporan Harian" in view_mode or "Laporan Harian" in view_mode or "Sli
         },
         "Bab 1: Tinjauan Multiplatform (The Overview)": {
             "Slide 3: Pembuka Bab 1 (The Overview)": render_slide_3_chapter_1,
-            # "Slide 4: Tren Harian Lembaga & Menteri (Overall Media & Social)": render_slide_4_overall_media_social,
-            "Slide 4: Tinjauan Percakapan 7 Saluran Multiplatform": render_slide_5_platform_review,
-            "Slide 5: Analisis Suara Teratas & Dua Awan Kata": render_slide_6_two_wordclouds,
-            "Slide 6: Pemetaan Isu Positif & Negatif Terbesar": render_slide_7_issues_minister,
+            "Slide 4: Tren Keseluruhan Media & Sosial (Overall Media & Social)": render_slide_4_overall_media_social,
+            "Slide 5: Tinjauan Percakapan 7 Saluran Multiplatform": render_slide_5_platform_review,
+            "Slide 6: Analisis Suara Teratas & Dua Awan Kata": render_slide_6_two_wordclouds,
+            "Slide 7: Pemetaan Isu Positif & Negatif Terbesar": render_slide_7_issues_minister,
         },
         "Bab 2: Analisis Mendalam (The Deep Dive)": {
-            "Slide 7: Pembuka Bab 2 (The Deep Dive)": render_slide_8_chapter_2,
-            "Slide 8: Analisis Topik Utama & Klaster Isu": render_slide_9_main_topics,
-            "Slide 9: Pemetaan Pemangku Kepentingan (Power-Interest)": render_slide_10_stakeholder_mapping,
-            "Slide 10: Kronologi & Dinamika Lintas Waktu": render_slide_11_water_focus_timeline,
-            "Slide 11: Analisis Pembingkaian Isu (Framing Analysis)": render_slide_12_framing_analysis,
-            "Slide 12: Pemetaan Respons & Layanan Publik": render_slide_13_disaster_response,
-            "Slide 13: Audit Keserempakan & Uji Organik (Bot / Buzzer)": render_slide_14_bot_organic_audit,
-            "Slide 14: Rekomendasi Intelijen & Proyeksi 7 Hari": render_slide_15_intelligence_projections,
+            "Slide 8: Pembuka Bab 2 (The Deep Dive)": render_slide_8_chapter_2,
+            "Slide 9: Analisis Topik Utama & Klaster Isu": render_slide_9_main_topics,
+            "Slide 10: Pemetaan Pemangku Kepentingan (Power-Interest)": render_slide_10_stakeholder_mapping,
+            "Slide 11: Kronologi & Dinamika Lintas Waktu": render_slide_11_water_focus_timeline,
+            "Slide 12: Analisis Pembingkaian Isu (Framing Analysis)": render_slide_12_framing_analysis,
+            "Slide 13: Pemetaan Respons & Layanan Publik": render_slide_13_disaster_response,
+            "Slide 14: Audit Keserempakan & Uji Organik (Bot / Buzzer)": render_slide_14_bot_organic_audit,
+            "Slide 15: Rekomendasi Intelijen & Proyeksi 7 Hari": render_slide_15_intelligence_projections,
         },
         "Bab 3: Tindakan Strategis (The Action)": {
-            "Slide 15: Pembuka Bab 3 (The Action)": render_slide_16_chapter_3,
-            "Slide 16: Pemantauan Sentimen Harian (Sesi Pagi)": render_slide_17_daily_nov1,
-            "Slide 17: Pemantauan Sentimen Harian (Sesi Sore)": render_slide_18_daily_nov2,
-            "Slide 18: Daftar Pantau Isu Strategis Sepekan": render_slide_19_watch_list,
-            "Slide 19: Matriks Prioritas Tindakan & Metodologi": render_slide_20_priorities_methodology,
-            "Slide 20: Penutup & Pesan Kunci Eksekutif": render_slide_21_closing_summary,
+            "Slide 16: Pembuka Bab 3 (The Action)": render_slide_16_chapter_3,
+            "Slide 17: Pemantauan Sentimen Harian (Sesi Pagi)": render_slide_17_daily_nov1,
+            "Slide 18: Pemantauan Sentimen Harian (Sesi Sore)": render_slide_18_daily_nov2,
+            "Slide 19: Daftar Pantau Isu Strategis Sepekan": render_slide_19_watch_list,
+            "Slide 20: Matriks Prioritas Tindakan & Metodologi": render_slide_20_priorities_methodology,
+            "Slide 21: Penutup & Pesan Kunci Eksekutif": render_slide_21_closing_summary,
         },
         "Test Sentimen": {
             "Uji Interaktif: Deteksi Sentimen, Emosi & SNA": render_test_sentiment_page,
@@ -739,10 +739,10 @@ if "Format Laporan Harian" in view_mode or "Laporan Harian" in view_mode or "Sli
 
     st.write("")
     if not view_all_mh:
-        mh_pages[selected_mh_slide](df_filtered, selected_topic=selected_topic, topic_label=selected_topic, date_str=date_display)
+        mh_pages[selected_mh_slide](df_filtered, selected_topic=selected_topic, topic_label=selected_topic, date_str=date_display, df_full=df_raw)
     else:
         for s_idx, (s_name, s_func) in enumerate(mh_pages.items(), 1):
-            s_func(df_filtered, selected_topic=selected_topic, topic_label=selected_topic, date_str=date_display)
+            s_func(df_filtered, selected_topic=selected_topic, topic_label=selected_topic, date_str=date_display, df_full=df_raw)
             if s_idx < len(mh_pages):
                 st.markdown("<div style='margin: 40px 0; border-bottom: 2px dashed #CBD5E1;'></div>", unsafe_allow_html=True)
 
