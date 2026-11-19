@@ -690,10 +690,6 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
         badge_neg_menteri_sub = "turun dari 7%"
         badge_headline = "Perkara KPK menekan; banjir Aceh menguji balai"
         badge_guide = "Enam temuan dari Pemantau Echo (279, 280), Pemantau Delta, dan media. Pita biru: prioritas."
-        # Force official findings
-        m_official = dict(m)
-        m_official['is_official_week'] = True
-        findings = _extract_top_6_issue_findings(df, m_official)
     else:
         badge_vol_lembaga_display = m['vol_lembaga_display']
         badge_vol_lembaga_sub = m['vol_lembaga_sub']
@@ -707,8 +703,12 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
         badge_neg_menteri_sub = m['neg_menteri_sub']
         badge_headline = m['headline_title']
         badge_guide = m['guide_text']
-        findings = _extract_top_6_issue_findings(df, m)
 
+    # ── 6 Temuan SELALU dinamis dari data korpus aktif ──────────────────
+    # Pastikan is_official_week = False agar selalu kalkulasi dari df
+    m_dynamic = dict(m)
+    m_dynamic['is_official_week'] = False
+    findings = _extract_top_6_issue_findings(df, m_dynamic)
     f0, f1, f2, f3, f4, f5 = findings[0], findings[1], findings[2], findings[3], findings[4], findings[5]
 
     chips_html = f"""
