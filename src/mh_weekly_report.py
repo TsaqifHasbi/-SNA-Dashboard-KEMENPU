@@ -656,9 +656,6 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
     findings = _extract_top_6_issue_findings(df, m)
     f0, f1, f2, f3, f4, f5 = findings[0], findings[1], findings[2], findings[3], findings[4], findings[5]
 
-    plat_vol_str = f"{m['top_plat_vol']:,}".replace(',', '.')
-    issue_vol_str = f"{m['top_issue_vol']:,}".replace(',', '.')
-
     chips_html = f"""
         <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
             <!-- 1. Penyebutan Lembaga -->
@@ -705,24 +702,6 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
                 </div>
                 <div style="font-size:19px; font-weight:800; color:#10B981; line-height:1.1;">{m['neg_p_menteri_display']}%</div>
                 <div style="font-size:9px; color:#10B981; margin-top:2px;">{m['neg_menteri_sub']}</div>
-            </div>
-            <!-- 6. Platform Terpadat -->
-            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:7px 11px; min-width:98px;">
-                <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
-                    <span style="width:7px; height:7px; border-radius:50%; background:#8B5CF6; display:inline-block;"></span>
-                    <span style="font-size:9.5px; font-weight:600; color:#475569;">Platform Terpadat</span>
-                </div>
-                <div style="font-size:19px; font-weight:800; color:#8B5CF6; line-height:1.1;">{m['top_plat_name']}</div>
-                <div style="font-size:9px; color:#8B5CF6; margin-top:2px;">{plat_vol_str} sebutan</div>
-            </div>
-            <!-- 7. Isu Terbesar -->
-            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:7px 11px; min-width:108px;">
-                <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
-                    <span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
-                    <span style="font-size:9.5px; font-weight:600; color:#475569;">Isu Terbesar</span>
-                </div>
-                <div style="font-size:19px; font-weight:800; color:#2563EB; line-height:1.1;">{m['top_issue_name']}</div>
-                <div style="font-size:9px; color:#64748B; margin-top:2px;">{issue_vol_str} sebutan</div>
             </div>
         </div>
     """
