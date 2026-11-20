@@ -267,7 +267,7 @@ def _get_slide_metrics(df, selected_topic='Semua', topic_label=None, df_full=Non
         vol_lembaga_prev = 0
         vol_lembaga_delta_pct = 0.0
         vol_lembaga_sub = "periode aktif"
-        vol_lembaga_display = f"{vol:,}"
+        vol_lembaga_display = f"{vol:,}".replace(',', '.')
         eng_total = eng
         eng_total_prev = 0
         eng_delta_pct = 0.0
@@ -296,6 +296,34 @@ def _get_slide_metrics(df, selected_topic='Semua', topic_label=None, df_full=Non
         neg_p_menteri_display = "0"
         headline_title = "Monitoring Komprehensif Opini Publik"
         guide_text = "Enam temuan utama hasil analisis isu korpus data. Pita biru: prioritas."
+
+    # Platform Terpadat (Dinamis dari korpus aktif)
+    if vol > 0 and 'platform' in df.columns:
+        plat_counts = df['platform'].value_counts()
+        top_plat_name = plat_counts.index[0]
+        top_plat_vol = int(plat_counts.iloc[0])
+    else:
+        top_plat_name = "Multiplatform"
+        top_plat_vol = 0
+
+    # Isu Terbesar berbasis frekuensi klaster isu riil di korpus aktif
+    content_series_eval = cur_slice['cleaned_content'].fillna('').astype(str) if ('cur_slice' in locals() and 'cleaned_content' in cur_slice.columns) else (df['cleaned_content'].fillna('').astype(str) if 'cleaned_content' in df.columns else pd.Series(dtype=str))
+    issue_patterns = [
+        ('Bencana & Balai', r'\b(?:banjir|bandang|longsor|galodo|bencana|pompa|drainase)\b'),
+        ('Sumber Daya Air', r'\b(?:sumber\s+daya\s+air|sda|sungai|bbws|bws|normalisasi|tanggul|bendung)\b'),
+        ('Konektivitas Jalan', r'\b(?:jalan\s+tol|ruas\s+jalan|bbpjn|jalan\s+nasional|preservasi|jembatan)\b'),
+        ('Jaringan Irigasi', r'\b(?:irigasi|lumbung\s+air|swasembada|saluran\s+primer|petani)\b'),
+        ('Air Bersih', r'\b(?:air\s+bersih|krisis\s+air|kekeringan|tandon|pipanisasi|spam)\b'),
+        ('Isu Pengadaan & Hukum', r'\b(?:kpk|korupsi|geledah|ott|sidang)\b')
+    ]
+    top_issue_name = "Bencana & Balai"
+    top_issue_vol = 0
+    if len(content_series_eval) > 0:
+        for iname, ipat in issue_patterns:
+            ivol = int(content_series_eval.str.contains(ipat, flags=re.I, na=False).sum())
+            if ivol > top_issue_vol:
+                top_issue_vol = ivol
+                top_issue_name = iname
         
     return {
         'vol': vol,
@@ -353,6 +381,10 @@ def _get_slide_metrics(df, selected_topic='Semua', topic_label=None, df_full=Non
         'neg_p_menteri_prev': neg_p_menteri_prev,
         'neg_menteri_sub': neg_menteri_sub,
         'neg_p_menteri_display': neg_p_menteri_display,
+        'top_plat_name': top_plat_name,
+        'top_plat_vol': top_plat_vol,
+        'top_issue_name': top_issue_name,
+        'top_issue_vol': top_issue_vol,
         'headline_title': headline_title,
         'guide_text': guide_text
     }
@@ -526,12 +558,21 @@ def _extract_top_6_issue_findings(df_sub, m=None):
 
     # 3. Bencana Alam & Respons Balai
     if content_series is not None:
-        benc_m = content_series.str.contains(r'\b(?:aceh|gayo|singkil|tamiang|banjir|bandang|longsor|galodo)\b', flags=re.I, na=False)
+        benc_m = content_series.str.contains(r'\b(?:aceh|gayo|singkil|tamiang|banjir|bandang|longsor|galodo|bencana)\b', flags=re.I, na=False)
         benc_vol = int(benc_m.sum())
     else:
         benc_vol = 0
 
-    # 4. Konten / Video Teratas
+    # 4. Infrastruktur Jalan & Kebutuhan Air Bersih
+    if content_series is not None:
+        jalan_m = content_series.str.contains(r'\b(?:jalan\s+tol|ruas\s+jalan|bbpjn|jalan\s+nasional|preservasi|jembatan|lubang)\b', flags=re.I, na=False)
+        jalan_vol = int(jalan_m.sum())
+        air_m = content_series.str.contains(r'\b(?:air\s+bersih|krisis\s+air|kekeringan|tandon|pipanisasi|spam)\b', flags=re.I, na=False)
+        air_vol = int(air_m.sum())
+    else:
+        jalan_vol, air_vol = 0, 0
+
+    # 5. Konten / Video Teratas
     if df_sub is not None and len(df_sub) > 0 and 'total_engagement' in df_sub.columns:
         top_post = df_sub.sort_values('total_engagement', ascending=False).iloc[0]
         top_plat = top_post.get('platform', 'Sosial Media')
@@ -540,27 +581,30 @@ def _extract_top_6_issue_findings(df_sub, m=None):
         top_views = fmt_val(top_post.get('views', 0)) if 'views' in top_post and hasattr(top_post.get('views'), '__gt__') and top_post.get('views') > 0 else top_eng
     else:
         top_plat = "TikTok"
-        top_author = "Gubernur Jabar"
-        top_views = "439 rb"
+        top_author = "Akun Publik"
+        top_views = "500 rb"
 
-    # 5. Amplifikasi Terkoordinasi
+    # 6. Puncak Kritik / Audit Keserempakan
     peak_day_str = m['peak_neg_day'] if m else "13 Nov"
     peak_count_str = str(m['peak_neg_count']) if m else "120"
 
-    # 6. Krisis Air & Pelayanan Publik
+    # 7. KPK / Isu Hukum & Pengadaan
     if content_series is not None:
-        air_m = content_series.str.contains(r'\b(?:air\s+bersih|krisis\s+air|kekeringan|jalan\s+rusak|irigasi)\b', flags=re.I, na=False)
-        air_vol = int(air_m.sum())
+        kpk_m = content_series.str.contains(r'\b(?:kpk|geledah|korupsi|sidang|ott)\b', flags=re.I, na=False)
+        kpk_vol = int(kpk_m.sum())
+        kpk_sub = df_sub[kpk_m] if kpk_vol > 0 else None
+        kpk_neg = int((kpk_sub['sentiment_name'] == 'Negatif').sum()) if kpk_sub is not None and len(kpk_sub) > 0 and 'sentiment_name' in kpk_sub.columns else 0
+        kpk_pct = round(kpk_neg / max(1, kpk_vol) * 100, 1)
     else:
-        air_vol = 0
+        kpk_vol, kpk_neg, kpk_pct = 0, 0, 0.0
 
     return [
         {
-            'title': '1. Perkara KPK & penegakan hukum penekan sentimen',
-            'short': 'Perkara KPK & Kasus',
-            'statement': f"kpk & isu pengadaan {kpk_vol:,} sebutan, {kpk_neg:,} negatif ({kpk_pct}% rasio kritik). Menjadi sorotan utama media daring.",
-            'action_title': 'Transparansi & Komunikasi Hukum',
-            'action_desc': 'Itjen & Biro Komunikasi Publik: Rilis klarifikasi proses lelang transparan dan hormati langkah KPK secara objektif.'
+            'title': '1. Penanganan bencana hidrometeorologi & banjir daerah',
+            'short': 'Bencana & Respons Balai',
+            'statement': f"{benc_vol:,} sebutan penanganan bencana (Aceh, Sumut, Jawa Barat). Balai teknis bergerak cepat turunkan pompa mobile dan alat berat.",
+            'action_title': 'Siaga Bencana & Pompa Mobile',
+            'action_desc': 'Ditjen SDA & Balai Wilayah Sungai: Siagakan pompa mobile dan percepat perbaikan jembatan/tanggul putus.'
         },
         {
             'title': '2. Volume dan perhatian publik meningkat',
@@ -570,32 +614,32 @@ def _extract_top_6_issue_findings(df_sub, m=None):
             'action_desc': 'Humas Kementerian: Perkuat publikasi capaian kerja nyata di platform visual (TikTok, IG, YouTube).'
         },
         {
-            'title': '3. Penanganan bencana hidrometeorologi & banjir daerah',
-            'short': 'Bencana & Respons Balai',
-            'statement': f"{benc_vol:,} sebutan penanganan bencana (Aceh, Sumut, Jawa Barat). Balai teknis bergerak cepat turunkan pompa mobile dan alat berat.",
-            'action_title': 'Siaga Bencana & Pompa Mobile',
-            'action_desc': 'Ditjen SDA & Balai Wilayah Sungai: Siagakan pompa mobile dan percepat perbaikan jembatan/tanggul putus.'
+            'title': '3. Preservasi infrastruktur jalan nasional & ketahanan air',
+            'short': 'Jalan & Layanan Air',
+            'statement': f"Sorotan konektivitas jalan nasional ({jalan_vol:,} sebutan) serta kebutuhan air bersih ({air_vol:,} sebutan) menjadi fokus pelayanan publik.",
+            'action_title': 'Aksi Cepat Preservasi & SPAM',
+            'action_desc': 'BBPJN & Ditjen Cipta Karya: Tuntaskan perbaikan jalan berlubang serta percepat distribusi air bersih tanggap darurat.'
         },
         {
-            'title': f'4. Konten teratas: video & isu jalan viral ({top_plat})',
+            'title': f'4. Konten teratas: video & atensi publik ({top_plat})',
             'short': 'Konten Viral Teratas',
-            'statement': f"{top_plat} {top_author} ({top_views} atensi): sorotan infrastruktur jalan nasional & keluhan warga diteruskan ke Kementerian PU.",
-            'action_title': 'Aksi Cepat Preservasi Jalan',
-            'action_desc': 'BBPJN & Satker Jalan: Tangani cepat lubang jalan nasional dan komunikasikan progres perbaikan secara visual.'
+            'statement': f"{top_plat} {top_author} ({top_views} atensi): sorotan infrastruktur & keluhan warga diteruskan ke Kementerian PU.",
+            'action_title': 'Aksi Respons Cepat Humas',
+            'action_desc': 'Biro Komunikasi Publik: Berikan update visual berkala mengenai progres penanganan aduan masyarakat.'
         },
         {
             'title': '5. Audit keserempakan & amplifikasi percakapan',
             'short': 'Amplifikasi & Uji Organik',
-            'statement': f"Puncak kritik warganet pada {peak_day_str} ({peak_count_str} negatif). Pola repetisi terpantau pada isu hukum dan keluhan jalan daerah.",
-            'action_title': 'Audit Buzzer & Mitigasi X',
+            'statement': f"Puncak kritik warganet terpantau pada {peak_day_str} ({peak_count_str} negatif). Pola percakapan relatif organik dengan sentimen isu lokal.",
+            'action_title': 'Audit Buzzer & Mitigasi Isu',
             'action_desc': 'Tim Media Monitoring: Pantau pola akun terkoordinasi; prioritaskan penanganan aspirasi publik yang organik.'
         },
         {
-            'title': '6. Kebutuhan dasar publik & layanan air bersih',
-            'short': 'Krisis Air Bersih',
-            'statement': f"Isu air bersih & infrastruktur dasar {air_vol:,} sebutan di sejumlah daerah krisis. Publik menantikan respon bantuan tanggap darurat.",
-            'action_title': 'Akselerasi Bantuan Air Bersih',
-            'action_desc': 'Ditjen Cipta Karya: Luncurkan bantuan armada mobil tangki air dan hidran umum di titik rawan kekeringan.'
+            'title': '6. Isu pengadaan & akuntabilitas hukum',
+            'short': 'Isu Hukum & Pengadaan',
+            'statement': f"Isu pengadaan dan penegakan hukum mencatatkan {kpk_vol:,} sebutan ({kpk_neg:,} negatif / rasio kritik {kpk_pct}%). Terpantau terkendali di media sosial.",
+            'action_title': 'Transparansi & Komunikasi Hukum',
+            'action_desc': 'Itjen & Biro Komunikasi Publik: Rilis klarifikasi proses lelang transparan dan hormati langkah hukum secara objektif.'
         }
     ]
 
@@ -611,6 +655,9 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
     # ── Ekstraksi 6 temuan intelijen strategis secara dinamis dari data korpus aktif
     findings = _extract_top_6_issue_findings(df, m)
     f0, f1, f2, f3, f4, f5 = findings[0], findings[1], findings[2], findings[3], findings[4], findings[5]
+
+    plat_vol_str = f"{m['top_plat_vol']:,}".replace(',', '.')
+    issue_vol_str = f"{m['top_issue_vol']:,}".replace(',', '.')
 
     chips_html = f"""
         <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
@@ -658,6 +705,24 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
                 </div>
                 <div style="font-size:19px; font-weight:800; color:#10B981; line-height:1.1;">{m['neg_p_menteri_display']}%</div>
                 <div style="font-size:9px; color:#10B981; margin-top:2px;">{m['neg_menteri_sub']}</div>
+            </div>
+            <!-- 6. Platform Terpadat -->
+            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:7px 11px; min-width:98px;">
+                <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                    <span style="width:7px; height:7px; border-radius:50%; background:#8B5CF6; display:inline-block;"></span>
+                    <span style="font-size:9.5px; font-weight:600; color:#475569;">Platform Terpadat</span>
+                </div>
+                <div style="font-size:19px; font-weight:800; color:#8B5CF6; line-height:1.1;">{m['top_plat_name']}</div>
+                <div style="font-size:9px; color:#8B5CF6; margin-top:2px;">{plat_vol_str} sebutan</div>
+            </div>
+            <!-- 7. Isu Terbesar -->
+            <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:7px 11px; min-width:108px;">
+                <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
+                    <span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
+                    <span style="font-size:9.5px; font-weight:600; color:#475569;">Isu Terbesar</span>
+                </div>
+                <div style="font-size:19px; font-weight:800; color:#2563EB; line-height:1.1;">{m['top_issue_name']}</div>
+                <div style="font-size:9px; color:#64748B; margin-top:2px;">{issue_vol_str} sebutan</div>
             </div>
         </div>
     """
@@ -1804,7 +1869,7 @@ def render_slide_10_stakeholder_mapping(df, selected_topic='Semua', topic_label=
         {"label": "Top Akun Interaksi", "val": (auth_df.iloc[0]['author'] if len(auth_df.iloc[0]['author']) <= 16 else f"{auth_df.iloc[0]['author'][:15]}…") if len(auth_df) > 0 else "-", "sub": "paling viral", "dot": "#10B981"},
         {"label": "Total Keterlibatan", "val": fmt_val(m['eng']), "sub": "seluruh platform", "dot": "#2563EB"},
         {"label": "Rasio Kritik", "val": f"{m['neg_p']}%", "sub": "proporsi negatif", "dot": "#EF4444"},
-        {"label": "Kanal Dominan", "val": m['plat_df'].iloc[0]['platform'] if len(m['plat_df']) > 0 else "-", "sub": "terbanyak aktif", "dot": "#8B5CF6"}
+        {"label": "Platform Dominan", "val": m['plat_df'].iloc[0]['platform'] if len(m['plat_df']) > 0 else "-", "sub": "terbanyak aktif", "dot": "#8B5CF6"}
     ]
     render_kpi_chips(chips)
     
@@ -1830,7 +1895,7 @@ Akun Pemengaruh Paling Berdampak (Berdasarkan Keterlibatan)
 <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
 <thead>
 <tr style="border-bottom:1.5px solid #CBD5E1; color:#64748B; font-size:10px; font-weight:700;">
-<th style="padding:6px 4px;">NAMA AKUN / KANAL</th>
+<th style="padding:6px 4px;">NAMA AKUN / PLATFORM</th>
 <th style="padding:6px 4px;">PLATFORM</th>
 <th style="padding:6px 4px;">INTERAKSI</th>
 <th style="padding:6px 4px;">KECENDERUNGAN</th>
@@ -1904,7 +1969,7 @@ def render_slide_11_water_focus_timeline(df, selected_topic='Semua', topic_label
         
         t_rows.append(f"""<tr style="border-bottom:1px solid #F1F5F9;">
 <td style="font-weight:700; padding:6px 4px;">{d_str}</td>
-<td>{vol_str} sebutan tercatat pada berbagai kanal</td>
+<td>{vol_str} sebutan tercatat pada berbagai platform</td>
 <td style="color:#EF4444; font-weight:600;">{neg_str}</td>
 <td>{status_tag}</td>
 </tr>""")
@@ -2003,7 +2068,7 @@ Bingkai Lawan vs Narasi Tandingan
 <tbody>
 <tr style="border-bottom:1px solid #F1F5F9;"><td style="color:#EF4444; font-weight:600; padding:6px 4px;">'Program tidak tepat sasaran'</td><td style="color:#1E293B;">Publikasikan data penerima manfaat dan mekanisme verifikasi berlapis.</td></tr>
 <tr style="border-bottom:1px solid #F1F5F9;"><td style="color:#EF4444; font-weight:600; padding:6px 4px;">'Kekhawatiran pemborosan anggaran'</td><td style="color:#1E293B;">Tampilkan efisiensi anggaran dan dampak ekonomi langsung ke masyarakat.</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="color:#EF4444; font-weight:600; padding:6px 4px;">'Kendala mutu & kualitas di lapangan'</td><td style="color:#1E293B;">Perkuat transparansi kanal aduan dan tindak lanjut cepat tim pengawas.</td></tr>
+<tr style="border-bottom:1px solid #F1F5F9;"><td style="color:#EF4444; font-weight:600; padding:6px 4px;">'Kendala mutu & kualitas di lapangan'</td><td style="color:#1E293B;">Perkuat transparansi platform aduan dan tindak lanjut cepat tim pengawas.</td></tr>
 </tbody>
 </table>
 </div>"""
@@ -2045,7 +2110,7 @@ Area Layanan Utama & Status Pengawasan
 <div style="display:flex; flex-direction:column; gap:8px; font-size:11px;">
 <div><strong>Distribusi & Ketersediaan Fasilitas:</strong> Pengawasan ketat rantai pasok agar bantuan tiba tepat waktu - {render_status_badge("BERJALAN", "green")}</div>
 <div><strong>Kualitas dan Standarisasi:</strong> Pengujian berkala terhadap standar layanan di lapangan - {render_status_badge("BERJALAN", "green")}</div>
-<div><strong>Kanal Pengaduan Warganet:</strong> Respons cepat terhadap laporan keterlambatan atau ketidaksesuaian - {render_status_badge("PANTAU", "amber")}</div>
+<div><strong>Platform Pengaduan Warganet:</strong> Respons cepat terhadap laporan keterlambatan atau ketidaksesuaian - {render_status_badge("PANTAU", "amber")}</div>
 <div><strong>Audit Transparansi Anggaran:</strong> Publikasi terbuka laporan penggunaan dana kebijakan - {render_status_badge("BERLANJUT", "green")}</div>
 </div>
 </div>"""
@@ -2193,7 +2258,7 @@ Tanda Bahaya & Tindakan Mitigasi
 </div>"""
         render_html(warn_table)
 
-    render_callout_target("Rekomendasi Utama: Siagakan kanal tanggap cepat humas untuk mengantisipasi potensi eskalasi sebelum menjadi perbincangan viral.")
+    render_callout_target("Rekomendasi Utama: Siagakan platform tanggap cepat humas untuk mengantisipasi potensi eskalasi sebelum menjadi perbincangan viral.")
     render_mh_footer(f"Sumber: Model Proyeksi Risiko Kebijakan ({m['vol']:,} rekaman)")
 
 
@@ -2450,7 +2515,7 @@ def render_slide_20_priorities_methodology(df, selected_topic='Semua', topic_lab
         {"label": "Total Korpus", "val": f"{m['vol']:,}", "sub": "rekaman terverifikasi", "dot": "#2563EB"},
         {"label": "Akurasi Model", "val": "91.3%", "sub": "IndoBERT Sentimen", "dot": "#10B981", "val_color": "#10B981"},
         {"label": "Akurasi 9-Emosi", "val": "91.8%", "sub": "IndoBERT Emotion", "dot": "#8B5CF6", "val_color": "#8B5CF6"},
-        {"label": "Jumlah Kanal", "val": f"{len(m['plat_df'])} Saluran", "sub": "multiplatform", "dot": "#2563EB"},
+        {"label": "Jumlah Platform", "val": f"{len(m['plat_df'])} Saluran", "sub": "multiplatform", "dot": "#2563EB"},
         {"label": "Status Evaluasi", "val": "VALID", "sub": "kriteria tercapai", "dot": "#10B981"}
     ]
     render_kpi_chips(chips)
@@ -2476,7 +2541,7 @@ Enam Tindakan Prioritas Pimpinan
 <tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 6px;">3. Kolaborasi bersama pemengaruh kredibel</td><td style="padding:6px 6px; white-space:nowrap; text-align:right;">{render_status_badge("PEKAN INI", "amber")}</td></tr>
 <tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 6px;">4. Penguatan narasi edukatif di TikTok & IG</td><td style="padding:6px 6px; white-space:nowrap; text-align:right;">{render_status_badge("PEKAN INI", "amber")}</td></tr>
 <tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 6px;">5. Evaluasi berkala sentimen negatif mingguan</td><td style="padding:6px 6px; white-space:nowrap; text-align:right;">{render_status_badge("RUTIN", "slate")}</td></tr>
-<tr><td style="font-weight:600; padding:6px 6px;">6. Pengawasan terpadu kanal hotline publik</td><td style="padding:6px 6px; white-space:nowrap; text-align:right;">{render_status_badge("RUTIN", "slate")}</td></tr>
+<tr><td style="font-weight:600; padding:6px 6px;">6. Pengawasan terpadu platform hotline publik</td><td style="padding:6px 6px; white-space:nowrap; text-align:right;">{render_status_badge("RUTIN", "slate")}</td></tr>
 </tbody>
 </table>
 </div>"""

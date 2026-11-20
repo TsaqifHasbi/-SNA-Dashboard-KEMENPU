@@ -172,7 +172,7 @@ def render_slide_sna_by_emotions(df, selected_topic='Kementerian_PU', topic_labe
 def render_slide_overall_sentiment(df, selected_topic='Kementerian_PU', topic_label=None, date_str='13 Aug 2026 - 14 Sept 2026', **kwargs):
     if topic_label is None: topic_label = selected_topic
     if selected_topic is None: selected_topic = topic_label
-    render_slide_header("OVERALL SENTIMENT", f"Sentimen Keseluruhan & Komparasi 7 Kanal &bull; {topic_label} &bull; {date_str}")
+    render_slide_header("OVERALL SENTIMENT", f"Sentimen Keseluruhan & Komparasi 7 Platform &bull; {topic_label} &bull; {date_str}")
     
     total = len(df)
     s_counts = df['sentiment_name'].value_counts()
@@ -229,7 +229,7 @@ def render_slide_overall_sentiment(df, selected_topic='Kementerian_PU', topic_la
             
     with col_bars:
         with st.container(border=True):
-            render_html("""<div style="font-size:13px; font-weight:700; color:#1E293B; margin-bottom:8px;">Perbandingan Proporsi Sentimen Lintas 7 Kanal</div>""")
+            render_html("""<div style="font-size:13px; font-weight:700; color:#1E293B; margin-bottom:8px;">Perbandingan Proporsi Sentimen Lintas 7 Platform</div>""")
             ct = pd.crosstab(df['platform'], df['sentiment_name'], normalize='index') * 100
             plats = ct.index.tolist()
             

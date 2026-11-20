@@ -12,11 +12,11 @@ import plotly.graph_objects as go
 from src.clean_header_footer import render_slide_header, render_slide_footer, _chart_layout, render_html, fmt_val
 from src.icons import get_platform_icon, get_platform_badge
 
-# SLIDE 26: EMOTION ANALYSIS /2 (Left: Emotion by Sentiment | Right: Komposisi Emosi di Tiap Kanal)
+# SLIDE 26: EMOTION ANALYSIS /2 (Left: Emotion by Sentiment | Right: Komposisi Emosi di Tiap Platform)
 def render_slide_emotion_analysis_2(df, selected_topic='Kementerian_PU', topic_label=None, date_str='13 Aug 2026 - 14 Sept 2026', **kwargs):
     if topic_label is None: topic_label = selected_topic
     if selected_topic is None: selected_topic = topic_label
-    render_slide_header("EMOTION ANALYSIS /2", f"Distribusi Emosi Berdasarkan Sentimen & Kanal &bull; {topic_label} &bull; {date_str}")
+    render_slide_header("EMOTION ANALYSIS /2", f"Distribusi Emosi Berdasarkan Sentimen & Platform &bull; {topic_label} &bull; {date_str}")
     
     total_all = len(df) if len(df) > 0 else 1
     
@@ -208,14 +208,14 @@ Negative Emotions
         render_html(html_sentiment)
         
     with col_right:
-        # KOMPOSISI EMOSI DI TIAP KANAL PLATFORM (With rounded pill bars: ujung tumpul & pure Plutchik emotions)
+        # KOMPOSISI EMOSI DI TIAP PLATFORM (With rounded pill bars: ujung tumpul & pure Plutchik emotions)
         with st.container(border=True):
             render_html(f"""<div style="margin-bottom:6px;">
 <div style="display:flex; justify-content:space-between; align-items:center;">
-<div style="font-size:13.5px; font-weight:800; color:#0F172A; letter-spacing:0.3px;">KOMPOSISI EMOSI DI TIAP KANAL PLATFORM</div>
+<div style="font-size:13.5px; font-weight:800; color:#0F172A; letter-spacing:0.3px;">KOMPOSISI EMOSI DI TIAP PLATFORM</div>
 <div style="font-size:11px; color:#94A3B8; font-weight:600;">Cross-Platform Emotion Breakdown</div>
 </div>
-<div style="font-size:10.5px; color:#94A3B8; margin-top:2px;">Proporsi distribusi 8 emosi Plutchik terstandarisasi per kanal media &bull; {topic_label}</div>
+<div style="font-size:10.5px; color:#94A3B8; margin-top:2px;">Proporsi distribusi 8 emosi Plutchik terstandarisasi per platform media &bull; {topic_label}</div>
 </div>""")
             # Filter for affective emotions for platform composition
             df_emo = df[~df['emotion'].str.lower().isin(['netral', 'neutral', 'informatif'])]
@@ -518,13 +518,13 @@ def render_slide_emoji_analysis(df, selected_topic='Kementerian_PU', topic_label
 def render_slide_crossplatform_diffusion(df, selected_topic='Kementerian_PU', topic_label=None, date_str='13 Aug 2026 - 14 Sept 2026', **kwargs):
     if topic_label is None: topic_label = selected_topic
     if selected_topic is None: selected_topic = topic_label
-    render_slide_header("CROSSPLATFORM DIFFUSION", f"Pola Difusi & Perjalanan Isu Lintas Kanal &bull; {topic_label} &bull; {date_str}")
+    render_slide_header("CROSSPLATFORM DIFFUSION", f"Pola Difusi & Perjalanan Isu Lintas Platform &bull; {topic_label} &bull; {date_str}")
     
     col_chart, col_phases = st.columns([2.0, 1.2])
     
     with col_chart:
         with st.container(border=True):
-            render_html("""<div style="font-size:13px; font-weight:700; color:#1E293B; margin-bottom:8px;">Alur Volume Percakapan Lintas 7 Kanal (Difusi Waktu Riil)</div>""")
+            render_html("""<div style="font-size:13px; font-weight:700; color:#1E293B; margin-bottom:8px;">Alur Volume Percakapan Lintas 7 Platform (Difusi Waktu Riil)</div>""")
             daily_p = df.groupby(['date_str', 'platform']).size().unstack(fill_value=0).reset_index().tail(30)
             
             plat_colors = {
@@ -561,7 +561,7 @@ Percakapan awal tereskalasi melalui utas kritis dan opini warganet di platform b
 <div style="margin-bottom:14px;">
 <span style="background:#FCE7F3; color:#BE185D; font-size:10px; font-weight:800; padding:2px 6px; border-radius:4px;">FASE 2: VIRALITAS MASAL (EXPULSION)</span>
 <div style="font-size:11.5px; color:#475569; margin-top:3px; line-height:1.5;">
-Konten dialihwahanakan ke format audio-visual di <strong>TikTok & Instagram Reels</strong>, melipatgandakan jangkauan publik hingga kanal {top_plat} mencatatkan pangsa dominan ({top_p_pct}% volume).
+Konten dialihwahanakan ke format audio-visual di <strong>TikTok & Instagram Reels</strong>, melipatgandakan jangkauan publik hingga platform {top_plat} mencatatkan pangsa dominan ({top_p_pct}% volume).
 </div>
 </div>
 

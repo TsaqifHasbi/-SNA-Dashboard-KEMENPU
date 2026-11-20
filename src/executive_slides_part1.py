@@ -125,7 +125,7 @@ def render_slide_volume_user_engagement_reach(df, selected_topic='Kementerian_PU
     render_html(f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:18px 24px; margin-top:16px;">
 <ul style="margin:0; padding-left:20px; font-size:13px; line-height:1.7; color:#1E293B;">
 <li style="margin-bottom:6px;">
-<b>Kanal Interaksi Tertinggi</b>: Platform <b>{top_channel}</b> memimpin total interaksi publik dengan pangsa <b>{top_channel_pct}%</b> dari seluruh interaksi di korpus {topic_label}.
+<b>Platform Interaksi Tertinggi</b>: Platform <b>{top_channel}</b> memimpin total interaksi publik dengan pangsa <b>{top_channel_pct}%</b> dari seluruh interaksi di korpus {topic_label}.
 </li>
 <li>
 <b>Aktivitas Komunitas Organik</b>: Total <b>{u_total:,}</b> penulis unik berpartisipasi dengan <b>{v_total:,}</b> mention, membuktikan partisipasi aktif publik terhadap pemantauan kebijakan ini.
@@ -161,7 +161,7 @@ def render_slide_mentions_trend_channel(df, selected_topic='Kementerian_PU', top
     top_plat_name = df['platform'].value_counts().index[0] if not df.empty else "Twitter"
     render_html(f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:16px 22px; margin-top:14px;">
 <div style="font-size:12.5px; color:#334155; line-height:1.6;">
-Berdasarkan data riil, kanal <strong>{top_plat_name}</strong> secara konsisten mencatatkan frekuensi publikasi terbanyak dalam kurun waktu pemantauan, disusul video di TikTok dan artikel legitimasi di Portal Berita Daring.
+Berdasarkan data riil, platform <strong>{top_plat_name}</strong> secara konsisten mencatatkan frekuensi publikasi terbanyak dalam kurun waktu pemantauan, disusul video di TikTok dan artikel legitimasi di Portal Berita Daring.
 </div>
 </div>""")
     render_slide_footer()

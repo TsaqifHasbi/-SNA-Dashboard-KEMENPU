@@ -451,7 +451,7 @@ with st.sidebar:
     # 2. Platform Selector
     platform_list = ["Semua Platform", "Twitter", "Facebook", "Instagram", "YouTube", "TikTok", "Threads", "News"]
     selected_plat_raw = st.selectbox(
-        "Kanal Platform:",
+        "Platform:",
         platform_list,
         index=0,
         help="Filter platform media sosial atau berita daring"
@@ -752,17 +752,17 @@ elif "Dashboard Analisis Multi Platform" in view_mode or "Katalog Analisis Multi
     CATEGORIES = {
         "1. Volume & Tren Temporal": {
             "Volume, User, Engagement & Reach": render_slide_volume_user_engagement_reach,
-            "Tren Mentions Tiap Kanal": render_slide_mentions_trend_channel,
+            "Tren Mentions Tiap Platform": render_slide_mentions_trend_channel,
             "Tren Sentimen Waktu Riil": render_slide_mentions_trend_sentiment,
             "Tren 8 Emosi Publik Waktu Riil": render_slide_mentions_trend_emotions,
-            "Difusi Isu Lintas Kanal (Crossplatform Diffusion)": render_slide_crossplatform_diffusion
+            "Difusi Isu Lintas Platform (Crossplatform Diffusion)": render_slide_crossplatform_diffusion
         },
         "2. Analisis Jaringan Sosial (SNA)": {
             "Polarisasi Jaringan Berdasarkan Sentimen": render_slide_sna_by_sentiment,
             "Struktur Komunitas Berdasarkan 4 Klaster Emosi": render_slide_sna_by_emotions
         },
-        "3. Sentimen 7 Kanal Platform": {
-            "Sentimen Keseluruhan & Komparasi 7 Kanal": render_slide_overall_sentiment,
+        "3. Sentimen 7 Platform Media & Sosial": {
+            "Sentimen Keseluruhan & Komparasi 7 Platform": render_slide_overall_sentiment,
             "Sentimen Portal Berita Daring": render_slide_sentiment_online_news,
             "Sentimen Platform Twitter / X": render_slide_sentiment_twitter,
             "Sentimen Platform Facebook": render_slide_sentiment_facebook,
@@ -773,7 +773,7 @@ elif "Dashboard Analisis Multi Platform" in view_mode or "Katalog Analisis Multi
         },
         "4. Analisis Emosi & Semantik": {
             "Distribusi & Intensitas 8 Emosi (Plutchik)": render_slide_emotion_analysis_1,
-            "Emosi Berdasarkan Sentimen & Kanal Platform": render_slide_emotion_analysis_2,
+            "Emosi Berdasarkan Sentimen & Platform Media & Sosial": render_slide_emotion_analysis_2,
             "Analisis Frekuensi & Rasio Sentimen Emoji": render_slide_emoji_analysis
         },
         "5. Media Berita & Top Pemengaruh": {
@@ -944,7 +944,7 @@ elif "Cockpit Analisis" in view_mode or "Evaluasi Model" in view_mode:
     tabs = st.tabs([
         "Ringkasan Eksekutif",
         "Analisis SNA",
-        "Analisis Kanal Platform",
+        "Analisis Platform Media & Sosial",
         "Analisis Emosi",
         "Klaster Isu",
         "Word Cloud",

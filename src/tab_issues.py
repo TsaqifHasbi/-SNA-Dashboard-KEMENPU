@@ -39,7 +39,7 @@ def _get_top_posts_with_links(sub_df, n=10):
 
 def render_tab_issues(df_filtered):
     st.subheader("🔍 Top Isu & Pola Difusi Lintas Platform (Issue Diffusion)")
-    st.caption("Bagaimana narasi berkembang, menguat, dan berpindah antar-kanal media sosial dan berita.")
+    st.caption("Bagaimana narasi berkembang, menguat, dan berpindah antar-platform media sosial dan berita.")
 
     iss_col1, iss_col2 = st.columns([1, 1.2])
     with iss_col1:

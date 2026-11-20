@@ -11,7 +11,7 @@ from src.components import (
 )
 
 def render_tab_platforms(df_filtered):
-    st.subheader("📱 Performa Opini & Pemengaruh pada 7 Kanal Media Sosial dan Berita")
+    st.subheader("📱 Performa Opini & Pemengaruh pada 7 Platform Media Sosial dan Berita")
     st.caption("Analisis komparatif di Twitter/X, Facebook, Instagram, YouTube, TikTok, Threads, dan Berita Daring.")
     
     st.plotly_chart(plot_platform_sentiment_bars(df_filtered), use_container_width=True)
