@@ -1,3 +1,4 @@
+# Build: 2026.11.20-dynamic-pop-v1 (Trigger Streamlit Cloud auto-redeploy)
 import os
 import sys
 import json
