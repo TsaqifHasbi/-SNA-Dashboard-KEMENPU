@@ -69,20 +69,28 @@ def _get_slide_metrics(df, selected_topic='Semua', topic_label=None, df_full=Non
     eng = int(df['total_engagement'].sum()) if vol > 0 and 'total_engagement' in df.columns else 0
     reach = int(df['reach'].sum()) if vol > 0 and 'reach' in df.columns else 0
     
-    sent_counts = df['sentiment_name'].value_counts() if vol > 0 and 'sentiment_name' in df.columns else {}
+    # Evaluasi Sentimen Opini Publik: Murni percakapan warganet di media sosial
+    # Berita daring adalah volume liputan media massa (90% netral/faktual), dipisahkan agar tidak mendilusi sentimen warganet.
+    if vol > 0 and 'platform' in df.columns and (df['platform'] != 'News').any() and (df['platform'] == 'News').any():
+        df_sent = df[df['platform'] != 'News']
+    else:
+        df_sent = df
+    sent_vol = len(df_sent)
+    
+    sent_counts = df_sent['sentiment_name'].value_counts() if sent_vol > 0 and 'sentiment_name' in df_sent.columns else {}
     pos_c = int(sent_counts.get('Positif', 0))
     neg_c = int(sent_counts.get('Negatif', 0))
     net_c = int(sent_counts.get('Netral', 0))
     
-    pos_p = round((pos_c / vol) * 100, 1) if vol > 0 else 0
-    neg_p = round((neg_c / vol) * 100, 1) if vol > 0 else 0
-    net_p = round((net_c / vol) * 100, 1) if vol > 0 else 0
+    pos_p = round((pos_c / sent_vol) * 100, 1) if sent_vol > 0 else 0
+    neg_p = round((neg_c / sent_vol) * 100, 1) if sent_vol > 0 else 0
+    net_p = round((net_c / sent_vol) * 100, 1) if sent_vol > 0 else 0
     
-    # Emotion distributions (IndoBERT 9 Classes)
-    emo_pcts = (df['emotion'].value_counts(normalize=True) * 100).round(1).to_dict() if vol > 0 and 'emotion' in df.columns else {}
+    # Emotion distributions (IndoBERT 9 Classes) - Mengukur Suasana Emosi Warganet
+    emo_pcts = (df_sent['emotion'].value_counts(normalize=True) * 100).round(1).to_dict() if sent_vol > 0 and 'emotion' in df_sent.columns else {}
     
     # Affective emotions (8 Plutchik emotions, excluding Neutral/Informatif)
-    df_affective = df[~df['emotion'].str.lower().isin(['neutral', 'netral', 'informatif', 'informational'])] if vol > 0 and 'emotion' in df.columns else pd.DataFrame()
+    df_affective = df_sent[~df_sent['emotion'].str.lower().isin(['neutral', 'netral', 'informatif', 'informational'])] if sent_vol > 0 and 'emotion' in df_sent.columns else pd.DataFrame()
     aff_vol = len(df_affective)
     if aff_vol > 0:
         aff_counts = df_affective['emotion'].value_counts()
@@ -1247,9 +1255,10 @@ def render_slide_6_two_wordclouds(df, selected_topic='Semua', topic_label=None, 
         "Dua awan dari unggahan lembaga (279) setelah saringan, 9-15 Nov. Kiri: frekuensi, warna = nada. Kanan: muatan negatif."
     )
     
-    # Dynamic word frequency extraction
-    freq_left = _extract_dynamic_freqs(df, top_n=37, is_negative=False)
-    neg_slice = df[df['sentiment_name'] == 'Negatif'] if 'sentiment_name' in df.columns else df
+    # Dynamic word frequency extraction (Penyaring: Tanpa Media Daring)
+    df_sosmed = df[df['platform'] != 'News'] if 'platform' in df.columns and (df['platform'] != 'News').any() else df
+    freq_left = _extract_dynamic_freqs(df_sosmed, top_n=37, is_negative=False)
+    neg_slice = df_sosmed[df_sosmed['sentiment_name'] == 'Negatif'] if 'sentiment_name' in df_sosmed.columns else df_sosmed
     freq_right = _extract_dynamic_freqs(neg_slice, top_n=15, is_negative=True)
 
     chips = [

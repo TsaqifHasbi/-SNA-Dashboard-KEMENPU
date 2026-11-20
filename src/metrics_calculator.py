@@ -27,12 +27,19 @@ def calculate_kpis(df):
     total_engagement = int(df['total_engagement'].sum()) if total_volume > 0 else 0
     total_reach = int(df['reach'].sum()) if 'reach' in df.columns and total_volume > 0 else 0
 
-    counts = df['sentiment_name'].value_counts() if total_volume > 0 else {}
+    # Sentimen Publik/Warganet: Memisahkan Berita Daring (News) agar penilaian sentimen murni opini warganet
+    if total_volume > 0 and 'platform' in df.columns and (df['platform'] != 'News').any() and (df['platform'] == 'News').any():
+        df_sent = df[df['platform'] != 'News']
+    else:
+        df_sent = df
+    sent_vol = len(df_sent)
+
+    counts = df_sent['sentiment_name'].value_counts() if sent_vol > 0 else {}
     pos = int(counts.get('Positif', 0))
     net = int(counts.get('Netral', 0))
     neg = int(counts.get('Negatif', 0))
 
-    nss = calculate_nss(pos, neg, total_volume)
+    nss = calculate_nss(pos, neg, sent_vol)
 
     return {
         'volume': total_volume,
@@ -43,9 +50,9 @@ def calculate_kpis(df):
         'neutral': net,
         'negative': neg,
         'nss': nss,
-        'pos_pct': round((pos / total_volume) * 100, 1) if total_volume > 0 else 0,
-        'net_pct': round((net / total_volume) * 100, 1) if total_volume > 0 else 0,
-        'neg_pct': round((neg / total_volume) * 100, 1) if total_volume > 0 else 0,
+        'pos_pct': round((pos / sent_vol) * 100, 1) if sent_vol > 0 else 0,
+        'net_pct': round((net / sent_vol) * 100, 1) if sent_vol > 0 else 0,
+        'neg_pct': round((neg / sent_vol) * 100, 1) if sent_vol > 0 else 0,
     }
 
 def calculate_z_test(p1_pos, n1_total, p2_pos, n2_total):
