@@ -33,6 +33,15 @@ STRONG_NEGATIVE_PHRASES = [
     'korupsi', 'koruptor', 'korup', 'bancakan', 'pencurian', 'penipuan',
     'manipulasi', 'mark up', 'markup', 'pungli', 'sunat anggaran',
     'pemborosan', 'pemborosan apbn', 'maling', 'mencuri', 'dirampok',
+
+    # Kerusakan Fisik Infrastruktur & Masalah Proyek PU
+    'sangat buruk', 'keadaan sangat buruk', 'kondisi sangat buruk', 'kualitas sangat buruk',
+    'rusak parah', 'rusak berat', 'hancur parah', 'hancur lebur',
+    'jalan rusak', 'jalan berlubang', 'jalan bolong', 'jalan ambles', 'jalan amblas',
+    'aspal buruk', 'aspal hancur', 'aspal mengelupas', 'aspal tipis',
+    'jembatan ambruk', 'jembatan putus', 'jembatan roboh',
+    'tanggul jebol', 'bendungan bocor', 'pipa bocor',
+    'proyek mangkrak', 'mangkrak bertahun-tahun', 'pekerjaan amburadul',
     
     # Keracunan & bahaya makanan
     'keracunan', 'beracun', 'racun', 'mematikan', 'cacing', 'ulat',
@@ -123,9 +132,18 @@ SARCASM_PATTERNS = [
     r'\b(?:kok|kenapa)\b.*?\b(?:sampe\s+detik\s+ini|sampe\s+sekarang|sampai\s+sekarang|hingga\s+kini|hingga\s+saat\s+ini|sampe\s+hari\s+ini)\b.*?\b(?:gada|gaada|ga|gak|ngga|nggak|belum|tidak|nihil)\b',
     r'\b(?:gada|gaada|ga\s+ada|gak\s+ada|nggak\s+ada|tidak\s+ada|tak\s+ada)\s+(?:manfaat|manfaatnya|guna|gunanya|faedah|faedahnya|efek|efeknya|hasil|hasilnya|dampak|dampaknya|bukti|buktinya|perubahan|kejelasan)\b',
     r'\bkatanya\b.*?\b(?:tapi|namun|padahal|malah|nyatanya|faktanya)\b.*?\b(?:ga|gak|ngga|nggak|gada|gaada|belum|tidak|bukan|kurang|nihil)\b',
-    # 0c. Sarkasme Pelayanan Publik & Kinerja Infrastruktur (Pujian Semu + Sindiran Kelambanan / Kerusakan)
-    # Contoh: "Kemenpu keren banget masa hal sepele kaya kebocoran bendungan aja diselesainnya lama banget"
+    # 0c. Sarkasme Pelayanan Publik & Kinerja Infrastruktur (Pujian Semu + Sindiran Kelambanan / Kerusakan / Kondisi Buruk)
+    # Contoh: "Apresiasi respon cepat Kementerian PU ... dengan keadaan jalan yang sangat buruk, hebat sekali kemenpu"
+    #         "Kemenpu keren banget masa hal sepele kaya kebocoran bendungan aja diselesainnya lama banget"
     #         "hebat betul jalan baru seminggu udah bolong-bolong parah"
+    #         "terima kasih kemenpu jalan makin hancur lebur"
+    r'(?:apresiasi|terima\s+kasih|makasih|salut|hebat|keren|mantap|top|luar\s+biasa|juara|bagus|terpuji).*?\b(?:dengan|padahal|faktanya|nyatanya|tapi|namun|meski|walau|walaupun)\s+(?:keadaan|kondisi|kualitas|situasi)?\s*(?:jalan|jembatan|aspal|infrastruktur|proyek|tanggul|air|fisik)?\s*(?:yang\s+)?(?:sangat\s+|amat\s+|begitu\s+|makin\s+)?(?:buruk|rusak|hancur|parah|bolong|ambruk|mangkrak|lelet|lambat|ambles|amblas|jebol|bocor|berantakan|ancur|amburadul|jelek|kacau)',
+    r'\b(?:hebat|keren|mantap|top|luar\s+biasa|juara|bagus|istimewa)\s+(?:banget+|bgt+|sekali|bet|bener|betul|beneran)\s+(?:kemenpu|pu|kementerian\s+pu|bbpjn|bws|satker|menteri|balai|pemda)\b.*?\b(?:buruk|rusak|hancur|parah|bolong|ambruk|mangkrak|lelet|lambat|ambles|amblas|jebol|bocor|berantakan|ancur|jelek)\b',
+    r'\b(?:buruk|rusak|hancur|parah|bolong|ambruk|mangkrak|lelet|lambat|ambles|amblas|jebol|bocor|berantakan|ancur|jelek)\b.*?\b(?:hebat|keren|mantap|top|luar\s+biasa|juara|bagus|istimewa)\s+(?:banget+|bgt+|sekali|bet|bener|betul|beneran)\s+(?:kemenpu|pu|kementerian\s+pu|bbpjn|bws|satker|menteri|balai|pemda)\b',
+    r'(?:selesai|menyelesaikan|diresmikan|peresmian|beres|sukses|tuntas).*?\b(?:dengan|padahal|faktanya|nyatanya|tapi|namun)\s+(?:keadaan|kondisi|kualitas|situasi|hasil)?\s*(?:jalan|jembatan|aspal|infrastruktur|proyek|tanggul|air|fisik)?\s*(?:yang\s+)?(?:sangat\s+|amat\s+|begitu\s+|makin\s+)?(?:buruk|rusak|hancur|parah|bolong|ambruk|mangkrak|lelet|lambat|ambles|amblas|jebol|bocor|berantakan|ancur|amburadul|jelek|kacau)',
+    r'\b(?:respon\s+cepat|respons\s+cepat|gercep|responsif)\b.*?\b(?:dengan|padahal|faktanya|nyatanya|tapi|namun)\s+(?:keadaan|kondisi|kualitas|situasi)?\s*(?:jalan|jembatan|aspal|infrastruktur|proyek|tanggul|air)?\s*(?:yang\s+)?(?:sangat\s+|amat\s+|begitu\s+|makin\s+)?(?:buruk|rusak|hancur|parah|mangkrak|ambruk|lelet|lama|ambles|jebol|bolong)',
+    r'\b(?:terima\s+kasih|makasih|thanks|tengkyu)\s+(?:kemenpu|pu|kementerian\s+pu|bbpjn|bws|satker|menteri).*?\b(?:jalan|jembatan|tanggul|proyek|irigasi).*?\b(?:makin|malah|justru|tambah)\s+(?:rusak|hancur|parah|buruk|ancur|mangkrak|bolong|ambles)\b',
+    r'\bapresiasi\b.*?\b(?:keadaan|kondisi|kualitas)\s+(?:jalan|jembatan|aspal|infrastruktur|proyek|air)?\s*(?:yang\s+)?(?:sangat\s+|amat\s+|begitu\s+|makin\s+)?(?:buruk|rusak|hancur|parah|ancur|mangkrak|ambruk|bolong)\b',
     r'(?:keren|hebat|mantap|top|luar\s+biasa|bagus|pinter|pintar)\s+(?:banget+|bgt+|sekali|bet|bener|betul)\b.*?\b(?:masa|kok|padahal|giliran)\b.*?\b(?:sepele|gitu\s+aja|gini\s+aja|kecil|lama|lelet|lambat|ga\s+bisa|gak\s+bisa|tidak\s+bisa|bocor|kebocoran|rusak|ancur|hancur|bolong|ambruk)\b',
     r'\b(?:keren|hebat|mantap|bagus)\s+(?:banget+|bgt+|bet|sekali)\b.*?\b(?:diselesaikannya|diselesainnya|dikerjakannya|dikerjainnya|nanganinnya|penanganannya|kerjanya)\s+(?:lama|lelet|lambat|parah|molor)\b',
     r'\b(?:masa|kok)\b.*?\b(?:hal\s+sepele|masalah\s+sepele|gini\s+aja|gitu\s+aja|kaya\s+gitu|kaya\s+gini)\b.*?\b(?:lama|lelet|lambat|ga\s+becus|gak\s+becus|ga\s+bisa|gak\s+bisa|berlarut|mangkrak|molor)\b',
@@ -479,7 +497,8 @@ ANGER_TEXT_PATTERNS = [
     'gada manfaat', 'gada manfaatnya', 'gaada manfaat', 'gaada manfaatnya', 'ga ada manfaat', 'gak ada manfaat', 'tidak ada manfaat',
     'gada guna', 'gada gunanya', 'gaada guna', 'tidak ada guna', 'gada faedah', 'gada efek', 'gada hasil',
     'apasi tujuan', 'apa sih tujuan', 'apa tujuannya', 'kok sampe detik ini', 'kok sampe sekarang', 'mana buktinya', 'mana hasilnya',
-    'cara licik', 'licik', 'kelicikan', 'siasat licik', 'alat politik', 'politisasi', 'kepentingan penguasa'
+    'cara licik', 'licik', 'kelicikan', 'siasat licik', 'alat politik', 'politisasi', 'kepentingan penguasa',
+    'sangat buruk', 'rusak parah', 'jalan rusak', 'aspal buruk', 'aspal hancur', 'proyek mangkrak', 'hebat sekali kemenpu'
 ]
 ANGER_EMOJIS = {'😡', '🤬', '👿', '😤', '🖕'}
 

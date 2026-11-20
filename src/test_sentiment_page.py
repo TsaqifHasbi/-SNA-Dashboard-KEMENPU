@@ -87,7 +87,9 @@ NEGATIVE_TERMS = {
     'buzzer': 2.5, 'cebong': 2.5, 'kadrun': 2.5, 'rezim': 2.2, 'komprador': 2.5,
     'budak': 2.5, 'pengkhianat': 3.2, 'khianat': 3.0, 'munafik': 3.0, 'fasik': 2.8,
     # Kritik Mutu, Keluhan, Kehancuran, & Kerusakan
-    'negatif': 2.8, 'buruk': 2.5, 'memburuk': 2.5, 'terburuk': 3.0, 'jelek': 2.5, 'kejelekan': 2.8,
+    'sangat buruk': 3.5, 'rusak parah': 3.5, 'rusak berat': 3.5, 'aspal buruk': 3.2, 'aspal hancur': 3.5,
+    'jalan rusak': 3.2, 'jalan berlubang': 3.0, 'jalan bolong': 3.0, 'jembatan ambruk': 3.5, 'tanggul jebol': 3.5,
+    'proyek mangkrak': 3.5, 'negatif': 2.8, 'buruk': 2.5, 'memburuk': 2.5, 'terburuk': 3.0, 'jelek': 2.5, 'kejelekan': 2.8,
     'jahat': 3.0, 'kejahatan': 3.2, 'kejam': 3.0, 'sadis': 3.2, 'zalim': 3.2, 'gagal': 2.8,
     'kegagalan': 2.8, 'rusak': 2.5, 'merusak': 2.8, 'perusak': 3.0, 'kerusakan': 2.8,
     'hancur': 2.8, 'menghancurkan': 3.0, 'kehancuran': 3.0, 'penghancur': 3.0,
@@ -648,10 +650,15 @@ def analyze_text_nlp(text):
         emo_scores['Anger'] = max(0.2, emo_scores['Anger'] * 0.25)
         emo_scores['Disgust'] = max(0.2, emo_scores['Disgust'] * 0.2)
 
-    # Reaksi emosi sarkasme: rasa jijik (Disgust) dan amarah (Anger) atas sindiran tajam
+    # Reaksi emosi sarkasme: rasa amarah (Anger) atau rasa jijik (Disgust) atas sindiran tajam
     if has_sarcasm:
-        emo_scores['Disgust'] += 6.0
-        emo_scores['Anger'] += 5.0
+        has_disgust_cue = any(w in clean_text for w in ['basi', 'busuk', 'ulat', 'cacing', 'jorok', 'muntah', 'mual', 'jijik'])
+        if has_disgust_cue:
+            emo_scores['Disgust'] += 6.0
+            emo_scores['Anger'] += 4.0
+        else:
+            emo_scores['Anger'] += 6.0
+            emo_scores['Disgust'] += 2.0
         emo_scores['Joy'] = 0.05
         emo_scores['Trust'] = 0.05
                 
