@@ -144,6 +144,9 @@ def predict_real_indobert(text):
                 elif final_sent == "Negatif":
                     probs_dict = {'Positif': 0.01, 'Netral': 0.03, 'Negatif': 0.96}
                     conf_raw = 0.96
+                elif final_sent == "Netral":
+                    probs_dict = {'Positif': 0.05, 'Netral': 0.90, 'Negatif': 0.05}
+                    conf_raw = 0.90
 
             if final_emo != raw_emo or (final_sent == 'Negatif' and raw_emo in ['Joy', 'Trust', 'Anticipation']):
                 new_e_probs = {k: 0.02 for k in emo_probs_dict}

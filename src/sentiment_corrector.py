@@ -324,6 +324,20 @@ def correct_sentiment(text, current_sentiment, current_score=0.0):
     if is_domestic and not _has_profanity(text_lower) and not has_disaster_casualty:
         return 'Netral', 1, 0.0, domestic_reason
 
+    # 0c. CEK ASPIRASI & TUNTUTAN KONSTRUKTIF WARGA (CITIZEN DEMAND / REQUEST)
+    # Contoh: "diharapkan mempercepat penyelesaian proyek agar warga tidak lagi kesulitan",
+    #         "mohon segera selesaikan perbaikan jalan agar tidak ada korban"
+    # Kalimat ini adalah tuntutan / desakan aspiratif masyarakat, bukan pujian kepuasan!
+    DEMAND_PATTERNS = [
+        r'\b(?:diharapkan|dimohon|mohon|tolong|minta|menuntut|harus\s+segera|perlu\s+segera|segera|mendesak)\s+(?:mempercepat|diselesaikan|diperbaiki|dibangun|menuntaskan|turunkan|tuntaskan|selesaikan|percepat)\b',
+        r'\bagar\s+(?:warga|rakyat|petani|masyarakat|anak).*?(?:tidak\s+lagi\s+(?:kesulitan|kekurangan|krisis|kebanjiran|menderita|terisolir|rugi)|bisa\s+segera)\b',
+        r'\b(?:kapan|kok\s+belum|kapan\s+selesai|jangan\s+ditunda|jangan\s+lambat)\b'
+    ]
+    is_demand = any(re.search(pat, text_lower) for pat in DEMAND_PATTERNS)
+    has_neg_early, _ = _has_strong_negative(text_lower)
+    if is_demand and not _has_profanity(text_lower) and not has_neg_early and not has_disaster_casualty:
+        return 'Netral', 1, 0.0, 'aspirasi_dan_tuntutan_warga'
+
     neg_signals = 0
     pos_signals = 0
     reasons = []
