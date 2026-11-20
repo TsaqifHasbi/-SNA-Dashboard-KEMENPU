@@ -119,13 +119,15 @@ def render_status_badge(text, variant="default"):
     st_style = styles.get(variant, styles["slate"])
     return f"""<span style="{st_style} font-size:10px; font-weight:700; padding:2.5px 8px; border-radius:4px; letter-spacing:0.3px; text-transform:uppercase; white-space:nowrap; display:inline-block; line-height:1.2;">{text}</span>"""
 
-def render_callout_target(text):
+def render_callout_target(text_or_title, body=None):
     """
     Renders orange bordered callout with bullseye icon.
+    Supports both render_callout_target("text") and render_callout_target("Title", "body").
     """
+    content = f"<strong>{text_or_title}:</strong> {body}" if body is not None else text_or_title
     html = f"""<div style="background:#FFFFFF; border:1.5px solid #FDBA74; border-radius:8px; padding:10px 16px; display:flex; align-items:flex-start; gap:12px; margin-top:14px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="min-width:20px; height:20px; border-radius:50%; border:2px solid #EA580C; display:flex; align-items:center; justify-content:center; color:#EA580C; font-size:11px; font-weight:800; margin-top:1px;">🎯</div>
-<div style="font-size:12.5px; font-weight:600; color:#0F172A; line-height:1.5;">{text}</div>
+<div style="font-size:12.5px; font-weight:600; color:#0F172A; line-height:1.5;">{content}</div>
 </div>"""
     render_html(html)
 
