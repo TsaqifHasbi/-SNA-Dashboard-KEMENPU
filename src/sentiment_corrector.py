@@ -123,6 +123,13 @@ SARCASM_PATTERNS = [
     r'\b(?:kok|kenapa)\b.*?\b(?:sampe\s+detik\s+ini|sampe\s+sekarang|sampai\s+sekarang|hingga\s+kini|hingga\s+saat\s+ini|sampe\s+hari\s+ini)\b.*?\b(?:gada|gaada|ga|gak|ngga|nggak|belum|tidak|nihil)\b',
     r'\b(?:gada|gaada|ga\s+ada|gak\s+ada|nggak\s+ada|tidak\s+ada|tak\s+ada)\s+(?:manfaat|manfaatnya|guna|gunanya|faedah|faedahnya|efek|efeknya|hasil|hasilnya|dampak|dampaknya|bukti|buktinya|perubahan|kejelasan)\b',
     r'\bkatanya\b.*?\b(?:tapi|namun|padahal|malah|nyatanya|faktanya)\b.*?\b(?:ga|gak|ngga|nggak|gada|gaada|belum|tidak|bukan|kurang|nihil)\b',
+    # 0c. Sarkasme Pelayanan Publik & Kinerja Infrastruktur (Pujian Semu + Sindiran Kelambanan / Kerusakan)
+    # Contoh: "Kemenpu keren banget masa hal sepele kaya kebocoran bendungan aja diselesainnya lama banget"
+    #         "hebat betul jalan baru seminggu udah bolong-bolong parah"
+    r'(?:keren|hebat|mantap|top|luar\s+biasa|bagus|pinter|pintar)\s+(?:banget+|bgt+|sekali|bet|bener|betul)\b.*?\b(?:masa|kok|padahal|giliran)\b.*?\b(?:sepele|gitu\s+aja|gini\s+aja|kecil|lama|lelet|lambat|ga\s+bisa|gak\s+bisa|tidak\s+bisa|bocor|kebocoran|rusak|ancur|hancur|bolong|ambruk)\b',
+    r'\b(?:keren|hebat|mantap|bagus)\s+(?:banget+|bgt+|bet|sekali)\b.*?\b(?:diselesaikannya|diselesainnya|dikerjakannya|dikerjainnya|nanganinnya|penanganannya|kerjanya)\s+(?:lama|lelet|lambat|parah|molor)\b',
+    r'\b(?:masa|kok)\b.*?\b(?:hal\s+sepele|masalah\s+sepele|gini\s+aja|gitu\s+aja|kaya\s+gitu|kaya\s+gini)\b.*?\b(?:lama|lelet|lambat|ga\s+becus|gak\s+becus|ga\s+bisa|gak\s+bisa|berlarut|mangkrak|molor)\b',
+    r'(?:keren|hebat|mantap)\s+(?:banget+|bgt+|sekali)\b.*?\b(?:baru\s+(?:seminggu|sebulan|beberapa\s+hari)|belum\s+setahun)\b.*?\b(?:udah|sudah)\s+(?:rusak|bolong|hancur|ambruk|retak|jebol)\b',
     # 0b. Pujian semu kontras / sindiran peningkatan (makin berguna/hebat/mantap tapi disusul keracunan/korban/ga becus)
     r'(?:makin|semakin)?\s*(?:berguna|bermanfaat|hebat|keren|mantap|bagus|sukses).*?(?:keracunan|diare|masuk\s+rs|mual|muntah|mati|korban|ga\s+becus|gak\s+becus|tidak\s+becus|korupsi|bancakan|nilep)',
     # 1. Pujian semu + Realitas bahaya/korupsi/bencana/keracunan (dengan tanda baca apa pun)
