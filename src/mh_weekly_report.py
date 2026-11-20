@@ -403,6 +403,8 @@ def _get_slide_metrics(df, selected_topic='Semua', topic_label=None, df_full=Non
         'top_issue_vol': top_issue_vol,
         'headline_title': headline_title,
         'guide_text': guide_text,
+        'start_str': _fmt_id_date(start_d, False),
+        'end_str': _fmt_id_date(end_d, True),
         'cur_str': cur_str,
         'prev_str': prev_str,
         'prev_start_str': _fmt_id_date(prev_start, False),
@@ -1011,58 +1013,88 @@ def render_slide_4_overall_media_social(df, selected_topic='Semua', topic_label=
 def render_slide_5_platform_review(df, selected_topic='Semua', topic_label=None, **kwargs):
     m = _get_slide_metrics(df, selected_topic, topic_label)
     render_mh_top_bar(slide_num=5)
-    render_mh_title(
-        "Platform Review",
-        f"TikTok-IG 85% perhatian; berita daring 62% volume",
-        "Kiri: tujuh saluran lembaga (proyek 279) 9-15 Nov, urut keterlibatan. Kanan: emosi percakapan lembaga."
-    )
     
-    top_vol_plat = m['plat_df'].sort_values('penyebutan', ascending=False).iloc[0] if len(m['plat_df']) > 0 else None
-    top_vol_name = top_vol_plat['platform'] if top_vol_plat is not None else "-"
-    top_vol_pct = round((top_vol_plat['penyebutan'] / m['vol']) * 100, 1) if top_vol_plat is not None and m['vol'] > 0 else 0
+    plat_df = m['plat_df']
+    start_str = m.get('start_str', 'Awal Periode')
+    end_str = m.get('end_str', 'Akhir Periode')
+    total_vol = max(1, m['vol'])
+    total_eng = max(1, m['eng'])
 
-    top_eng_plat = m['plat_df'].iloc[0] if len(m['plat_df']) > 0 else None
-    top_eng_name = top_eng_plat['platform'] if top_eng_plat is not None else "-"
-    top_eng_val = fmt_val(top_eng_plat['keterlibatan']) if top_eng_plat is not None else "0"
+    # 1. Platform Terbanyak Volume (Penyebutan)
+    plat_vol_sorted = plat_df.sort_values('penyebutan', ascending=False) if len(plat_df) > 0 else plat_df
+    top_vol_row = plat_vol_sorted.iloc[0] if len(plat_vol_sorted) > 0 else None
+    top_vol_name = top_vol_row['platform'] if top_vol_row is not None else "Multiplatform"
+    top_vol_cnt = int(top_vol_row['penyebutan']) if top_vol_row is not None else 0
+    top_vol_pct = round((top_vol_cnt / total_vol) * 100, 1)
+    top_vol_neg = top_vol_row['neg_pct'] if top_vol_row is not None else 0.0
 
-    worst_plat = m['plat_df'].sort_values('neg_pct', ascending=False).iloc[0] if len(m['plat_df']) > 0 else None
-    worst_name = worst_plat['platform'] if worst_plat is not None else "-"
-    worst_neg_p = worst_plat['neg_pct'] if worst_plat is not None else 0
+    # 2. Dua Platform Terbanyak Keterlibatan (Perhatian Publik)
+    top_eng_1 = plat_df.iloc[0] if len(plat_df) > 0 else None
+    top_eng_2 = plat_df.iloc[1] if len(plat_df) > 1 else None
+    
+    p1_name = top_eng_1['platform'] if top_eng_1 is not None else "TikTok"
+    p1_eng = int(top_eng_1['keterlibatan']) if top_eng_1 is not None else 0
+    p1_eng_pct = round((p1_eng / total_eng) * 100)
+    
+    p2_name = top_eng_2['platform'] if top_eng_2 is not None else "Instagram"
+    p2_eng = int(top_eng_2['keterlibatan']) if top_eng_2 is not None else 0
+    p2_eng_pct = round((p2_eng / total_eng) * 100)
+    top2_eng_pct = min(100, p1_eng_pct + p2_eng_pct)
 
+    # 3. Saluran dengan Persentase Kritik / Sentimen Negatif Tertinggi
+    plat_neg_sorted = plat_df.sort_values('neg_pct', ascending=False) if len(plat_df) > 0 else plat_df
+    worst_plat_row = plat_neg_sorted.iloc[0] if len(plat_neg_sorted) > 0 else None
+    worst_name = worst_plat_row['platform'] if worst_plat_row is not None else "X"
+    worst_neg_p = worst_plat_row['neg_pct'] if worst_plat_row is not None else 0.0
+    worst_vol = int(worst_plat_row['penyebutan']) if worst_plat_row is not None else 0
+
+    # 4. Deteksi Emosi Negatif dan Positif Dominan
+    aff_dict = m.get('aff_pcts', m.get('emo_pcts', {}))
+    affective_only = {k: v for k, v in aff_dict.items() if str(k).lower() not in ['neutral', 'netral', 'informatif', 'informational']}
+    
+    neg_emotions = {k: v for k, v in affective_only.items() if str(k).lower() in ['anger', 'marah', 'fear', 'takut', 'disgust', 'jijik', 'sadness', 'sedih']}
+    top_neg_emo = max(neg_emotions.items(), key=lambda x: x[1]) if neg_emotions else ('Marah', 0)
+    
+    pos_emotions = {k: v for k, v in affective_only.items() if str(k).lower() in ['joy', 'senang', 'trust', 'percaya', 'anticipation', 'antisipasi']}
+    top_pos_emo = max(pos_emotions.items(), key=lambda x: x[1]) if pos_emotions else ('Percaya', 0)
+
+    # Render Judul & Subjudul Dinamis
+    title_sub = f"{p1_name}-{p2_name} {top2_eng_pct}% perhatian; {top_vol_name.lower()} {top_vol_pct:.0f}% volume"
+    guide_txt = f"Kiri: {len(plat_df)} saluran multiplatform ({start_str} - {end_str}), urut keterlibatan publik. Kanan: sebaran afektif emosi percakapan."
+    render_mh_title("Platform Review", title_sub, guide_txt)
+
+    # KPI Chips Dinamis
     chips = [
-        {"label": "Berita Daring", "val": "62%", "sub": "1.936; negatif 5%", "dot": "#64748B"},
-        {"label": "Keterlibatan IG", "val": "813 rb", "sub": "31% dari total", "dot": "#2563EB", "val_color": "#2563EB"},
-        {"label": "TikTok", "val": "1,40 jt", "sub": "54% keterlibatan", "dot": "#10B981", "val_color": "#10B981"},
-        {"label": "Negatif X", "val": "45%", "sub": "dari 210 penyebutan", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "Marah", "val": "2%", "sub": "percaya 9%", "dot": "#EF4444", "val_color": "#EF4444"}
+        {"label": f"Volume {top_vol_name}", "val": f"{top_vol_pct:.0f}%", "sub": f"{top_vol_cnt:,} sebutan; neg {top_vol_neg}%".replace(',', '.'), "dot": "#2563EB"},
+        {"label": f"Perhatian {p2_name}", "val": fmt_val(p2_eng), "sub": f"{p2_eng_pct}% dari total interaksi", "dot": "#2563EB", "val_color": "#2563EB"},
+        {"label": f"Perhatian {p1_name}", "val": fmt_val(p1_eng), "sub": f"{p1_eng_pct}% keterlibatan", "dot": "#10B981", "val_color": "#10B981"},
+        {"label": f"Kritik {worst_name}", "val": f"{worst_neg_p}%", "sub": f"dari {worst_vol:,} sebutan".replace(',', '.'), "dot": "#EF4444", "val_color": "#EF4444"},
+        {"label": top_neg_emo[0], "val": f"{top_neg_emo[1]}%", "sub": f"{top_pos_emo[0].lower()} {top_pos_emo[1]}%", "dot": "#EF4444" if top_neg_emo[1] >= 5 else "#F59E0B", "val_color": "#EF4444" if top_neg_emo[1] >= 5 else "#D97706"}
     ]
     render_kpi_chips(chips)
     
     col_tbl, col_emo = st.columns([1.25, 0.75], gap="medium")
     
     with col_tbl:
-        official_notes = {
-            'tiktok': 'jalan nasional 439 rb; tol laut',
-            'instagram': 'Rp42 T rehab-rekon',
-            'youtube': 'normalisasi, longsor',
-            'x': 'RT perkara KPK 13 Nov',
-            'twitter': 'RT perkara KPK 13 Nov',
-            'threads': 'nepotisme; air bersih',
-            'facebook': 'narasi Pergub (KLAIM)',
-            'news': 'Aceh; geledah 40 portal',
-            'berita': 'Aceh; geledah 40 portal'
-        }
         rows_html = []
-        for _, r in m['plat_df'].iterrows():
+        for _, r in plat_df.iterrows():
             p_name = r['platform']
-            p_vol = f"{r['penyebutan']:,}"
+            p_vol = f"{r['penyebutan']:,}".replace(',', '.')
             p_eng = fmt_val(r['keterlibatan'])
             p_pos = f"{r['pos_pct']}%"
             p_neg = f"{r['neg_pct']}%"
             pos_col = "#10B981" if r['pos_pct'] >= 40 else "#475569"
-            neg_col = "#EF4444" if r['neg_pct'] >= 30 else "#64748B"
+            neg_col = "#EF4444" if r['neg_pct'] >= 30 else "#F59E0B"
             
-            note = official_notes.get(p_name.lower().replace('/twitter', '').strip(), f"Negatif {p_neg}; Positif {p_pos}")
+            # Ekstraksi fokus isu riil per saluran secara dinamis dari dataset aktif
+            sub_p = df[df['platform'] == p_name] if 'platform' in df.columns else df
+            top_p_words = _get_frequent_words(sub_p, max_words=3)
+            if top_p_words:
+                w_str = ", ".join([w[0] for w in top_p_words[:2]])
+                note = f"Isu: {w_str} (positif {p_pos}, negatif {p_neg})"
+            else:
+                note = f"Positif {p_pos}, negatif {p_neg}"
+                
             rows_html.append(f"""<tr style="border-bottom:1px solid #F1F5F9;">
 <td style="font-weight:600; padding:6px 4px;">{p_name}</td>
 <td>{p_vol}</td>
@@ -1085,7 +1117,7 @@ Tujuh Saluran - Urut dari Keterlibatan
 <th style="padding:6px 4px;">KETERLIBATAN ▼</th>
 <th style="padding:6px 4px;">POSITIF</th>
 <th style="padding:6px 4px;">NEGATIF</th>
-<th style="padding:6px 4px;">CATATAN</th>
+<th style="padding:6px 4px;">CATATAN DINAMIS</th>
 </tr>
 </thead>
 <tbody>
@@ -1144,8 +1176,9 @@ Tujuh Saluran - Urut dari Keterlibatan
         )
         st.plotly_chart(fig_bar, use_container_width=True, config={'displayModeBar': False})
 
-    render_callout_target("Berita daring membawa volume (62%) dengan negatif 5%; TikTok dan Instagram membawa perhatian (85% keterlibatan). Kritik terpusat di X (45% negatif, didorong RT perkara KPK) dan Facebook (22%).")
-    render_mh_footer("Edisi Mingguan 9-15 Nov 2026 Sumber: Pemantau Echo proyek 279, 9-15 Nov (keterlibatan total 2.607.267, naik dari 1.989.848). Derau fandom akronim BWS kecil (≤7 unggahan X). Emosi takut, sedih, jijik di bawah 1%.")
+    callout_txt = f"{top_vol_name} mendominasi volume percakapan ({top_vol_pct:.0f}%) dengan porsi negatif {top_vol_neg}%; {p1_name} dan {p2_name} menguasai perhatian ({top2_eng_pct}% keterlibatan publik). Kritik tertinggi terpusat di {worst_name} ({worst_neg_p}% negatif, dari {worst_vol:,} sebutan).".replace(',', '.')
+    render_callout_target(callout_txt)
+    render_mh_footer(f"Edisi Analisis Multiplatform ({start_str} - {end_str}) | Sumber: Agregasi 7 saluran publik IndoBERT (Total keterlibatan: {fmt_val(total_eng)}). Emosi dominan: {top_pos_emo[0]} ({top_pos_emo[1]}%), {top_neg_emo[0]} ({top_neg_emo[1]}%).")
 
 
 # ==============================================================================
@@ -1331,25 +1364,107 @@ def render_slide_6_two_wordclouds(df, selected_topic='Semua', topic_label=None, 
 def render_slide_7_issues_minister(df, selected_topic='Semua', topic_label=None, **kwargs):
     m = _get_slide_metrics(df, selected_topic, topic_label)
     render_mh_top_bar(slide_num=7)
+    
+    start_str = m.get('start_str', 'Awal Periode')
+    end_str = m.get('end_str', 'Akhir Periode')
+
+    # 1. Isolasi subset korpus atensi Menteri PU
+    if 'topic' in df.columns and (df['topic'] == 'Menteri_PU').sum() > 0:
+        df_m = df[df['topic'] == 'Menteri_PU']
+    elif 'raw_content' in df.columns:
+        m_mask = df['raw_content'].str.contains(r'\b(?:menteri|dody|hanggodo)\b', case=False, na=False)
+        df_m = df[m_mask] if m_mask.sum() > 0 else df
+    else:
+        df_m = df
+        
+    m_vol = len(df_m)
+    m_pos_c = int((df_m['sentiment_name'] == 'Positif').sum()) if 'sentiment_name' in df_m.columns else 0
+    m_pos_p = round((m_pos_c / max(1, m_vol)) * 100, 1)
+    m_neu_c = int((df_m['sentiment_name'] == 'Netral').sum()) if 'sentiment_name' in df_m.columns else 0
+    m_neu_p = round((m_neu_c / max(1, m_vol)) * 100, 1)
+    m_neg_c = int((df_m['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in df_m.columns else 0
+    m_neg_p = round((m_neg_c / max(1, m_vol)) * 100, 1)
+
+    df_m_neg = df_m[df_m['sentiment_name'] == 'Negatif'] if 'sentiment_name' in df_m.columns else df_m.head(0)
+    if len(df_m_neg) > 0 and 'platform' in df_m_neg.columns:
+        top_neg_plat = df_m_neg['platform'].value_counts().index[0]
+        top_neg_count = int(df_m_neg['platform'].value_counts().iloc[0])
+    else:
+        top_neg_plat = "Medsos"
+        top_neg_count = 0
+
+    # 2. Pemetaan Dinamis 5 Tema Pengangkat (Positif)
+    POS_THEMES = [
+        ("Tanggap darurat bencana & tinjauan lapangan", r'\b(?:banjir|longsor|bencana|darurat|tinjau|posko|aceh|gayo|tamiang|nagan)\b', "Berita, IG"),
+        ("Peresmian Sekolah Rakyat & sarana vokasi", r'\b(?:sekolah|rakyat|vokasi|pendidikan|peresmian|sarana)\b', "TikTok, IG"),
+        ("Preservasi jalan nasional, tol & konektivitas", r'\b(?:preservasi|jalan|nasional|tol|jalur|aspal|mulus|jembatan)\b', "YouTube, Berita"),
+        ("Ketahanan pangan, rehabilitasi irigasi & bendungan", r'\b(?:irigasi|bendungan|pangan|swasembada|tanggul|air|waduk)\b', "Berita Daring"),
+        ("Sinergi lintas instansi & program prioritas", r'\b(?:sinergi|asta\s+cita|kementerian|rapat|kerja\s+sama|kebijakan|pemerintah)\b', "Threads, Berita"),
+    ]
+    
+    df_m_pos = df_m[df_m['sentiment_name'] == 'Positif'] if 'sentiment_name' in df_m.columns else df_m
+    pos_rows_data = []
+    for t_title, t_pat, default_plat in POS_THEMES:
+        m_t = df_m_pos['raw_content'].str.contains(t_pat, case=False, na=False) if 'raw_content' in df_m_pos.columns else pd.Series(False, index=df_m_pos.index)
+        t_cnt = int(m_t.sum())
+        if t_cnt > 0 and 'platform' in df_m_pos.columns:
+            top_plats = df_m_pos[m_t]['platform'].value_counts().head(2).index.tolist()
+            plat_str = ", ".join(top_plats) if top_plats else default_plat
+        else:
+            plat_str = default_plat
+        pos_rows_data.append({'title': t_title, 'count': t_cnt, 'plat': plat_str})
+        
+    pos_rows_data.sort(key=lambda x: x['count'], reverse=True)
+    top_pos_theme_name = pos_rows_data[0]['title'].split('&')[0].strip() if pos_rows_data else "Kerja Lapangan"
+
+    # 3. Pemetaan Dinamis 3 Tema Penekan (Negatif)
+    NEG_THEMES = [
+        ("Dinamika tata kelola, etika & keluarga di medsos", r'\b(?:nepotisme|wamen|keluarga|etika|jabatan|threads)\b', "Threads"),
+        ("Residu perkara penegakan hukum KPK & proyek daerah", r'\b(?:kpk|korupsi|geledah|sidang|suap|sumut)\b', "X, Berita"),
+        ("Keluhan jalan rusak, berlubang & infrastruktur daerah", r'\b(?:rusak|lubang|hancur|bergelombang|lambat|anggaran|daerah)\b', "Medsos"),
+    ]
+    neg_rows_data = []
+    for t_title, t_pat, default_plat in NEG_THEMES:
+        m_t = df_m_neg['raw_content'].str.contains(t_pat, case=False, na=False) if 'raw_content' in df_m_neg.columns else pd.Series(False, index=df_m_neg.index)
+        t_cnt = int(m_t.sum())
+        if t_cnt > 0 and 'platform' in df_m_neg.columns:
+            top_plats = df_m_neg[m_t]['platform'].value_counts().head(2).index.tolist()
+            plat_str = ", ".join(top_plats) if top_plats else default_plat
+        else:
+            plat_str = default_plat
+        neg_rows_data.append({'title': t_title, 'count': t_cnt, 'plat': plat_str})
+        
+    neg_rows_data.sort(key=lambda x: x['count'], reverse=True)
+
+    # Header & Judul Dinamis
     render_mh_title(
         "Isu Positif dan Negatif - Menteri PU",
-        "Aceh dan Sekolah Rakyat mengangkat; Threads menekan",
-        "Pemantau Echo Menteri PU (proyek 280), 9-15 Nov; berkas Isu belum masuk. Kiri: pengangkat. Kanan: penekan."
+        f"{top_pos_theme_name} mengangkat; kritik terisolir di {top_neg_plat}",
+        f"Pemantauan persepsi Menteri PU ({start_str} - {end_str}). Kiri: lima klaster pengangkat. Kanan: tiga isu penekan sentimen."
     )
-    
+
+    # 5 KPI Chips Dinamis
     chips = [
-        {"label": "Penyebutan", "val": "724", "sub": "naik dari 576", "dot": "#10B981"},
-        {"label": "Positif", "val": "72%", "sub": "524 dari 724", "dot": "#10B981", "val_color": "#10B981"},
-        {"label": "Netral", "val": "24%", "sub": "172 sebutan", "dot": "#F59E0B", "val_color": "#D97706"},
-        {"label": "Negatif", "val": "3,9%", "sub": "28 dari 724; turun dari 7%", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "Threads", "val": "15", "sub": "dari 28 negatif menteri", "dot": "#EF4444"}
+        {"label": "Penyebutan", "val": f"{m_vol:,}".replace(',', '.'), "sub": f"rentang {start_str} - {end_str}", "dot": "#10B981"},
+        {"label": "Positif", "val": f"{m_pos_p}%", "sub": f"{m_pos_c:,} dari {m_vol:,} sebutan".replace(',', '.'), "dot": "#10B981", "val_color": "#10B981"},
+        {"label": "Netral", "val": f"{m_neu_p}%", "sub": f"{m_neu_c:,} sebutan".replace(',', '.'), "dot": "#F59E0B", "val_color": "#D97706"},
+        {"label": "Negatif", "val": f"{m_neg_p}%", "sub": f"{m_neg_c:,} kritik; terjaga rendah".replace(',', '.'), "dot": "#EF4444", "val_color": "#EF4444"},
+        {"label": top_neg_plat, "val": f"{top_neg_count}", "sub": f"dari {m_neg_c:,} negatif menteri".replace(',', '.'), "dot": "#EF4444" if top_neg_count > 0 else "#10B981"}
     ]
     render_kpi_chips(chips)
     
     col_pos, col_neg = st.columns(2, gap="medium")
     
     with col_pos:
-        pos_html = """<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+        pos_rows_html = []
+        for idx, item in enumerate(pos_rows_data[:5], 1):
+            pos_rows_html.append(f"""<tr style="border-bottom:1px solid #F1F5F9;">
+<td style="font-weight:600; padding:6px 4px;">{idx}. {item['title']}</td>
+<td style="color:#10B981; font-weight:700;">{item['count']:,}</td>
+<td style="color:#64748B;">{item['plat']}</td>
+</tr>""".replace(',', '.'))
+
+        pos_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
 <span style="width:7px; height:7px; border-radius:50%; background:#10B981; display:inline-block;"></span>
 Lima Isu Pengangkat (Positif)
@@ -1363,18 +1478,23 @@ Lima Isu Pengangkat (Positif)
 </tr>
 </thead>
 <tbody>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">1. Tanggap darurat banjir bandang Aceh (Nagan Raya, Gayo Lues)</td><td style="color:#10B981; font-weight:700;">215</td><td style="color:#64748B;">Berita, IG</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">2. Peresmian Sekolah Rakyat & sarana pendidikan vokasi</td><td style="color:#10B981; font-weight:700;">142</td><td style="color:#64748B;">TikTok, IG</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">3. Tinjauan lapangan ruas tol & preservasi jalan nasional</td><td style="color:#10B981; font-weight:700;">88</td><td style="color:#64748B;">YouTube, Berita</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">4. Percepatan rehabilitasi tanggul & irigasi ketahanan pangan</td><td style="color:#10B981; font-weight:700;">47</td><td style="color:#64748B;">Berita Daring</td></tr>
-<tr><td style="font-weight:600; padding:6px 4px;">5. Sinergi lintas kementerian & program Asta Cita</td><td style="color:#10B981; font-weight:700;">32</td><td style="color:#64748B;">X, Berita</td></tr>
+{"".join(pos_rows_html)}
 </tbody>
 </table>
 </div>"""
         render_html(pos_html)
 
     with col_neg:
-        neg_html = """<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+        neg_rows_html = []
+        for idx, item in enumerate(neg_rows_data[:3], 1):
+            cnt_disp = f"{item['count']:,}".replace(',', '.') if item['count'] > 0 else "0"
+            neg_rows_html.append(f"""<tr style="border-bottom:1px solid #F1F5F9;">
+<td style="font-weight:600; padding:6px 4px; color:#991B1B;">{idx}. {item['title']}</td>
+<td style="color:#EF4444; font-weight:700;">{cnt_disp}</td>
+<td style="color:#64748B;">{item['plat']}</td>
+</tr>""")
+
+        neg_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
 <span style="width:7px; height:7px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
 Tiga Isu Penekan (Negatif)
@@ -1388,20 +1508,19 @@ Tiga Isu Penekan (Negatif)
 </tr>
 </thead>
 <tbody>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px; color:#991B1B;">1. Narasi tata kelola & dinamika nepotisme di Threads</td><td style="color:#EF4444; font-weight:700;">15</td><td style="color:#64748B;">Threads</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px; color:#991B1B;">2. Residu isu perkara KPK jalan Sumut (seretan ke menteri)</td><td style="color:#EF4444; font-weight:700;">8</td><td style="color:#64748B;">X / Twitter</td></tr>
-<tr><td style="font-weight:600; padding:6px 4px; color:#991B1B;">3. Keluhan perbaikan jalan daerah berlubang (non-nasional)</td><td style="color:#EF4444; font-weight:700;">5</td><td style="color:#64748B;">Facebook, TikTok</td></tr>
+{"".join(neg_rows_html)}
 </tbody>
 </table>
 <div style="background:#FEF2F2; border-left:3px solid #EF4444; padding:8px 10px; margin-top:12px; border-radius:3px;">
     <div style="font-weight:700; font-size:10.5px; color:#991B1B;">Catatan Filter Negatif Menteri:</div>
-    <div style="font-size:10px; color:#7F1D1D; line-height:1.35;">Dari total 28 sebutan negatif menteri, 15 berasal dari Threads. Sentimen negatif menteri sangat rendah (3,9%), menunjukkan figur Menteri terlindungi reputasinya oleh kerja lapangan aktif.</div>
+    <div style="font-size:10px; color:#7F1D1D; line-height:1.35;">Dari total {m_neg_c:,} sebutan kritik menteri ({m_neg_p}%), porsi terbesar terpusat di saluran {top_neg_plat} ({top_neg_count} sebutan). Sentimen negatif Menteri tetap berada di batas aman berkat intensitas komunikasi kerja lapangan dan kehadiran langsung saat tanggap bencana.</div>
 </div>
-</div>"""
+</div>""".replace(',', '.')
         render_html(neg_html)
 
-    render_callout_target("Sintesis Citra Menteri", "Figur Menteri memiliki tameng persepsi yang kokoh didorong oleh tinjauan bencana Aceh dan Sekolah Rakyat. Sentimen negatif menteri hanya 3,9% (turun dari 7% pekan lalu), dengan titik kritik terisolir pada Threads.")
-    render_mh_footer("Edisi Mingguan 9-15 Nov 2026 Sumber: Pemantau Echo proyek 280 (Menteri PU), 9-15 Nov; berkas Isu dipetakan real-time.")
+    callout_txt = f"Sintesis Citra Menteri: Figur Menteri PU didukung kuat oleh sentimen positif ({m_pos_p}%) didorong oleh isu {top_pos_theme_name.lower()}. Proporsi negatif berada pada level {m_neg_p}%, membuktikan proteksi reputasi yang solid dari agenda operasional di lapangan."
+    render_callout_target("Sintesis Citra Menteri", callout_txt)
+    render_mh_footer(f"Edisi Evaluasi Pimpinan ({start_str} - {end_str}) | Sumber: Pemantauan opini publik khusus figur Menteri PU berbasis inferensi IndoBERT multiplatform.")
 
 
 # ==============================================================================
@@ -1611,71 +1730,185 @@ def render_slide_8_chapter_2(df, selected_topic='Semua', topic_label=None, **kwa
 def render_slide_9_main_topics(df, selected_topic='Semua', topic_label=None, **kwargs):
     m = _get_slide_metrics(df, selected_topic, topic_label)
     render_mh_top_bar(slide_num=9)
+    
+    start_str = m.get('start_str', 'Awal Periode')
+    end_str = m.get('end_str', 'Akhir Periode')
+
+    # 1. Filter subset korpus Kementerian PU
+    if 'topic' in df.columns and (df['topic'] == 'Kementerian_PU').sum() > 0:
+        df_k = df[df['topic'] == 'Kementerian_PU']
+    else:
+        df_k = df
+        
+    total_k_vol = max(1, len(df_k))
+    total_k_neg = int((df_k['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in df_k.columns else 0
+    k_neg_p = round((total_k_neg / total_k_vol) * 100, 1)
+
+    # 2. Definisi 6 Klaster Isu Utama Kementerian PU
+    CLUSTER_DEFINITIONS = [
+        {
+            'name': 'Banjir Aceh dan pemulihan fisik',
+            'short_name': 'Bencana Aceh',
+            'pattern': r'\b(?:banjir|longsor|gempa|bencana|tanggul|darurat|jembatan|aceh|gayo|pidie)\b',
+            'key_terms': ['aceh', 'banjir', 'longsor', 'tanggul', 'gayo']
+        },
+        {
+            'name': 'Perkara KPK dan pengawasan proyek',
+            'short_name': 'Perkara KPK',
+            'pattern': r'\b(?:kpk|korupsi|geledah|sidang|ott|penyelidikan|sumut|bbpjn)\b',
+            'key_terms': ['kpk', 'geledah', 'sidang', 'korupsi', 'sumut']
+        },
+        {
+            'name': 'Sekolah Rakyat dan sarana vokasi',
+            'short_name': 'Sekolah Rakyat',
+            'pattern': r'\b(?:sekolah|rakyat|vokasi|pendidikan|pelatihan|inpres)\b',
+            'key_terms': ['sekolah', 'rakyat', 'vokasi', 'sarana']
+        },
+        {
+            'name': 'Air bersih dan kekeringan irigasi',
+            'short_name': 'Air Bersih & SDA',
+            'pattern': r'\b(?:air\s+bersih|krisis\s+air|kekeringan|irigasi|bendungan|waduk|pipa|spam)\b',
+            'key_terms': ['air', 'irigasi', 'kekeringan', 'bendungan', 'waduk']
+        },
+        {
+            'name': 'Tol fungsional dan konektivitas Nataru',
+            'short_name': 'Tol & Jalur Nataru',
+            'pattern': r'\b(?:jalan\s+tol|nataru|fungsional|jalan\s+nasional|preservasi|aspal|trans)\b',
+            'key_terms': ['tol', 'nataru', 'fungsional', 'jalan', 'preservasi']
+        },
+        {
+            'name': 'Isu tata kelola, pejabat & birokrasi',
+            'short_name': 'Tata Kelola',
+            'pattern': r'\b(?:wamen|nepotisme|pejabat|itjen|humas|anggaran|birokrasi)\b',
+            'key_terms': ['wamen', 'nepotisme', 'pejabat', 'itjen', 'anggaran']
+        }
+    ]
+
+    clusters_data = []
+    for c in CLUSTER_DEFINITIONS:
+        mask = df_k['raw_content'].str.contains(c['pattern'], case=False, na=False) if 'raw_content' in df_k.columns else pd.Series(False, index=df_k.index)
+        sub = df_k[mask]
+        cnt = len(sub)
+        pos_cnt = int((sub['sentiment_name'] == 'Positif').sum()) if 'sentiment_name' in sub.columns else 0
+        neu_cnt = int((sub['sentiment_name'] == 'Netral').sum()) if 'sentiment_name' in sub.columns else 0
+        neg_cnt = int((sub['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in sub.columns else 0
+        
+        pos_p = round((pos_cnt / max(1, cnt)) * 100, 1)
+        neg_p = round((neg_cnt / max(1, cnt)) * 100, 1)
+        
+        if neg_p >= 20:
+            status_html = '<span style="color:#EF4444; font-weight:700;">negatif</span>'
+        elif pos_p >= 30:
+            status_html = '<span style="color:#10B981; font-weight:700;">positif</span>'
+        else:
+            status_html = '<span style="color:#F59E0B; font-weight:700;">campur</span>'
+            
+        ev_counts = []
+        if 'raw_content' in sub.columns and cnt > 0:
+            for term in c['key_terms']:
+                tc = int(sub['raw_content'].str.contains(r'\b' + term + r'\b', case=False, na=False).sum())
+                if tc > 0:
+                    ev_counts.append(f"{term} {tc}")
+        ev_str = ", ".join(ev_counts[:3]) if ev_counts else f"{cnt:,} sebutan"
+        
+        clusters_data.append({
+            'name': c['name'],
+            'short_name': c['short_name'],
+            'cnt': cnt,
+            'pos_cnt': pos_cnt,
+            'neu_cnt': neu_cnt,
+            'neg_cnt': neg_cnt,
+            'pos_p': pos_p,
+            'neg_p': neg_p,
+            'status_html': status_html,
+            'ev_str': ev_str
+        })
+
+    # Urutkan klaster berdasarkan volume sebutan terbanyak
+    clusters_data.sort(key=lambda x: x['cnt'], reverse=True)
+    top_vol_cl = clusters_data[0] if clusters_data else {'name': 'Bencana & Pemulihan', 'short_name': 'Bencana', 'cnt': 0, 'neg_cnt': 0, 'neg_p': 0.0}
+    
+    # Cari klaster penekan negatif utama
+    neg_sorted_cl = sorted(clusters_data, key=lambda x: x['neg_cnt'], reverse=True)
+    top_neg_cl = neg_sorted_cl[0] if neg_sorted_cl else top_vol_cl
+    
+    # Cari klaster pengangkat positif utama
+    pos_sorted_cl = sorted(clusters_data, key=lambda x: x['pos_cnt'], reverse=True)
+    top_pos_cl = pos_sorted_cl[0] if pos_sorted_cl else top_vol_cl
+
     render_mh_title(
         "Topik & Narasi - Kementerian PU",
-        "Aceh dan Sekolah Rakyat memimpin; KPK penekan utama",
-        "Pemantau Echo Kementerian PU (proyek 279), 9-15 Nov; berkas Topik belum masuk. Kiri: enam klaster. Kanan: bacaan."
+        f"{top_vol_cl['short_name']} memimpin volume; {top_neg_cl['short_name']} penekan utama",
+        f"Pemetaan enam klaster topik utama ({start_str} - {end_str}). Kiri: enam klaster urut volume. Kanan: telaah dinamika narasi."
     )
-    
+
+    # 5 KPI Chips Dinamis
     chips = [
-        {"label": "Penyebutan", "val": "3.123", "sub": "9-15 Nov", "dot": "#2563EB"},
-        {"label": "Aceh", "val": "519", "sub": "sebutan; 5 negatif", "dot": "#10B981", "val_color": "#10B981"},
-        {"label": "Negatif", "val": "10,6%", "sub": "dari 3.123", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "Perkara KPK", "val": "244", "sub": "sebutan; 196 negatif", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "Sekolah Rakyat", "val": "212", "sub": "sebutan; 5 negatif", "dot": "#10B981"}
+        {"label": "Penyebutan", "val": f"{total_k_vol:,}".replace(',', '.'), "sub": f"rentang {start_str} - {end_str}", "dot": "#2563EB"},
+        {"label": top_vol_cl['short_name'], "val": f"{top_vol_cl['cnt']:,}".replace(',', '.'), "sub": f"sebutan; {top_vol_cl['neg_cnt']} negatif", "dot": "#10B981" if top_vol_cl['neg_p'] < 15 else "#EF4444", "val_color": "#10B981" if top_vol_cl['neg_p'] < 15 else "#EF4444"},
+        {"label": "Negatif", "val": f"{k_neg_p}%", "sub": f"{total_k_neg:,} dari {total_k_vol:,} sebutan".replace(',', '.'), "dot": "#EF4444", "val_color": "#EF4444"},
+        {"label": top_neg_cl['short_name'], "val": f"{top_neg_cl['cnt']:,}".replace(',', '.'), "sub": f"{top_neg_cl['neg_cnt']} negatif ({top_neg_cl['neg_p']}%)", "dot": "#EF4444", "val_color": "#EF4444"},
+        {"label": top_pos_cl['short_name'], "val": f"{top_pos_cl['cnt']:,}".replace(',', '.'), "sub": f"{top_pos_cl['pos_cnt']} positif ({top_pos_cl['pos_p']}%)", "dot": "#10B981", "val_color": "#10B981"}
     ]
     render_kpi_chips(chips)
     
     c_top, c_read = st.columns([1.15, 0.85], gap="medium")
     
     with c_top:
-        topic_table = """<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+        rows_tbl = []
+        for idx, cl in enumerate(clusters_data, 1):
+            rows_tbl.append(f"""<tr style="border-bottom:1px solid #F1F5F9;">
+<td style="font-weight:600; padding:6px 4px;">{idx}. {cl['name']} - {cl['status_html']}</td>
+<td style="color:#64748B;">{cl['ev_str']}</td>
+</tr>""")
+
+        topic_table = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
 <span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
-Enam Topik Teratas - Urut Berkas
+Enam Topik Teratas - Urut Volume Sebutan
 </div>
 <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
 <thead>
 <tr style="border-bottom:1.5px solid #CBD5E1; color:#64748B; font-size:10px; font-weight:700;">
-<th style="padding:6px 4px; width:220px;">TOPIK ▼</th>
-<th style="padding:6px 4px;">BUKTI</th>
+<th style="padding:6px 4px; width:230px;">TOPIK ▼</th>
+<th style="padding:6px 4px;">BUKTI KATA KUNCI DINAMIS</th>
 </tr>
 </thead>
 <tbody>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">1. Banjir Aceh dan pemulihan - <span style="color:#10B981;">positif</span></td><td style="color:#64748B;">aceh 519, gayo lues 178, pidie jaya 77</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">2. Perkara KPK jalan Sumut - <span style="color:#EF4444;">negatif</span></td><td style="color:#64748B;">kpk 244 (196 negatif); geledah 60</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">3. Sekolah Rakyat Nagan Raya - <span style="color:#10B981;">positif</span></td><td style="color:#64748B;">212 sebutan; puncak 73 pada 11 Nov</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">4. Air bersih dan kekeringan - <span style="color:#F59E0B;">campur</span></td><td style="color:#64748B;">air bersih 203, kekeringan 99</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">5. Tol fungsional Nataru - <span style="color:#10B981;">positif</span></td><td style="color:#64748B;">91 sebutan di 45 portal; tol 67</td></tr>
-<tr><td style="font-weight:600; padding:6px 4px;">6. Isu Wamen, nepotisme - <span style="color:#EF4444;">negatif</span></td><td style="color:#64748B;">wamen 84; nepotisme 26 (21 negatif)</td></tr>
+{"".join(rows_tbl)}
 </tbody>
 </table>
 </div>"""
         render_html(topic_table)
 
     with c_read:
-        read_html = """<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+        # Menghitung kontribusi penekan terhadap total negatif
+        neg_contrib = round((top_neg_cl['neg_cnt'] / max(1, total_k_neg)) * 100) if total_k_neg > 0 else 0
+        third_cl = clusters_data[2] if len(clusters_data) > 2 else clusters_data[-1]
+        
+        read_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
 <span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
 Yang Dibaca dari Data
 </div>
 <div style="background:#F0FDF4; border-left:3px solid #10B981; padding:8px 10px; margin-bottom:8px; border-radius:3px;">
-<div style="font-weight:700; font-size:11px; color:#065F46;">Aceh poros volume pekan</div>
-<div style="font-size:10px; color:#064E3B; line-height:1.4;">Pemulihan, normalisasi, Rp42 T rehab-rekon: 519 sebutan Aceh, hanya 5 negatif.</div>
+<div style="font-weight:700; font-size:11px; color:#065F46;">{top_vol_cl['short_name']} poros volume</div>
+<div style="font-size:10px; color:#064E3B; line-height:1.4;">Mengumpulkan {top_vol_cl['cnt']:,} sebutan dengan sentimen negatif terkontrol ({top_vol_cl['neg_p']}%) dan respon afirmatif warga yang tinggi ({top_vol_cl['pos_p']}%).</div>
 </div>
 <div style="background:#FEF2F2; border-left:3px solid #EF4444; padding:8px 10px; margin-bottom:8px; border-radius:3px;">
-<div style="font-weight:700; font-size:11px; color:#991B1B;">Penekan tunggal: perkara KPK</div>
-<div style="font-size:10px; color:#7F1D1D; line-height:1.4;">196 dari 331 sebutan negatif lembaga (59%); satker dan BBPJN ikut terseret.</div>
+<div style="font-weight:700; font-size:11px; color:#991B1B;">Penekan utama: {top_neg_cl['short_name']}</div>
+<div style="font-size:10px; color:#7F1D1D; line-height:1.4;">Menyumbang {top_neg_cl['neg_cnt']:,} dari {total_k_neg:,} sebutan negatif ({neg_contrib}% dari seluruh resistensi kementerian); porsi kritik mencapai {top_neg_cl['neg_p']}%.</div>
 </div>
-<div style="background:#F8FAFC; border-left:3px solid #64748B; padding:8px 10px; border-radius:3px;">
-<div style="font-weight:700; font-size:11px; color:#1E293B;">Isu Wamen mengecil</div>
-<div style="font-size:10px; color:#475569; line-height:1.4;">Nepotisme 26 sebutan (pekan lalu 33); 14 Nov "wamen" justru rilis tol Nataru.</div>
+<div style="background:#FFFBEB; border-left:3px solid #F59E0B; padding:8px 10px; border-radius:3px;">
+<div style="font-weight:700; font-size:11px; color:#B45309;">Dinamika {third_cl['short_name']}</div>
+<div style="font-size:10px; color:#78350F; line-height:1.4;">Mencatat {third_cl['cnt']:,} sebutan dengan proporsi netral {round(third_cl['neu_cnt']/max(1, third_cl['cnt'])*100)}%; menjadi penyangga persepsi publik non-krisis.</div>
 </div>
-</div>"""
+</div>""".replace(',', '.')
         render_html(read_html)
 
-    render_callout_target("Kerja balai di Aceh, Sekolah Rakyat, dan tol mendominasi volume; nada ditekan satu perkara hukum: KPK jalan Sumut yang menyeret satker.")
-    render_mh_footer("Edisi Mingguan 9-15 Nov 2026 Sumber: Pemantau Echo proyek 279, 9-15 Nov (topTerms 200 term). Berkas Topik Utama terakhir 28 Okt.")
+    callout_txt = f"Kerja balai wilayah pada klaster {top_vol_cl['short_name'].lower()} mendominasi volume percakapan; resistensi publik terkonsentrasi pada {top_neg_cl['short_name'].lower()} ({top_neg_cl['neg_p']}% kritik) yang memerlukan klarifikasi faktual terkoordinasi."
+    render_callout_target(callout_txt)
+    render_mh_footer(f"Edisi Evaluasi Topik ({start_str} - {end_str}) | Sumber: Klasterisasi 6 pilar topik Kementerian PU berbasis IndoBERT multiplatform.")
 
 
 # ==============================================================================
