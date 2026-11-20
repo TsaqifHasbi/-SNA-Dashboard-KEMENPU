@@ -152,162 +152,150 @@ def _get_slide_metrics(df, selected_topic='Semua', topic_label=None, df_full=Non
     prev_end = start_d - timedelta(days=1)
     prev_start = prev_end - timedelta(days=n_days - 1)
 
-    # Deteksi apakah periode yang dipilih adalah Pekan Resmi Monitoring (9 s.d. 15 Nov 2026)
-    is_official_week = (start_d == datetime.date(2026, 11, 9) and end_d == datetime.date(2026, 11, 15))
+    # Period-over-Period (PoP) comparison window (n_days vs identical n_days preceding start_d)
+    is_official_week = False
 
-    if is_official_week:
-        vol_lembaga = 3123
-        vol_lembaga_prev = 2738
-        vol_lembaga_delta_pct = 14.1
-        vol_lembaga_sub = "naik dari 2.738"
-        vol_lembaga_display = "3.123"
+    full_data = df_full if (df_full is not None and len(df_full) > 0) else df
+    if full_data is not None and len(full_data) > 0:
+        if 'date_only' not in full_data.columns:
+            if 'date' in full_data.columns and len(full_data['date'].dropna()) > 0:
+                full_data['date_only'] = pd.to_datetime(full_data['date'], errors='coerce').dt.date
+            elif 'created_at' in full_data.columns:
+                full_data['date_only'] = pd.to_datetime(full_data['created_at'].astype(str).str.replace(' WIB', ''), errors='coerce').dt.date
+            else:
+                full_data['date_only'] = start_d
 
-        eng_total = 2610000
-        eng_total_prev = 1990000
-        eng_delta_pct = 31.2
-        eng_sub = "naik 31% dari 1,99 jt"
-        eng_display = "2,61 jt"
+        cur_slice = full_data[(full_data['date_only'] >= start_d) & (full_data['date_only'] <= end_d)]
+        prev_slice = full_data[(full_data['date_only'] >= prev_start) & (full_data['date_only'] <= prev_end)]
 
-        neg_p_lembaga = 10.6
-        neg_p_lembaga_prev = 8.0
-        neg_lembaga_sub = "naik dari 8%"
-        neg_p_lembaga_display = "10,6"
-        neg_c_l = 331
+        l_cur = cur_slice[cur_slice['topic'] == 'Kementerian_PU']
+        l_prev = prev_slice[prev_slice['topic'] == 'Kementerian_PU']
+        m_cur = cur_slice[cur_slice['topic'] == 'Menteri_PU']
+        m_prev = prev_slice[prev_slice['topic'] == 'Menteri_PU']
 
-        peak_neg_count = 120
-        peak_neg_day = "13 Nov"
-        peak_neg_sub = "lembaga, 13 Nov; RT seragam"
+        vol_lembaga = len(l_cur) if len(l_cur) > 0 else vol
+        vol_lembaga_prev = len(l_prev)
+        vol_lembaga_diff = vol_lembaga - vol_lembaga_prev
+        vol_lembaga_delta_pct = round((vol_lembaga_diff / max(1, vol_lembaga_prev) * 100), 1) if vol_lembaga_prev > 0 else 0.0
+        if vol_lembaga_prev > 0:
+            if vol_lembaga >= vol_lembaga_prev:
+                vol_lembaga_sub = f"naik {vol_lembaga_delta_pct:.0f}% dari {vol_lembaga_prev:,}".replace(',', '.')
+            else:
+                vol_lembaga_sub = f"turun {abs(vol_lembaga_delta_pct):.0f}% dari {vol_lembaga_prev:,}".replace(',', '.')
+        else:
+            vol_lembaga_sub = "periode aktif"
+        vol_lembaga_display = f"{vol_lembaga:,}".replace(',', '.')
 
-        vol_menteri = 724
-        vol_menteri_prev = 576
-        vol_menteri_delta_pct = 25.7
-        vol_menteri_sub = "naik dari 576"
-        vol_menteri_display = "724"
+        eng_total = int(cur_slice['total_engagement'].sum()) if 'total_engagement' in cur_slice.columns else eng
+        eng_total_prev = int(prev_slice['total_engagement'].sum()) if 'total_engagement' in prev_slice.columns else 0
+        eng_diff = eng_total - eng_total_prev
+        eng_delta_pct = round((eng_diff / max(1, eng_total_prev) * 100), 1) if eng_total_prev > 0 else 0.0
+        eng_display = fmt_val(eng_total)
+        if eng_total_prev > 0:
+            if eng_diff >= 0:
+                eng_sub = f"naik {eng_delta_pct:.0f}% dari {fmt_val(eng_total_prev)}"
+            else:
+                eng_sub = f"turun {abs(eng_delta_pct):.0f}% dari {fmt_val(eng_total_prev)}"
+        else:
+            eng_sub = "total interaksi"
 
-        eng_menteri = 791000
-        eng_menteri_prev = 695000
-        eng_menteri_sub = "naik dari 695 rb"
-        eng_menteri_display = "791 rb"
+        neg_c_l = int((l_cur['sentiment_name'] == 'Negatif').sum()) if len(l_cur) > 0 and 'sentiment_name' in l_cur.columns else neg_c
+        neg_p_lembaga = round((neg_c_l / max(1, vol_lembaga) * 100), 1) if vol_lembaga > 0 else 0.0
+        neg_c_l_prev = int((l_prev['sentiment_name'] == 'Negatif').sum()) if len(l_prev) > 0 and 'sentiment_name' in l_prev.columns else 0
+        neg_p_lembaga_prev = round((neg_c_l_prev / max(1, vol_lembaga_prev) * 100), 1) if vol_lembaga_prev > 0 else 0.0
+        if vol_lembaga_prev > 0:
+            if neg_p_lembaga >= neg_p_lembaga_prev:
+                neg_lembaga_sub = f"naik dari {str(neg_p_lembaga_prev).replace('.', ',')}%"
+            else:
+                neg_lembaga_sub = f"turun dari {str(neg_p_lembaga_prev).replace('.', ',')}%"
+        else:
+            neg_lembaga_sub = f"{str(neg_p_lembaga).replace('.', ',')}% kritik"
+        neg_p_lembaga_display = f"{neg_p_lembaga}".replace('.', ',')
 
-        neg_p_menteri = 3.9
-        neg_p_menteri_prev = 7.0
-        neg_menteri_sub = "turun dari 7%"
-        neg_p_menteri_display = "3,9"
-
-        headline_title = "Perkara KPK menekan; banjir Aceh menguji balai"
-        guide_text = "Enam temuan dari Pemantau Echo (279, 280), Pemantau Delta, dan media. Pita biru: prioritas."
-    else:
-        # Perhitungan dinamis dari df_full untuk rentang tanggal kustom (misal 5-18 Nov atau bulanan)
-        if df_full is not None and len(df_full) > 0:
-            if 'date_only' not in df_full.columns:
-                if 'date' in df_full.columns and len(df_full['date'].dropna()) > 0:
-                    df_full['date_only'] = pd.to_datetime(df_full['date'], errors='coerce').dt.date
-                elif 'created_at' in df_full.columns:
-                    df_full['date_only'] = pd.to_datetime(df_full['created_at'].astype(str).str.replace(' WIB', ''), errors='coerce').dt.date
-                else:
-                    df_full['date_only'] = start_d
-
-            cur_slice = df_full[(df_full['date_only'] >= start_d) & (df_full['date_only'] <= end_d)]
-            prev_slice = df_full[(df_full['date_only'] >= prev_start) & (df_full['date_only'] <= prev_end)]
-
-            l_cur = cur_slice[cur_slice['topic'] == 'Kementerian_PU']
-            l_prev = prev_slice[prev_slice['topic'] == 'Kementerian_PU']
-            m_cur = cur_slice[cur_slice['topic'] == 'Menteri_PU']
-            m_prev = prev_slice[prev_slice['topic'] == 'Menteri_PU']
-
-            vol_lembaga = len(l_cur) if len(l_cur) > 0 else vol
-            vol_lembaga_prev = len(l_prev)
-            vol_lembaga_diff = vol_lembaga - vol_lembaga_prev
-            vol_lembaga_delta_pct = round((vol_lembaga_diff / max(1, vol_lembaga_prev) * 100), 1) if vol_lembaga_prev > 0 else 0.0
-            vol_lembaga_sub = f"naik dari {vol_lembaga_prev:,}" if vol_lembaga >= vol_lembaga_prev else f"turun dari {vol_lembaga_prev:,}"
-            vol_lembaga_display = f"{vol_lembaga:,}"
-
-            eng_total = int(cur_slice['total_engagement'].sum()) if 'total_engagement' in cur_slice.columns else eng
-            eng_total_prev = int(prev_slice['total_engagement'].sum()) if 'total_engagement' in prev_slice.columns else 0
-            eng_diff = eng_total - eng_total_prev
-            eng_delta_pct = round((eng_diff / max(1, eng_total_prev) * 100), 1) if eng_total_prev > 0 else 0.0
-            eng_display = fmt_val(eng_total)
-            eng_sub = f"naik {eng_delta_pct:+.0f}% dari {fmt_val(eng_total_prev)}" if eng_diff >= 0 else f"turun {abs(eng_delta_pct):.0f}% dari {fmt_val(eng_total_prev)}"
-
-            neg_c_l = int((l_cur['sentiment_name'] == 'Negatif').sum()) if len(l_cur) > 0 and 'sentiment_name' in l_cur.columns else neg_c
-            neg_p_lembaga = round((neg_c_l / max(1, vol_lembaga) * 100), 1) if vol_lembaga > 0 else 0.0
-            neg_c_l_prev = int((l_prev['sentiment_name'] == 'Negatif').sum()) if len(l_prev) > 0 and 'sentiment_name' in l_prev.columns else 0
-            neg_p_lembaga_prev = round((neg_c_l_prev / max(1, vol_lembaga_prev) * 100), 1) if vol_lembaga_prev > 0 else 0.0
-            neg_lembaga_sub = f"naik dari {neg_p_lembaga_prev}%" if neg_p_lembaga >= neg_p_lembaga_prev else f"turun dari {neg_p_lembaga_prev}%"
-            neg_p_lembaga_display = f"{neg_p_lembaga}".replace('.', ',')
-
-            # Puncak Negatif
-            if len(l_cur) > 0 and 'sentiment_name' in l_cur.columns:
-                l_cur_dates = l_cur['date'].dt.date if 'date' in l_cur.columns else l_cur['date_only']
-                neg_by_day = l_cur[l_cur['sentiment_name'] == 'Negatif'].groupby(l_cur_dates).size()
-                if len(neg_by_day) > 0:
-                    peak_date = neg_by_day.idxmax()
-                    peak_neg_count = int(neg_by_day.max())
-                    peak_neg_day = peak_date.strftime('%d %b') if hasattr(peak_date, 'strftime') else str(peak_date)
-                else:
-                    peak_neg_count = 0
-                    peak_neg_day = start_d.strftime('%d %b')
+        # Puncak Negatif
+        if len(l_cur) > 0 and 'sentiment_name' in l_cur.columns:
+            l_cur_dates = l_cur['date'].dt.date if 'date' in l_cur.columns else l_cur['date_only']
+            neg_by_day = l_cur[l_cur['sentiment_name'] == 'Negatif'].groupby(l_cur_dates).size()
+            if len(neg_by_day) > 0:
+                peak_date = neg_by_day.idxmax()
+                peak_neg_count = int(neg_by_day.max())
+                peak_neg_day = peak_date.strftime('%d %b') if hasattr(peak_date, 'strftime') else str(peak_date)
             else:
                 peak_neg_count = 0
                 peak_neg_day = start_d.strftime('%d %b')
-
-            peak_neg_sub = f"lembaga, {peak_neg_day}; dinamika isu"
-
-            vol_menteri = len(m_cur)
-            vol_menteri_prev = len(m_prev)
-            vol_menteri_diff = vol_menteri - vol_menteri_prev
-            vol_menteri_delta_pct = round((vol_menteri_diff / max(1, vol_menteri_prev) * 100), 1) if vol_menteri_prev > 0 else 0.0
-            vol_menteri_sub = f"naik dari {vol_menteri_prev:,}" if vol_menteri >= vol_menteri_prev else f"turun dari {vol_menteri_prev:,}"
-            vol_menteri_display = f"{vol_menteri:,}"
-
-            eng_menteri = int(m_cur['total_engagement'].sum()) if 'total_engagement' in m_cur.columns else 0
-            eng_menteri_prev = int(m_prev['total_engagement'].sum()) if 'total_engagement' in m_prev.columns else 0
-            eng_menteri_display = fmt_val(eng_menteri)
-            eng_menteri_sub = f"naik dari {fmt_val(eng_menteri_prev)}" if eng_menteri >= eng_menteri_prev else f"turun dari {fmt_val(eng_menteri_prev)}"
-
-            neg_c_m = int((m_cur['sentiment_name'] == 'Negatif').sum()) if len(m_cur) > 0 and 'sentiment_name' in m_cur.columns else 0
-            neg_p_menteri = round((neg_c_m / max(1, vol_menteri) * 100), 1) if vol_menteri > 0 else 0.0
-            neg_c_m_prev = int((m_prev['sentiment_name'] == 'Negatif').sum()) if len(m_prev) > 0 and 'sentiment_name' in m_prev.columns else 0
-            neg_p_menteri_prev = round((neg_c_m_prev / max(1, vol_menteri_prev) * 100), 1) if vol_menteri_prev > 0 else 0.0
-            neg_menteri_sub = f"turun dari {neg_p_menteri_prev}%" if neg_p_menteri <= neg_p_menteri_prev else f"naik dari {neg_p_menteri_prev}%"
-            neg_p_menteri_display = f"{neg_p_menteri}".replace('.', ',')
-
-            headline_title = "Dinamika Penanganan Bencana & Evaluasi Kinerja Publik"
-            guide_text = f"Enam temuan hasil pemantauan komparatif ({start_d.strftime('%d %b')} - {end_d.strftime('%d %b %Y')}). Pita biru: prioritas."
         else:
-            vol_lembaga = vol
-            vol_lembaga_prev = 0
-            vol_lembaga_delta_pct = 0.0
-            vol_lembaga_sub = "periode aktif"
-            vol_lembaga_display = f"{vol:,}"
-            eng_total = eng
-            eng_total_prev = 0
-            eng_delta_pct = 0.0
-            eng_sub = "total interaksi"
-            eng_display = fmt_val(eng)
-            neg_p_lembaga = neg_p
-            neg_p_lembaga_prev = 0.0
-            neg_lembaga_sub = f"{neg_p}% kritik"
-            neg_p_lembaga_display = f"{neg_p}".replace('.', ',')
-            neg_c_l = neg_c
-            peak_neg_count = neg_c
+            peak_neg_count = 0
             peak_neg_day = start_d.strftime('%d %b')
-            peak_neg_sub = f"lembaga, {peak_neg_day}"
-            vol_menteri = 0
-            vol_menteri_prev = 0
-            vol_menteri_delta_pct = 0.0
+
+        peak_neg_sub = f"lembaga, {peak_neg_day}; puncak kritik"
+
+        vol_menteri = len(m_cur)
+        vol_menteri_prev = len(m_prev)
+        vol_menteri_diff = vol_menteri - vol_menteri_prev
+        vol_menteri_delta_pct = round((vol_menteri_diff / max(1, vol_menteri_prev) * 100), 1) if vol_menteri_prev > 0 else 0.0
+        if vol_menteri_prev > 0:
+            if vol_menteri >= vol_menteri_prev:
+                vol_menteri_sub = f"naik {vol_menteri_delta_pct:.0f}% dari {vol_menteri_prev:,}".replace(',', '.')
+            else:
+                vol_menteri_sub = f"turun {abs(vol_menteri_delta_pct):.0f}% dari {vol_menteri_prev:,}".replace(',', '.')
+        else:
             vol_menteri_sub = "-"
-            vol_menteri_display = "0"
-            eng_menteri = 0
-            eng_menteri_prev = 0
-            eng_menteri_sub = "-"
-            eng_menteri_display = "0"
-            neg_p_menteri = 0.0
-            neg_p_menteri_prev = 0.0
-            neg_menteri_sub = "-"
-            neg_p_menteri_display = "0"
-            headline_title = "Monitoring Komprehensif Opini Publik"
-            guide_text = "Enam temuan utama hasil analisis isu korpus data. Pita biru: prioritas."
+        vol_menteri_display = f"{vol_menteri:,}".replace(',', '.')
+
+        eng_menteri = int(m_cur['total_engagement'].sum()) if 'total_engagement' in m_cur.columns else 0
+        eng_menteri_prev = int(m_prev['total_engagement'].sum()) if 'total_engagement' in m_prev.columns else 0
+        eng_menteri_display = fmt_val(eng_menteri)
+        eng_menteri_sub = f"naik dari {fmt_val(eng_menteri_prev)}" if eng_menteri >= eng_menteri_prev else f"turun dari {fmt_val(eng_menteri_prev)}"
+
+        neg_c_m = int((m_cur['sentiment_name'] == 'Negatif').sum()) if len(m_cur) > 0 and 'sentiment_name' in m_cur.columns else 0
+        neg_p_menteri = round((neg_c_m / max(1, vol_menteri) * 100), 1) if vol_menteri > 0 else 0.0
+        neg_c_m_prev = int((m_prev['sentiment_name'] == 'Negatif').sum()) if len(m_prev) > 0 and 'sentiment_name' in m_prev.columns else 0
+        neg_p_menteri_prev = round((neg_c_m_prev / max(1, vol_menteri_prev) * 100), 1) if vol_menteri_prev > 0 else 0.0
+        if vol_menteri_prev > 0:
+            if neg_p_menteri <= neg_p_menteri_prev:
+                neg_menteri_sub = f"turun dari {str(neg_p_menteri_prev).replace('.', ',')}%"
+            else:
+                neg_menteri_sub = f"naik dari {str(neg_p_menteri_prev).replace('.', ',')}%"
+        else:
+            neg_menteri_sub = f"{str(neg_p_menteri).replace('.', ',')}% kritik"
+        neg_p_menteri_display = f"{neg_p_menteri}".replace('.', ',')
+
+        headline_title = "Dinamika Isu Penanganan Bencana, Infrastruktur & Akuntabilitas Publik"
+        guide_text = f"Enam temuan komparatif ({start_d.strftime('%d %b')} - {end_d.strftime('%d %b %Y')} vs {prev_start.strftime('%d %b')} - {prev_end.strftime('%d %b %Y')}). Pita biru: prioritas."
+    else:
+        vol_lembaga = vol
+        vol_lembaga_prev = 0
+        vol_lembaga_delta_pct = 0.0
+        vol_lembaga_sub = "periode aktif"
+        vol_lembaga_display = f"{vol:,}"
+        eng_total = eng
+        eng_total_prev = 0
+        eng_delta_pct = 0.0
+        eng_sub = "total interaksi"
+        eng_display = fmt_val(eng)
+        neg_p_lembaga = neg_p
+        neg_p_lembaga_prev = 0.0
+        neg_lembaga_sub = f"{neg_p}% kritik"
+        neg_p_lembaga_display = f"{neg_p}".replace('.', ',')
+        neg_c_l = neg_c
+        peak_neg_count = neg_c
+        peak_neg_day = start_d.strftime('%d %b')
+        peak_neg_sub = f"lembaga, {peak_neg_day}"
+        vol_menteri = 0
+        vol_menteri_prev = 0
+        vol_menteri_delta_pct = 0.0
+        vol_menteri_sub = "-"
+        vol_menteri_display = "0"
+        eng_menteri = 0
+        eng_menteri_prev = 0
+        eng_menteri_sub = "-"
+        eng_menteri_display = "0"
+        neg_p_menteri = 0.0
+        neg_p_menteri_prev = 0.0
+        neg_menteri_sub = "-"
+        neg_p_menteri_display = "0"
+        headline_title = "Monitoring Komprehensif Opini Publik"
+        guide_text = "Enam temuan utama hasil analisis isu korpus data. Pita biru: prioritas."
         
     return {
         'vol': vol,
@@ -512,53 +500,7 @@ def _extract_top_6_issue_findings(df_sub, m=None):
     5. Amplifikasi Terkoordinasi & Anomali Percakapan (Audit Bot / RT Seragam)
     6. Pelayanan Publik & Kebutuhan Dasar (Krisis Air Bersih / Layanan Publik)
     """
-    if m is not None and m.get('is_official_week'):
-        return [
-            {
-                'title': '1. Perkara KPK jalan Sumut penekan utama',
-                'short': 'Perkara KPK Sumut',
-                'statement': 'kpk 244 sebutan, 196 negatif = 59% negatif lembaga. Puncak 11 Nov (geledah, 40 portal) dan 13 Nov.',
-                'action_title': 'Klarifikasi & Transparansi Hukum',
-                'action_desc': 'Itjen & Biro Komunikasi Publik: Rilis transparansi proses lelang dan hormati langkah KPK secara profesional.'
-            },
-            {
-                'title': '2. Volume dan perhatian naik',
-                'short': 'Pertumbuhan Atensi',
-                'statement': 'Lembaga 3.123 (+14%), keterlibatan 2,61 jt (+31%); menteri 724 (+26%), negatif 3,9% dari 7%.',
-                'action_title': 'Manajemen Isu Multiplatform',
-                'action_desc': 'Humas Kementerian: Perkuat amplifikasi konten capaian positif di kanal visual (TikTok, IG, YouTube).'
-            },
-            {
-                'title': '3. Banjir bandang Aceh kembali',
-                'short': 'Banjir Aceh & Longsor',
-                'statement': 'Gayo Lues, Singkil, Tamiang 14-15 Nov; balai turunkan tim dan pompa. Pagi ini longsor ruas nasional Aceh Tengah.',
-                'action_title': 'Siaga Bencana & Pompa Mobile',
-                'action_desc': 'Ditjen SDA & Balai Wilayah Sungai: Siagakan pompa mobile dan percepat penanganan jembatan putus serta longsor.'
-            },
-            {
-                'title': '4. Video teratas: jalan nasional',
-                'short': 'Video Viral Jalan',
-                'statement': 'TikTok Gubernur Jabar 439 rb tayang: ruas Soreang-Ciwidey jalan nasional, keluhan diteruskan ke PU.',
-                'action_title': 'Aksi Cepat Preservasi Jalan',
-                'action_desc': 'BBPJN DKI-Jabar: Tuntaskan penanganan lubang jalan Soreang-Ciwidey dan beri update visual penanganan ke publik.'
-            },
-            {
-                'title': '5. Satu amplifikasi terkoordinasi',
-                'short': 'Amplifikasi Bot & Buzzer',
-                'statement': '13 Nov: 59 RT seragam teks "fakta sidang" dari 59 akun, 0 interaksi; sasaran pejabat daerah, satker PU terseret.',
-                'action_title': 'Audit Buzzer & Mitigasi X',
-                'action_desc': 'Tim Media Monitoring: Deteksi pola amplifikasi akun seragam dan hindari reaktif pada bot non-organik.'
-            },
-            {
-                'title': '6. Krisis air tanpa kabar baru PU',
-                'short': 'Krisis Air Bersih',
-                'statement': 'Air bersih 203 sebutan; Bandung, Pekalongan, Flores Timur, Raha. Kegiatan baru PU 0; terakhir 7 Nov.',
-                'action_title': 'Akselerasi Bantuan Air Bersih',
-                'action_desc': 'Ditjen Cipta Karya: Luncurkan bantuan armada mobil tangki air dan hidran umum di titik krisis daerah.'
-            }
-        ]
-
-    # Dynamic extraction for custom date ranges
+    # Dynamic extraction from active corpus data
     import re
     content_series = df_sub['cleaned_content'].fillna('').astype(str) if df_sub is not None and 'cleaned_content' in df_sub.columns else None
     
@@ -666,49 +608,8 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
     df_full = kwargs.get('df_full', None)
     m = _get_slide_metrics(df, selected_topic, topic_label, df_full=df_full)
 
-    # ── Toggle: Laporan Resmi vs Kalkulasi Dinamis ──────────────────────
-    data_mode = st.radio(
-        "Sumber Data Executive Summary:",
-        ["📋 Laporan Resmi Pimpinan (9-15 Nov)", "📊 Kalkulasi Dinamis Korpus Aktif"],
-        index=0,
-        horizontal=True,
-        key="slide2_data_mode"
-    )
-    use_official = data_mode.startswith("📋")
-
-    # ── Angka Resmi (hardcoded sesuai laporan vendor 9-15 Nov) ──────────
-    if use_official:
-        badge_vol_lembaga_display = "3.123"
-        badge_vol_lembaga_sub = "naik dari 2.738"
-        badge_eng_display = "2,61 jt"
-        badge_eng_sub = "naik 31% dari 1,99 jt"
-        badge_neg_p_lembaga_display = "10,6"
-        badge_neg_lembaga_sub = "naik dari 8%"
-        badge_peak_neg_count = "120"
-        badge_peak_neg_sub = "lembaga, 13 Nov; RT seragam"
-        badge_neg_p_menteri_display = "3,9"
-        badge_neg_menteri_sub = "turun dari 7%"
-        badge_headline = "Perkara KPK menekan; banjir Aceh menguji balai"
-        badge_guide = "Enam temuan dari Pemantau Echo (279, 280), Pemantau Delta, dan media. Pita biru: prioritas."
-    else:
-        badge_vol_lembaga_display = m['vol_lembaga_display']
-        badge_vol_lembaga_sub = m['vol_lembaga_sub']
-        badge_eng_display = m['eng_display']
-        badge_eng_sub = m['eng_sub']
-        badge_neg_p_lembaga_display = m['neg_p_lembaga_display']
-        badge_neg_lembaga_sub = m['neg_lembaga_sub']
-        badge_peak_neg_count = str(m['peak_neg_count'])
-        badge_peak_neg_sub = m['peak_neg_sub']
-        badge_neg_p_menteri_display = m['neg_p_menteri_display']
-        badge_neg_menteri_sub = m['neg_menteri_sub']
-        badge_headline = m['headline_title']
-        badge_guide = m['guide_text']
-
-    # ── 6 Temuan SELALU dinamis dari data korpus aktif ──────────────────
-    # Pastikan is_official_week = False agar selalu kalkulasi dari df
-    m_dynamic = dict(m)
-    m_dynamic['is_official_week'] = False
-    findings = _extract_top_6_issue_findings(df, m_dynamic)
+    # ── Ekstraksi 6 temuan intelijen strategis secara dinamis dari data korpus aktif
+    findings = _extract_top_6_issue_findings(df, m)
     f0, f1, f2, f3, f4, f5 = findings[0], findings[1], findings[2], findings[3], findings[4], findings[5]
 
     chips_html = f"""
@@ -719,8 +620,8 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
                     <span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
                     <span style="font-size:9.5px; font-weight:600; color:#475569;">Penyebutan Lembaga</span>
                 </div>
-                <div style="font-size:19px; font-weight:800; color:#2563EB; line-height:1.1;">{badge_vol_lembaga_display}</div>
-                <div style="font-size:9px; color:#64748B; margin-top:2px;">{badge_vol_lembaga_sub}</div>
+                <div style="font-size:19px; font-weight:800; color:#2563EB; line-height:1.1;">{m['vol_lembaga_display']}</div>
+                <div style="font-size:9px; color:#64748B; margin-top:2px;">{m['vol_lembaga_sub']}</div>
             </div>
             <!-- 2. Keterlibatan -->
             <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:7px 11px; min-width:98px;">
@@ -728,8 +629,8 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
                     <span style="width:7px; height:7px; border-radius:50%; background:#10B981; display:inline-block;"></span>
                     <span style="font-size:9.5px; font-weight:600; color:#475569;">Keterlibatan</span>
                 </div>
-                <div style="font-size:19px; font-weight:800; color:#10B981; line-height:1.1;">{badge_eng_display}</div>
-                <div style="font-size:9px; color:#64748B; margin-top:2px;">{badge_eng_sub}</div>
+                <div style="font-size:19px; font-weight:800; color:#10B981; line-height:1.1;">{m['eng_display']}</div>
+                <div style="font-size:9px; color:#64748B; margin-top:2px;">{m['eng_sub']}</div>
             </div>
             <!-- 3. Negatif Lembaga -->
             <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:7px 11px; min-width:98px;">
@@ -737,8 +638,8 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
                     <span style="width:7px; height:7px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
                     <span style="font-size:9.5px; font-weight:600; color:#475569;">Negatif Lembaga</span>
                 </div>
-                <div style="font-size:19px; font-weight:800; color:#EF4444; line-height:1.1;">{badge_neg_p_lembaga_display}%</div>
-                <div style="font-size:9px; color:#EF4444; margin-top:2px;">{badge_neg_lembaga_sub}</div>
+                <div style="font-size:19px; font-weight:800; color:#EF4444; line-height:1.1;">{m['neg_p_lembaga_display']}%</div>
+                <div style="font-size:9px; color:#EF4444; margin-top:2px;">{m['neg_lembaga_sub']}</div>
             </div>
             <!-- 4. Puncak Negatif -->
             <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:7px 11px; min-width:108px;">
@@ -746,8 +647,8 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
                     <span style="width:7px; height:7px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
                     <span style="font-size:9.5px; font-weight:600; color:#475569;">Puncak Negatif</span>
                 </div>
-                <div style="font-size:19px; font-weight:800; color:#EF4444; line-height:1.1;">{badge_peak_neg_count}</div>
-                <div style="font-size:9px; color:#64748B; margin-top:2px;">{badge_peak_neg_sub}</div>
+                <div style="font-size:19px; font-weight:800; color:#EF4444; line-height:1.1;">{m['peak_neg_count']}</div>
+                <div style="font-size:9px; color:#64748B; margin-top:2px;">{m['peak_neg_sub']}</div>
             </div>
             <!-- 5. Negatif Menteri -->
             <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:7px 11px; min-width:98px;">
@@ -755,8 +656,8 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
                     <span style="width:7px; height:7px; border-radius:50%; background:#10B981; display:inline-block;"></span>
                     <span style="font-size:9.5px; font-weight:600; color:#475569;">Negatif Menteri</span>
                 </div>
-                <div style="font-size:19px; font-weight:800; color:#10B981; line-height:1.1;">{badge_neg_p_menteri_display}%</div>
-                <div style="font-size:9px; color:#10B981; margin-top:2px;">{badge_neg_menteri_sub}</div>
+                <div style="font-size:19px; font-weight:800; color:#10B981; line-height:1.1;">{m['neg_p_menteri_display']}%</div>
+                <div style="font-size:9px; color:#10B981; margin-top:2px;">{m['neg_menteri_sub']}</div>
             </div>
         </div>
     """
@@ -770,7 +671,7 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
                     <span style="color:#0F2942;">Executive</span> <span style="color:#2563EB;">Summary</span>
                 </div>
                 <div style="font-size:15px; font-weight:700; color:#0F2942; margin-top:4px;">
-                    {badge_headline}
+                    {m['headline_title']}
                 </div>
             </div>
             {chips_html}
@@ -779,7 +680,7 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
         <!-- Yellow PANDUAN BACA Banner -->
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px; background:#FEF3C7; border:1px solid #FDE68A; padding:6px 14px; border-radius:8px;">
             <span style="background:#F59E0B; color:#0F172A; font-weight:800; font-size:10px; padding:3px 10px; border-radius:12px; letter-spacing:0.5px; text-transform:uppercase;">PANDUAN BACA</span>
-            <span style="font-size:11.5px; color:#78350F; font-weight:500;">{badge_guide}</span>
+            <span style="font-size:11.5px; color:#78350F; font-weight:500;">{m['guide_text']}</span>
         </div>
 
         <!-- Enam Temuan Utama Sepekan Card -->
