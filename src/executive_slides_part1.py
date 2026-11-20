@@ -175,7 +175,7 @@ def render_slide_mentions_trend_sentiment(df, selected_topic='Kementerian_PU', t
     
     daily_sent = df.groupby(['date_str', 'sentiment_name']).size().unstack(fill_value=0).reset_index().tail(30)
     fig = go.Figure()
-    s_colors = {'Positif': '#10B981', 'Netral': '#94A3B8', 'Negatif': '#EF4444'}
+    s_colors = {'Positif': '#10B981', 'Netral': '#F59E0B', 'Negatif': '#EF4444'}
     for s_name, c in s_colors.items():
         if s_name in daily_sent.columns:
             fig.add_trace(go.Scatter(

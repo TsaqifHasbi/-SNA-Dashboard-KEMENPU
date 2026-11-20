@@ -118,14 +118,14 @@ def render_slide_sna_by_emotions(df, selected_topic='Kementerian_PU', topic_labe
         total_emo = len(df)
         
         PLUTCHIK_8_DEFS = [
-            {'en': 'Joy', 'id': 'Senang', 'label': 'Joy / Senang', 'color': '#F59E0B'},
-            {'en': 'Trust', 'id': 'Percaya', 'label': 'Trust / Percaya', 'color': '#10B981'},
-            {'en': 'Anticipation', 'id': 'Antisipasi', 'label': 'Anticipation / Harapan', 'color': '#F97316'},
+            {'en': 'Joy', 'id': 'Senang', 'label': 'Joy / Senang', 'color': '#10B981'},
+            {'en': 'Trust', 'id': 'Percaya', 'label': 'Trust / Percaya', 'color': '#06B6D4'},
+            {'en': 'Anticipation', 'id': 'Antisipasi', 'label': 'Anticipation / Harapan', 'color': '#F59E0B'},
             {'en': 'Anger', 'id': 'Marah', 'label': 'Anger / Marah', 'color': '#EF4444'},
-            {'en': 'Fear', 'id': 'Takut', 'label': 'Fear / Cemas', 'color': '#6366F1'},
-            {'en': 'Sadness', 'id': 'Sedih', 'label': 'Sadness / Sedih', 'color': '#3B82F6'},
-            {'en': 'Disgust', 'id': 'Jijik', 'label': 'Disgust / Kecewa', 'color': '#14B8A6'},
-            {'en': 'Surprise', 'id': 'Terkejut', 'label': 'Surprise / Terkejut', 'color': '#EC4899'},
+            {'en': 'Fear', 'id': 'Takut', 'label': 'Fear / Cemas', 'color': '#DC2626'},
+            {'en': 'Sadness', 'id': 'Sedih', 'label': 'Sadness / Sedih', 'color': '#991B1B'},
+            {'en': 'Disgust', 'id': 'Jijik', 'label': 'Disgust / Kecewa', 'color': '#B91C1C'},
+            {'en': 'Surprise', 'id': 'Terkejut', 'label': 'Surprise / Terkejut', 'color': '#F59E0B'},
         ]
         
         total_affective = sum(int(emo_counts.get(d['en'], 0) + emo_counts.get(d['id'], 0)) for d in PLUTCHIK_8_DEFS)
@@ -226,7 +226,7 @@ def render_slide_overall_sentiment(df, selected_topic='Kementerian_PU', topic_la
                 labels=['Positif', 'Netral', 'Negatif'],
                 values=[pos_c, neu_c, neg_c],
                 hole=0.62,
-                marker=dict(colors=['#10B981', '#94A3B8', '#EF4444'], line=dict(color='#FFFFFF', width=2)),
+                marker=dict(colors=['#10B981', '#F59E0B', '#EF4444'], line=dict(color='#FFFFFF', width=2)),
                 textinfo='percent',
                 hoverinfo='label+value'
             )])
@@ -240,7 +240,7 @@ def render_slide_overall_sentiment(df, selected_topic='Kementerian_PU', topic_la
             plats = ct.index.tolist()
             
             fig_bar = go.Figure()
-            for s_name, col in [('Positif', '#10B981'), ('Netral', '#94A3B8'), ('Negatif', '#EF4444')]:
+            for s_name, col in [('Positif', '#10B981'), ('Netral', '#F59E0B'), ('Negatif', '#EF4444')]:
                 vals = [round(ct.loc[p, s_name], 1) if s_name in ct.columns else 0 for p in plats]
                 fig_bar.add_trace(go.Bar(
                     name=s_name, y=plats, x=vals, orientation='h',
@@ -288,8 +288,8 @@ def _render_single_platform_sentiment_slide(df, platform_name, title, breadcrumb
 </div>""")
     with c3:
         render_html(f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
-<div style="font-size:11px; font-weight:700; color:#64748B;">NETRAL</div>
-<div style="font-size:26px; font-weight:800; color:#64748B; margin:2px 0;">{neu_p}%</div>
+<div style="font-size:11px; font-weight:700; color:#D97706;">NETRAL</div>
+<div style="font-size:26px; font-weight:800; color:#F59E0B; margin:2px 0;">{neu_p}%</div>
 <div style="font-size:11px; color:#64748B;">{neu_c:,} post</div>
 </div>""")
     with c4:
@@ -334,7 +334,7 @@ def _render_single_platform_sentiment_slide(df, platform_name, title, breadcrumb
 
             fig_time = go.Figure()
             if len(daily) > 1:
-                for s_name, col in [('Positif', '#10B981'), ('Netral', '#94A3B8'), ('Negatif', '#EF4444')]:
+                for s_name, col in [('Positif', '#10B981'), ('Netral', '#F59E0B'), ('Negatif', '#EF4444')]:
                     if s_name in daily.columns:
                         fig_time.add_trace(go.Scatter(
                             x=daily[x_col].astype(str), y=daily[s_name], name=s_name, mode='lines+markers',
@@ -342,7 +342,7 @@ def _render_single_platform_sentiment_slide(df, platform_name, title, breadcrumb
                         ))
                 fig_time.update_xaxes(type='category', title="Waktu / Jam" if is_hourly else "Tanggal")
             elif len(daily) == 1:
-                for s_name, col in [('Positif', '#10B981'), ('Netral', '#94A3B8'), ('Negatif', '#EF4444')]:
+                for s_name, col in [('Positif', '#10B981'), ('Netral', '#F59E0B'), ('Negatif', '#EF4444')]:
                     val = int(daily[s_name].iloc[0]) if s_name in daily.columns else 0
                     fig_time.add_trace(go.Bar(
                         name=s_name, x=[str(daily[x_col].iloc[0])], y=[val],

@@ -32,10 +32,10 @@ def _render_platform_influencers_slide(df, platform_name, title, breadcrumb_sub)
 Matriks Interest vs Power: Top Aktor di {platform_name}
 </div>""")
             fig = go.Figure()
-            sent_colors = {'Positif': '#10B981', 'Netral': '#64748B', 'Negatif': '#EF4444'}
+            sent_colors = {'Positif': '#10B981', 'Netral': '#F59E0B', 'Negatif': '#EF4444'}
             
             for row in top_actors.itertuples():
-                col = sent_colors.get(row.sentiment, '#64748B')
+                col = sent_colors.get(row.sentiment, '#F59E0B')
                 clean_name = f"@{str(row.author).strip().lstrip('@')}"
                 fig.add_trace(go.Scatter(
                     x=[row.mentions], y=[row.engagement],

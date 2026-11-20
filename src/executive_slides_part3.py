@@ -217,14 +217,14 @@ def render_slide_emotion_analysis_1(df, selected_topic='Kementerian_PU', topic_l
     
     # Standard 8 Plutchik Emotions mapping (matching Standar Eksekutif palette & icons)
     PLUTCHIK_8 = [
-        {'key': 'Senang', 'en': 'Joy', 'emoji': '🙂', 'color': '#F59E0B', 'type': 'pos'},
-        {'key': 'Marah', 'en': 'Anger', 'emoji': '😠', 'color': '#F87171', 'type': 'neg'},
-        {'key': 'Takut', 'en': 'Fear', 'emoji': '😨', 'color': '#8B5CF6', 'type': 'neg'},
-        {'key': 'Percaya', 'en': 'Trust', 'emoji': '🤝', 'color': '#10B981', 'type': 'pos'},
-        {'key': 'Jijik', 'en': 'Disgust', 'emoji': '🤢', 'color': '#84CC16', 'type': 'neg'},
-        {'key': 'Antisipasi', 'en': 'Anticipation', 'emoji': '⏳', 'color': '#F97316', 'type': 'pos'},
-        {'key': 'Terkejut', 'en': 'Surprise', 'emoji': '😲', 'color': '#06B6D4', 'type': 'neu'},
-        {'key': 'Sedih', 'en': 'Sadness', 'emoji': '😢', 'color': '#3B82F6', 'type': 'neg'},
+        {'key': 'Senang', 'en': 'Joy', 'emoji': '🙂', 'color': '#10B981', 'type': 'pos'},
+        {'key': 'Marah', 'en': 'Anger', 'emoji': '😠', 'color': '#EF4444', 'type': 'neg'},
+        {'key': 'Takut', 'en': 'Fear', 'emoji': '😨', 'color': '#DC2626', 'type': 'neg'},
+        {'key': 'Percaya', 'en': 'Trust', 'emoji': '🤝', 'color': '#06B6D4', 'type': 'pos'},
+        {'key': 'Jijik', 'en': 'Disgust', 'emoji': '🤢', 'color': '#B91C1C', 'type': 'neg'},
+        {'key': 'Antisipasi', 'en': 'Anticipation', 'emoji': '⏳', 'color': '#F59E0B', 'type': 'pos'},
+        {'key': 'Terkejut', 'en': 'Surprise', 'emoji': '😲', 'color': '#F59E0B', 'type': 'neu'},
+        {'key': 'Sedih', 'en': 'Sadness', 'emoji': '😢', 'color': '#991B1B', 'type': 'neg'},
     ]
     
     results = []

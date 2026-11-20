@@ -24,7 +24,7 @@ from collections import Counter
 # ======================================================================
 COLORS = {
     'Positif': '#10B981',
-    'Netral': '#64748B',
+    'Netral': '#F59E0B',
     'Negatif': '#EF4444',
     'bg_dark': '#0F172A',
     'bg_card': '#1E293B',
@@ -38,7 +38,7 @@ COLORS = {
     'accent_cyan': '#22D3EE',
 }
 
-SENTIMENT_COLORS = ['#10B981', '#64748B', '#EF4444']
+SENTIMENT_COLORS = ['#10B981', '#F59E0B', '#EF4444']
 EMOTION_COLORS = {
     # Positif
     'Joy': '#10B981',
@@ -47,21 +47,21 @@ EMOTION_COLORS = {
     'Trust': '#06B6D4',
     'Antisipasi': '#F59E0B',
     'Anticipation': '#F59E0B',
-    # Negatif
+    # Negatif (Danger/Buruk: Merah / Crimson / Burgundy - tidak boleh Hijau / Biru)
     'Marah': '#EF4444',
     'Anger': '#EF4444',
-    'Takut': '#8B5CF6',
-    'Fear': '#8B5CF6',
-    'Jijik': '#84CC16',
-    'Disgust': '#84CC16',
-    'Sedih': '#3B82F6',
-    'Sadness': '#3B82F6',
-    # Netral
-    'Surprise': '#A78BFA',
-    'Terkejut': '#A78BFA',
-    'Informatif': '#64748B',
-    'Netral': '#64748B',
-    'Neutral': '#64748B',
+    'Takut': '#DC2626',
+    'Fear': '#DC2626',
+    'Jijik': '#B91C1C',
+    'Disgust': '#B91C1C',
+    'Sedih': '#991B1B',
+    'Sadness': '#991B1B',
+    # Netral / Sedang / Diantara (Kuning / Amber)
+    'Surprise': '#F59E0B',
+    'Terkejut': '#F59E0B',
+    'Informatif': '#F59E0B',
+    'Netral': '#F59E0B',
+    'Neutral': '#F59E0B',
 }
 
 PLATFORM_COLORS = {

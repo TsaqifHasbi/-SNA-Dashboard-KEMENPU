@@ -114,10 +114,10 @@ def render_slide_emotion_analysis_2(df, selected_topic='Kementerian_PU', topic_l
     sadness_c = int(neg_emo_counts.get('Sedih', 0) + neg_emo_counts.get('Sadness', 0))
     
     neg_candidates = [
-        ('😠 Anger', anger_c, '#FFE4E6', '#BE123C', '#FECDD3'),
-        ('😨 Fear', fear_c, '#EDE9FE', '#6D28D9', '#DDD6FE'),
-        ('🤢 Disgust', disgust_c, '#FEF3C7', '#A16207', '#FDE68A'),
-        ('😢 Sadness', sadness_c, '#E0F2FE', '#1D4ED8', '#BFDBFE'),
+        ('😠 Anger', anger_c, '#FEE2E2', '#DC2626', '#FCA5A5'),
+        ('😨 Fear', fear_c, '#FFF1F2', '#BE123C', '#FFE4E6'),
+        ('🤢 Disgust', disgust_c, '#FEF2F2', '#B91C1C', '#FECACA'),
+        ('😢 Sadness', sadness_c, '#FEE2E2', '#991B1B', '#FECACA'),
     ]
     active_neg = [(name, c, bg, tc, bc) for name, c, bg, tc, bc in neg_candidates if c > 0]
     if not active_neg:
@@ -239,14 +239,14 @@ Negative Emotions
             plats = ct_plat.index.tolist()
             
             emo_colors = {
-                'Joy': '#F59E0B',
-                'Trust': '#10B981',
-                'Anticipation': '#F97316',
+                'Joy': '#10B981',
+                'Trust': '#06B6D4',
+                'Anticipation': '#F59E0B',
                 'Anger': '#EF4444',
-                'Fear': '#8B5CF6',
-                'Disgust': '#84CC16',
-                'Sadness': '#3B82F6',
-                'Surprise': '#06B6D4',
+                'Fear': '#DC2626',
+                'Disgust': '#B91C1C',
+                'Sadness': '#991B1B',
+                'Surprise': '#F59E0B',
             }
             
             fig_p = go.Figure()
@@ -653,9 +653,9 @@ def render_slide_top_influencers_twitter(df, selected_topic='Kementerian_PU', to
             render_html("""<div style="font-size:13px; font-weight:700; color:#1E293B; margin-bottom:8px;">Matriks Pengaruh: Keterlibatan vs Jangkauan</div>""")
             fig = go.Figure()
             
-            sent_colors = {'Positif': '#10B981', 'Netral': '#64748B', 'Negatif': '#EF4444'}
+            sent_colors = {'Positif': '#10B981', 'Netral': '#F59E0B', 'Negatif': '#EF4444'}
             for row in top_tw.itertuples():
-                col = sent_colors.get(row.sentiment, '#64748B')
+                col = sent_colors.get(row.sentiment, '#F59E0B')
                 clean_name = f"@{str(row.author).strip().lstrip('@')}"
                 fig.add_trace(go.Scatter(
                     x=[row.mentions], y=[row.engagement],

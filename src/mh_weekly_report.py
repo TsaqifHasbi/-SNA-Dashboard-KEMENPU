@@ -527,7 +527,7 @@ Pemantauan opini publik, percakapan warganet multiplatform (7 saluran), inferens
             labels=['Positif', 'Netral', 'Negatif'],
             values=[m['pos_c'], m['net_c'], m['neg_c']],
             hole=.65,
-            marker_colors=['#10B981', '#64748B', '#EF4444'],
+            marker_colors=['#10B981', '#F59E0B', '#EF4444'],
             textinfo='label+percent',
             textposition='outside',
             showlegend=False
@@ -765,11 +765,11 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
             <!-- 5. Negatif Menteri -->
             <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:7px 11px; min-width:98px;">
                 <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px;">
-                    <span style="width:7px; height:7px; border-radius:50%; background:#10B981; display:inline-block;"></span>
+                    <span style="width:7px; height:7px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
                     <span style="font-size:9.5px; font-weight:600; color:#475569;">Negatif Menteri</span>
                 </div>
-                <div style="font-size:19px; font-weight:800; color:#10B981; line-height:1.1;">{m['neg_p_menteri_display']}%</div>
-                <div style="font-size:9px; color:#10B981; margin-top:2px;">{m['neg_menteri_sub']}</div>
+                <div style="font-size:19px; font-weight:800; color:#EF4444; line-height:1.1;">{m['neg_p_menteri_display']}%</div>
+                <div style="font-size:9px; color:#EF4444; margin-top:2px;">{m['neg_menteri_sub']}</div>
             </div>
         </div>
     """
@@ -919,7 +919,7 @@ def render_slide_4_overall_media_social(df, selected_topic='Semua', topic_label=
             {"label": "Lembaga", "val": "3.123", "sub": "naik dari 2.738", "dot": "#2563EB", "val_color": "#2563EB"},
             {"label": "Menteri", "val": "724", "sub": "naik dari 576", "dot": "#10B981", "val_color": "#0F2942"},
             {"label": "Puncak Negatif", "val": "13 Nov", "sub": "lembaga 120 dari 613", "dot": "#EF4444", "val_color": "#EF4444"},
-            {"label": "Negatif Menteri", "val": "3,9%", "sub": "28 dari 724; dari 7%", "dot": "#10B981", "val_color": "#10B981"},
+            {"label": "Negatif Menteri", "val": "3,9%", "sub": "28 dari 724; dari 7%", "dot": "#EF4444", "val_color": "#EF4444"},
             {"label": "Keterlibatan Menteri", "val": "791 rb", "sub": "naik dari 695 rb", "dot": "#2563EB", "val_color": "#2563EB"}
         ]
         x_labels = ['9 Nov', '10 Nov', '11 Nov', '12 Nov', '13 Nov', '14 Nov', '15 Nov']
@@ -938,7 +938,7 @@ def render_slide_4_overall_media_social(df, selected_topic='Semua', topic_label=
             {"label": "Lembaga", "val": m['vol_lembaga_display'], "sub": m['vol_lembaga_sub'], "dot": "#2563EB", "val_color": "#2563EB"},
             {"label": "Menteri", "val": m['vol_menteri_display'], "sub": m['vol_menteri_sub'], "dot": "#10B981", "val_color": "#0F2942"},
             {"label": "Puncak Negatif", "val": m['peak_neg_day'], "sub": m['peak_neg_sub'], "dot": "#EF4444", "val_color": "#EF4444"},
-            {"label": "Negatif Menteri", "val": f"{m['neg_p_menteri_display']}%", "sub": m['neg_menteri_sub'], "dot": "#10B981", "val_color": "#10B981"},
+            {"label": "Negatif Menteri", "val": f"{m['neg_p_menteri_display']}%", "sub": m['neg_menteri_sub'], "dot": "#EF4444", "val_color": "#EF4444"},
             {"label": "Keterlibatan Total", "val": m['eng_display'], "sub": m['eng_sub'], "dot": "#2563EB", "val_color": "#2563EB"}
         ]
         x_labels = [d.strftime('%d %b') for d in dates_7] if dates_7 else ['H-6', 'H-5', 'H-4', 'H-3', 'H-2', 'H-1', 'Hari Ini']
@@ -969,7 +969,7 @@ def render_slide_4_overall_media_social(df, selected_topic='Semua', topic_label=
     with col_left:
         fig_l = go.Figure()
         fig_l.add_trace(go.Bar(name='Positif', x=x_labels, y=k_pos, marker_color='#10B981'))
-        fig_l.add_trace(go.Bar(name='Netral', x=x_labels, y=k_net, marker_color='#64748B'))
+        fig_l.add_trace(go.Bar(name='Netral', x=x_labels, y=k_net, marker_color='#F59E0B'))
         fig_l.add_trace(go.Bar(name='Negatif', x=x_labels, y=k_neg, marker_color='#EF4444'))
         fig_l.update_layout(
             barmode='stack',
@@ -985,7 +985,7 @@ def render_slide_4_overall_media_social(df, selected_topic='Semua', topic_label=
     with col_right:
         fig_r = go.Figure()
         fig_r.add_trace(go.Bar(name='Positif', x=x_labels, y=m_pos, marker_color='#10B981'))
-        fig_r.add_trace(go.Bar(name='Netral', x=x_labels, y=m_net, marker_color='#64748B'))
+        fig_r.add_trace(go.Bar(name='Netral', x=x_labels, y=m_net, marker_color='#F59E0B'))
         fig_r.add_trace(go.Bar(name='Negatif', x=x_labels, y=m_neg, marker_color='#EF4444', text=m_labels, textposition='outside'))
         fig_r.update_layout(
             barmode='stack',
@@ -1034,7 +1034,7 @@ def render_slide_5_platform_review(df, selected_topic='Semua', topic_label=None,
         {"label": "Keterlibatan IG", "val": "813 rb", "sub": "31% dari total", "dot": "#2563EB", "val_color": "#2563EB"},
         {"label": "TikTok", "val": "1,40 jt", "sub": "54% keterlibatan", "dot": "#10B981", "val_color": "#10B981"},
         {"label": "Negatif X", "val": "45%", "sub": "dari 210 penyebutan", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "Marah", "val": "2%", "sub": "percaya 9%", "dot": "#8B5CF6"}
+        {"label": "Marah", "val": "2%", "sub": "percaya 9%", "dot": "#EF4444", "val_color": "#EF4444"}
     ]
     render_kpi_chips(chips)
     
@@ -1108,13 +1108,14 @@ Tujuh Saluran - Urut dari Keterlibatan
         
         emo_colors_palette = {
             'Anger': '#EF4444', 'Marah': '#EF4444',
-            'Joy': '#F59E0B', 'Senang': '#F59E0B',
-            'Disgust': '#84CC16', 'Jijik': '#84CC16',
-            'Surprise': '#06B6D4', 'Terkejut': '#06B6D4',
-            'Sadness': '#3B82F6', 'Sedih': '#3B82F6',
-            'Trust': '#10B981', 'Percaya': '#10B981',
-            'Fear': '#8B5CF6', 'Takut': '#8B5CF6',
-            'Anticipation': '#F97316', 'Antisipasi': '#F97316',
+            'Joy': '#10B981', 'Senang': '#10B981',
+            'Disgust': '#B91C1C', 'Jijik': '#B91C1C',
+            'Surprise': '#F59E0B', 'Terkejut': '#F59E0B',
+            'Sadness': '#991B1B', 'Sedih': '#991B1B',
+            'Trust': '#2563EB', 'Percaya': '#2563EB',
+            'Fear': '#DC2626', 'Takut': '#DC2626',
+            'Anticipation': '#F59E0B', 'Antisipasi': '#F59E0B',
+            'Neutral': '#F59E0B', 'Netral': '#F59E0B',
         }
         
         target_emos = m.get('aff_pcts', m.get('emo_pcts', {}))
@@ -1339,7 +1340,7 @@ def render_slide_7_issues_minister(df, selected_topic='Semua', topic_label=None,
     chips = [
         {"label": "Penyebutan", "val": "724", "sub": "naik dari 576", "dot": "#10B981"},
         {"label": "Positif", "val": "72%", "sub": "524 dari 724", "dot": "#10B981", "val_color": "#10B981"},
-        {"label": "Netral", "val": "24%", "sub": "172 sebutan", "dot": "#64748B"},
+        {"label": "Netral", "val": "24%", "sub": "172 sebutan", "dot": "#F59E0B", "val_color": "#D97706"},
         {"label": "Negatif", "val": "3,9%", "sub": "28 dari 724; turun dari 7%", "dot": "#EF4444", "val_color": "#EF4444"},
         {"label": "Threads", "val": "15", "sub": "dari 28 negatif menteri", "dot": "#EF4444"}
     ]
@@ -1417,10 +1418,10 @@ ISSUE_DEFINITIONS = [
         'counter_narrative': 'Kementerian PU bergerak cepat memobilisasi alat berat, memasang jembatan bailey, dan memastikan konektivitas logistik serta tanggul darurat pulih.',
         'layers': [
             ("L1 Tanggap Darurat & Jembatan Bailey", "Positif", "#10B981", "Apresiasi respon cepat penanganan jembatan putus & pemulihan akses jalan."),
-            ("L2 Penanganan Banjir & Normalisasi Sungai", "Netral", "#64748B", "Laporan debit air sungai, kondisi tanggul, dan posko siaga banjir balai."),
+            ("L2 Penanganan Banjir & Normalisasi Sungai", "Netral", "#F59E0B", "Laporan debit air sungai, kondisi tanggul, dan posko siaga banjir balai."),
             ("L3 Korban & Dampak Terisolir", "Negatif", "#EF4444", "Kekhawatiran warga terkait ruas jalan putus dan desa yang sempat terisolir."),
             ("L4 Kesiapsiagaan Alat Berat di Lapangan", "Positif", "#10B981", "Pengerahan excavator dan dump truck balai di titik-titik rawan longsor."),
-            ("L5 Kebutuhan Bantuan Logistik & Air Bersih", "Netral", "#64748B", "Distribusi mobil tangki air bersih kementerian ke posko pengungsian.")
+            ("L5 Kebutuhan Bantuan Logistik & Air Bersih", "Netral", "#F59E0B", "Distribusi mobil tangki air bersih kementerian ke posko pengungsian.")
         ]
     },
     {
@@ -1434,8 +1435,8 @@ ISSUE_DEFINITIONS = [
         'layers': [
             ("L1 Pasokan Air Minum & Jaringan SPAM", "Positif", "#10B981", "Apresiasi peresmian dan perluasan pipa sambungan rumah air bersih SPAM."),
             ("L2 Irigasi Sawah & Ketahanan Pangan", "Positif", "#10B981", "Dukungan petani terhadap normalisasi saluran primer/sekunder penunjang panen."),
-            ("L3 Keluhan Debit Air Musim Kemarau", "Netral", "#64748B", "Aspirasi kelompok tani agar pembagian air bendungan proporsional dan merata."),
-            ("L4 Pemeliharaan Fisik Bendungan & Waduk", "Netral", "#64748B", "Monitoring kapasitas tampung waduk dan pengerukan sedimentasi berkala."),
+            ("L3 Keluhan Debit Air Musim Kemarau", "Netral", "#F59E0B", "Aspirasi kelompok tani agar pembagian air bendungan proporsional dan merata."),
+            ("L4 Pemeliharaan Fisik Bendungan & Waduk", "Netral", "#F59E0B", "Monitoring kapasitas tampung waduk dan pengerukan sedimentasi berkala."),
             ("L5 Aduan Pipa Bocor & Tekanan Rendah", "Negatif", "#EF4444", "Aduan warga terkait keterlambatan perbaikan pipa distribusi di pemukiman.")
         ]
     },
@@ -1450,9 +1451,9 @@ ISSUE_DEFINITIONS = [
         'layers': [
             ("L1 Apresiasi Gedung Sekolah Rakyat Baru", "Positif", "#10B981", "Pujian atas fasilitas belajar modern, asrama, dan ruang kelas yang representatif."),
             ("L2 Revitalisasi Madrasah & Sekolah Daerah", "Positif", "#10B981", "Dukungan terhadap program rehabilitasi ruang belajar rusak di daerah 3T."),
-            ("L3 Kebutuhan Sarana Penunjang & Akses Jalan", "Netral", "#64748B", "Permintaan penataan trotoar dan akses jalan lingkungan menuju sekolah."),
-            ("L4 Harapan Pemerataan Fasilitas ke Pelosok", "Netral", "#64748B", "Aspirasi agar pembangunan sekolah rakyat menjangkau lebih banyak kabupaten."),
-            ("L5 Pengawasan Kualitas Konstruksi Bangunan", "Netral", "#64748B", "Desakan agar pengawasan mutu beton dan atap bangunan sekolah diperketat.")
+            ("L3 Kebutuhan Sarana Penunjang & Akses Jalan", "Netral", "#F59E0B", "Permintaan penataan trotoar dan akses jalan lingkungan menuju sekolah."),
+            ("L4 Harapan Pemerataan Fasilitas ke Pelosok", "Netral", "#F59E0B", "Aspirasi agar pembangunan sekolah rakyat menjangkau lebih banyak kabupaten."),
+            ("L5 Pengawasan Kualitas Konstruksi Bangunan", "Netral", "#F59E0B", "Desakan agar pengawasan mutu beton dan atap bangunan sekolah diperketat.")
         ]
     },
     {
@@ -1482,8 +1483,8 @@ ISSUE_DEFINITIONS = [
         'layers': [
             ("L1 Pemberitaan Penyidikan & Penggeledahan", "Negatif", "#EF4444", "Liputan media daring mengenai pemeriksaan saksi dan penggeledahan berkas."),
             ("L2 Sorotan Integritas Pejabat Satker Daerah", "Negatif", "#EF4444", "Kritik publik atas dugaan penyimpangan pelaksanaan lelang proyek jalan."),
-            ("L3 Dukungan Pembenahan Pengawasan Internal", "Netral", "#64748B", "Aspirasi agar Inspektorat Jenderal Kementerian memperketat audit preventif."),
-            ("L4 Klarifikasi Pemisahan Ranah Proyek", "Netral", "#64748B", "Penjelasan pemisahan antara kewenangan jalan provinsi dengan jalan nasional."),
+            ("L3 Dukungan Pembenahan Pengawasan Internal", "Netral", "#F59E0B", "Aspirasi agar Inspektorat Jenderal Kementerian memperketat audit preventif."),
+            ("L4 Klarifikasi Pemisahan Ranah Proyek", "Netral", "#F59E0B", "Penjelasan pemisahan antara kewenangan jalan provinsi dengan jalan nasional."),
             ("L5 Komitmen Dukungan Penuh Penegakan Hukum", "Positif", "#10B981", "Pernyataan resmi komitmen pimpinan kementerian kooperatif membantu KPK.")
         ]
     }
@@ -1524,7 +1525,7 @@ def extract_top_3_issues(df_active):
             prim_color = "#EF4444"
         else:
             prim_sent = "Netral"
-            prim_color = "#64748B"
+            prim_color = "#F59E0B"
             
         if 'platform' in sub_df.columns and len(sub_df) > 0:
             top_plat = sub_df['platform'].value_counts().index[0]
@@ -1702,7 +1703,7 @@ def render_dynamic_special_issue_slide(df, rank=1, slide_num=10, selected_topic=
             'neu': 0, 'neu_pct': 0.0,
             'neg': 0, 'neg_pct': 0.0,
             'primary_sentiment': 'Netral',
-            'primary_color': '#64748B',
+            'primary_color': '#F59E0B',
             'top_platform': 'Multiplatform',
             'top_platform_count': 0,
             'peak_str': '-',
@@ -1730,7 +1731,7 @@ def render_dynamic_special_issue_slide(df, rank=1, slide_num=10, selected_topic=
     chips = [
         {"label": "Sebutan Isu", "val": vol_disp, "sub": f"{issue['vol_pct']}% dari total sebutan", "dot": issue['primary_color'], "val_color": issue['primary_color']},
         {"label": "Positif", "val": f"{issue['pos_pct']}%", "sub": pos_sub, "dot": "#10B981", "val_color": "#10B981"},
-        {"label": "Netral", "val": f"{issue['neu_pct']}%", "sub": neu_sub, "dot": "#64748B"},
+        {"label": "Netral", "val": f"{issue['neu_pct']}%", "sub": neu_sub, "dot": "#F59E0B", "val_color": "#D97706"},
         {"label": "Negatif", "val": f"{issue['neg_pct']}%", "sub": neg_sub, "dot": "#EF4444", "val_color": "#EF4444"},
         {"label": "Kanal Terbanyak", "val": issue['top_platform'], "sub": plat_sub, "dot": "#2563EB", "val_color": "#0F2942"}
     ]
@@ -2069,7 +2070,7 @@ def render_slide_13_bot_organic_audit(df, selected_topic='Semua', topic_label=No
         penilaian = "Kopas narasi; terkoordinasi" if is_coord else "Salin narasi warganet; skala kecil"
         sent_mode = sub['sentiment_name'].mode()[0] if ('sentiment_name' in sub.columns and len(sub['sentiment_name']) > 0) else 'Netral'
         arah = 'KRITIK' if sent_mode == 'Negatif' else ('DUKUNG' if sent_mode == 'Positif' else 'NETRAL')
-        color = '#F59E0B' if arah == 'KRITIK' else ('#10B981' if arah == 'DUKUNG' else '#64748B')
+        color = '#F59E0B' if arah == 'KRITIK' else ('#10B981' if arah == 'DUKUNG' else '#F59E0B')
         
         patterns.append({
             'arah': arah,
@@ -2133,7 +2134,7 @@ def render_slide_13_bot_organic_audit(df, selected_topic='Semua', topic_label=No
             'pola': f'Sindikasi Informasi: "{snippet}" ({plats})',
             'ukuran': f"{cnt} sebutan dari {n_authors} akun; {zero_eng} tanpa interaksi",
             'penilaian': 'Bot informasi berkala; wajar',
-            'color': '#64748B',
+            'color': '#F59E0B',
             'is_coord': True,
             'is_attack': False,
             'zero_eng': zero_eng,
@@ -2197,7 +2198,7 @@ def render_slide_13_bot_organic_audit(df, selected_topic='Semua', topic_label=No
         {"label": "Terkoordinasi", "val": f"{total_coordinated}", "sub": "amplifikasi & tagar internal", "dot": "#F59E0B"},
         {"label": "Serangan ke PU", "val": f"{total_attacks}", "sub": "langsung; satker terseret" if total_attacks == 0 else "terdeteksi menyasar PU", "dot": "#10B981" if total_attacks == 0 else "#EF4444", "val_color": "#EF4444" if total_attacks > 0 else None},
         {"label": "RT/Teks Seragam", "val": f"{total_zero_eng_accounts:,}", "sub": "unggahan 0 interaksi", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "Portal Berita", "val": f"{portal_count:,}", "sub": f"portal, {portal_news_count:,} berita", "dot": "#64748B"}
+        {"label": "Portal Berita", "val": f"{portal_count:,}", "sub": f"portal, {portal_news_count:,} berita", "dot": "#2563EB"}
     ]
     render_kpi_chips(chips)
     
@@ -2354,7 +2355,7 @@ def render_slide_14_intelligence_projections(df, selected_topic='Semua', topic_l
         {"label": "Paling Mungkin", "val": most_likely['short_name'][:12], "sub": growth_sub, "dot": "#2563EB"},
         {"label": "Paling Berbahaya", "val": "Konvergensi", "sub": f"{worst_case['short_name'][:13]} ({worst_case['neg_pct']}%)", "dot": "#EF4444", "val_color": "#EF4444"},
         {"label": "Terkendali", "val": stable['short_name'][:12], "sub": f"Negatif minim ({stable['neg_pct']}%)", "dot": "#10B981"},
-        {"label": "Negatif Harian", "val": f"{neg_min}-{neg_max}%", "sub": "proyeksi negatif lembaga", "dot": "#64748B"},
+        {"label": "Negatif Harian", "val": f"{neg_min}-{neg_max}%", "sub": "proyeksi negatif lembaga", "dot": "#EF4444", "val_color": "#EF4444"},
         {"label": "Review", "val": review_str, "sub": "evaluasi mingguan", "dot": "#2563EB"}
     ]
     render_kpi_chips(chips)
@@ -2439,9 +2440,9 @@ Tanda Bahaya dan Respons Cepat
 <tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">{tanda_1}</td><td style="color:#EF4444; font-weight:700;">{ambang_1}</td><td>{respons_1}</td></tr>
 <tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">{tanda_2}</td><td style="color:#EF4444; font-weight:700;">{ambang_2}</td><td>{respons_2}</td></tr>
 <tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">Amplifikasi RT / tagar seragam menyasar PU</td><td style="color:#D97706; font-weight:700;">>30 akun</td><td>Fakta ranah pusat-daerah & klarifikasi</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">Banjir atau tanggul kritis meluas</td><td style="color:#2563EB; font-weight:700;">24 jam</td><td>Rilis update BWS & kesiapsiagaan posko</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">Krisis pasokan air bersih tanpa progres</td><td style="color:#64748B; font-weight:700;">3 hari</td><td>Rilis Ditjen Cipta Karya & dropping tangki</td></tr>
-<tr><td style="font-weight:600; padding:6px 4px;">Video komplain jalan baru viral di medsos</td><td style="color:#2563EB; font-weight:700;">>100 rb tayang</td><td>Jawab di kanal sama dalam kurun 6 jam</td></tr>
+<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">Banjir atau tanggul kritis meluas</td><td style="color:#EF4444; font-weight:700;">24 jam</td><td>Rilis update BWS & kesiapsiagaan posko</td></tr>
+<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">Krisis pasokan air bersih tanpa progres</td><td style="color:#D97706; font-weight:700;">3 hari</td><td>Rilis Ditjen Cipta Karya & dropping tangki</td></tr>
+<tr><td style="font-weight:600; padding:6px 4px;">Video komplain jalan baru viral di medsos</td><td style="color:#D97706; font-weight:700;">>100 rb tayang</td><td>Jawab di kanal sama dalam kurun 6 jam</td></tr>
 </tbody>
 </table>
 </div>"""
@@ -2690,8 +2691,8 @@ def render_slide_17_daily_nov16(df, selected_topic='Semua', topic_label=None, **
         {"label": "Lembaga", "val": "24", "sub": "pagi; 1 negatif", "dot": "#2563EB"},
         {"label": "Menteri", "val": "6", "sub": "pagi; 0 negatif", "dot": "#10B981"},
         {"label": "Korban", "val": "1", "sub": "balita, longsor Aceh Tengah", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "KPK", "val": "0", "sub": "sebutan pagi ini", "dot": "#10B981"},
-        {"label": "Sawah Jabar", "val": "65 rb", "sub": "ha terdampak 2026", "dot": "#64748B"}
+        {"label": "KPK", "val": "0", "sub": "sebutan pagi ini", "dot": "#F59E0B"},
+        {"label": "Sawah Jabar", "val": "65 rb", "sub": "ha terdampak 2026", "dot": "#F59E0B"}
     ]
     render_kpi_chips(chips)
     
@@ -2763,7 +2764,7 @@ def render_slide_18_watch_list(df, selected_topic='Semua', topic_label=None, **k
         {"label": "Butir", "val": "9", "sub": "diikuti", "dot": "#2563EB"},
         {"label": "Baru", "val": "3", "sub": "sejak 13 Nov", "dot": "#EF4444", "val_color": "#EF4444"},
         {"label": "Klaim", "val": "3", "sub": "perlu cek", "dot": "#F59E0B"},
-        {"label": "Kurang", "val": "2", "sub": "belum ada kabar", "dot": "#64748B"},
+        {"label": "Kurang", "val": "2", "sub": "belum ada kabar", "dot": "#F59E0B"},
         {"label": "Mereda", "val": "1", "sub": "isu Wamen", "dot": "#10B981"}
     ]
     render_kpi_chips(chips)
@@ -2771,11 +2772,11 @@ def render_slide_18_watch_list(df, selected_topic='Semua', topic_label=None, **k
     watch_items = [
         ("Perkara KPK proyek jalan Sumut; satker terseret", "Itjen + Humas", "TINGGI", "Satu pernyataan", "#EF4444"),
         ("Longsor ruas nasional Aceh Tengah, korban jiwa", "Bina Marga", "BARU", "Kronologi 24 jam", "#EF4444"),
-        ("Banjir Gayo Lues, Tamiang, Singkil", "SDA + Bina Marga", "BARU", "Progres jembatan, tanggul", "#2563EB"),
+        ("Banjir Gayo Lues, Tamiang, Singkil", "SDA + Bina Marga", "BARU", "Progres jembatan, tanggul", "#EF4444"),
         ("Tol fungsional Nataru (11 ruas)", "BPJT", "BARU", "Info satu pintu", "#10B981"),
         ("Krisis air Jawa, NTT", "Cipta Karya + SDA", "KURANG", "Rilis air bersih", "#F59E0B"),
-        ("Karhutla dan kekeringan", "SDA", "KURANG", "Rilis sumur bor", "#64748B"),
-        ("Video jalan nasional Soreang-Ciwidey", "BBPJN Jabar", "PANTAU", "Jadwal tambal", "#2563EB"),
+        ("Karhutla dan kekeringan", "SDA", "KURANG", "Rilis sumur bor", "#F59E0B"),
+        ("Video jalan nasional Soreang-Ciwidey", "BBPJN Jabar", "PANTAU", "Jadwal tambal", "#F59E0B"),
         ("Klaim \"Pergub\", \"sewa jet\", \"antrian KPK\"", "Humas + Itjen", "KLAIM", "Cek; jangan amplifikasi", "#D97706"),
         ("Isu keluarga Wamen (nepotisme)", "Setjen + Itjen", "MEREDA", "Hasil penelusuran", "#10B981")
     ]
@@ -2905,8 +2906,8 @@ def render_slide_20_methodology_sentiment_shift(df, selected_topic='Semua', topi
     )
     
     chips = [
-        {"label": "Netral Dulu", "val": "72%", "sub": "lembaga 2-8 Nov, tarikan 9 Nov", "dot": "#64748B"},
-        {"label": "Netral Kini", "val": "19%", "sub": "periode sama, tarikan 12 Nov", "dot": "#64748B"},
+        {"label": "Netral Dulu", "val": "72%", "sub": "lembaga 2-8 Nov, tarikan 9 Nov", "dot": "#F59E0B", "val_color": "#D97706"},
+        {"label": "Netral Kini", "val": "19%", "sub": "periode sama, tarikan 12 Nov", "dot": "#F59E0B", "val_color": "#D97706"},
         {"label": "Positif Kini", "val": "73%", "sub": "dari 21% pada tarikan lama", "dot": "#10B981", "val_color": "#10B981"},
         {"label": "Tarikan 16 Nov", "val": "73% / 8%", "sub": "2-8 Nov stabil (2.738)", "dot": "#2563EB"},
         {"label": "Brandivers", "val": "Stabil", "sub": "±51% positif, 46% netral", "dot": "#10B981"}

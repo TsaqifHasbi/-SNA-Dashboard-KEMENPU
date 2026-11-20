@@ -722,7 +722,7 @@ def build_micro_sna_graph(author, analysis, topic="Kementerian_PU", df_corpus=No
     if targeted_decomp and targeted_decomp.get('is_multi_target'):
         for p, ev in targeted_decomp['evaluations'].items():
             ev_sent = ev['sentiment']
-            edge_col = "#10B981" if ev_sent == "Positif" else ("#EF4444" if ev_sent == "Negatif" else "#64748B")
+            edge_col = "#10B981" if ev_sent == "Positif" else ("#EF4444" if ev_sent == "Negatif" else "#F59E0B")
             
             p_node = ev['handle']
             G.add_node(p_node, color="#2563EB", size=26, shape="dot", title=f"Lembaga Target: {ev['agency']} ({ev['title']})")
@@ -759,7 +759,7 @@ def build_micro_sna_graph(author, analysis, topic="Kementerian_PU", df_corpus=No
         for kol in top_kols:
             kol_clean = f"@{str(kol).strip().lstrip('@')}"
             if kol_clean != clean_author and kol_clean not in G.nodes():
-                G.add_node(kol_clean, color="#06B6D4" if sent == "Positif" else "#EF4444", size=24, title=f"Aktor Sentral Korpus {topic} ({sent})")
+                G.add_node(kol_clean, color="#10B981" if sent == "Positif" else ("#EF4444" if sent == "Negatif" else "#F59E0B"), size=24, title=f"Aktor Sentral Korpus {topic} ({sent})")
                 G.add_edge(kol_clean, clean_author, weight=1, label="kesamaan narasi")
                 
     return G
@@ -858,8 +858,8 @@ def render_test_sentiment_page(df=None, selected_topic='Kementerian_PU', topic_l
         sent_bg = "#FEF2F2"
         sent_icon = "error"
     else:
-        sent_color = "#64748B"
-        sent_bg = "#F8FAFC"
+        sent_color = "#D97706"
+        sent_bg = "#FFFBEB"
         sent_icon = "help"
 
     emo_hex = EMOTION_COLORS.get(emo, "#2563EB")
@@ -930,9 +930,9 @@ def render_test_sentiment_page(df=None, selected_topic='Kementerian_PU', topic_l
                 t_bg = "#FEF2F2"
                 badge_icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px; margin-right:4px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>'
             else:
-                t_color = "#64748B"
-                t_bg = "#F8FAFC"
-                badge_icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px; margin-right:4px;"><line x1="5" y1="12" x2="19" y2="12"></line></svg>'
+                t_color = "#D97706"
+                t_bg = "#FFFBEB"
+                badge_icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px; margin-right:4px;"><line x1="5" y1="12" x2="19" y2="12"></line></svg>'
                 
             with cols_target[idx]:
                 with st.container(border=True):
@@ -1196,14 +1196,14 @@ def render_test_sentiment_page(df=None, selected_topic='Kementerian_PU', topic_l
             if targeted_decomp.get('is_multi_target'):
                 st.markdown("""
                 <div style="display:flex; justify-content:space-between; font-size:10.5px; color:#64748B; margin-top:4px;">
-                    <span><b>Relasi Komparasi Terarah:</b> Hijau = Dukungan/Afirmatif | Merah = Kritik/Aduan | Biru = Lembaga Penyelenggara</span>
+                    <span><b>Relasi Komparasi Terarah:</b> Hijau = Dukungan/Afirmatif | Kuning = Netral | Merah = Kritik/Aduan | Biru = Lembaga Penyelenggara</span>
                     <span>Interaktif: Klik & geser simpul untuk analisis klaster</span>
                 </div>
                 """, unsafe_allow_html=True)
             else:
                 st.markdown("""
                 <div style="display:flex; justify-content:space-between; font-size:10.5px; color:#64748B; margin-top:4px;">
-                    <span><b>Legenda:</b> Hijau = Opini Positif | Merah = Opini Negatif | Biru = Akun Rujukan (@) | Kuning = Tagar (#)</span>
+                    <span><b>Legenda:</b> Hijau = Opini Positif | Kuning = Opini Netral | Merah = Opini Negatif | Biru = Akun Rujukan (@) | Oranye = Tagar (#)</span>
                     <span>Interaktif: Klik, tahan, atau geser titik untuk eksplorasi relasi</span>
                 </div>
                 """, unsafe_allow_html=True)

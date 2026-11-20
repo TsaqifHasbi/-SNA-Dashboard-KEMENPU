@@ -9,7 +9,7 @@ from pyvis.network import Network
 
 SENTIMENT_COLORS = {
     'Positif': '#10B981',  # Emerald Green
-    'Netral': '#64748B',   # Slate Grey
+    'Netral': '#F59E0B',   # Amber / Yellow
     'Negatif': '#EF4444',  # Crimson Red
 }
 
@@ -21,21 +21,21 @@ EMOTION_COLORS = {
     'Trust': '#06B6D4',
     'Antisipasi': '#F59E0B',   # Amber
     'Anticipation': '#F59E0B',
-    # Negatif
+    # Negatif (Danger/Buruk: Merah / Crimson / Burgundy - tidak boleh Hijau / Biru)
     'Marah': '#EF4444',        # Crimson Red
     'Anger': '#EF4444',
-    'Takut': '#8B5CF6',        # Violet / Purple
-    'Fear': '#8B5CF6',
-    'Jijik': '#84CC16',        # Lime Green / Olive
-    'Disgust': '#84CC16',
-    'Sedih': '#3B82F6',        # Blue
-    'Sadness': '#3B82F6',
-    # Netral
-    'Surprise': '#A78BFA',     # Lavender
-    'Terkejut': '#A78BFA',
-    'Informatif': '#64748B',   # Slate Grey
-    'Netral': '#64748B',
-    'Neutral': '#64748B',
+    'Takut': '#DC2626',        # Red
+    'Fear': '#DC2626',
+    'Jijik': '#B91C1C',        # Dark Red
+    'Disgust': '#B91C1C',
+    'Sedih': '#991B1B',        # Deep Red / Burgundy
+    'Sadness': '#991B1B',
+    # Netral / Sedang / Diantara (Kuning / Amber)
+    'Surprise': '#F59E0B',     # Amber
+    'Terkejut': '#F59E0B',
+    'Informatif': '#F59E0B',   # Amber
+    'Netral': '#F59E0B',
+    'Neutral': '#F59E0B',
 }
 
 def extract_mentions(text):

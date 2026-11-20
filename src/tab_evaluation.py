@@ -109,7 +109,7 @@ def render_tab_evaluation(current_dir):
             if w in user_test_text.lower(): score -= 1
 
         pred_label = 'Positif' if score > 0 else ('Negatif' if score < 0 else 'Netral')
-        pred_color = '#10B981' if pred_label == 'Positif' else ('#EF4444' if pred_label == 'Negatif' else '#64748B')
+        pred_color = '#10B981' if pred_label == 'Positif' else ('#EF4444' if pred_label == 'Negatif' else '#F59E0B')
 
         st.markdown(f"""
         <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-left:4px solid {pred_color}; padding:16px; border-radius:8px; margin-top:8px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
