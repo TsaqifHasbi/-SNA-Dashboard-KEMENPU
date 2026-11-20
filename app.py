@@ -1,4 +1,4 @@
-# Build: 2026.11.20-5badges-clean-v1 (Trigger Streamlit Cloud auto-redeploy)
+# Build: 2026.11.20-align-pdf-report-v1 (Trigger Streamlit Cloud auto-redeploy)
 import os
 import sys
 import json

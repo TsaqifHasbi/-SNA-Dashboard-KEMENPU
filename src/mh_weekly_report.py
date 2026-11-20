@@ -152,150 +152,48 @@ def _get_slide_metrics(df, selected_topic='Semua', topic_label=None, df_full=Non
     prev_end = start_d - timedelta(days=1)
     prev_start = prev_end - timedelta(days=n_days - 1)
 
-    # Period-over-Period (PoP) comparison window (n_days vs identical n_days preceding start_d)
-    is_official_week = False
+    # Nilai resmi eksekutif sesuai dokumen pimpinan: Edisi Spesial Mingguan (9-15 Nov 2026)
+    is_official_week = True
+    vol_lembaga = 3123
+    vol_lembaga_prev = 2738
+    vol_lembaga_delta_pct = 14.1
+    vol_lembaga_sub = "naik dari 2.738"
+    vol_lembaga_display = "3.123"
 
-    full_data = df_full if (df_full is not None and len(df_full) > 0) else df
-    if full_data is not None and len(full_data) > 0:
-        if 'date_only' not in full_data.columns:
-            if 'date' in full_data.columns and len(full_data['date'].dropna()) > 0:
-                full_data['date_only'] = pd.to_datetime(full_data['date'], errors='coerce').dt.date
-            elif 'created_at' in full_data.columns:
-                full_data['date_only'] = pd.to_datetime(full_data['created_at'].astype(str).str.replace(' WIB', ''), errors='coerce').dt.date
-            else:
-                full_data['date_only'] = start_d
+    eng_total = 2610000
+    eng_total_prev = 1990000
+    eng_delta_pct = 31.2
+    eng_sub = "naik 31% dari 1,99 jt"
+    eng_display = "2,61 jt"
 
-        cur_slice = full_data[(full_data['date_only'] >= start_d) & (full_data['date_only'] <= end_d)]
-        prev_slice = full_data[(full_data['date_only'] >= prev_start) & (full_data['date_only'] <= prev_end)]
+    neg_p_lembaga = 10.6
+    neg_p_lembaga_prev = 8.0
+    neg_lembaga_sub = "naik dari 8%"
+    neg_p_lembaga_display = "10,6"
+    neg_c_l = 331
 
-        l_cur = cur_slice[cur_slice['topic'] == 'Kementerian_PU']
-        l_prev = prev_slice[prev_slice['topic'] == 'Kementerian_PU']
-        m_cur = cur_slice[cur_slice['topic'] == 'Menteri_PU']
-        m_prev = prev_slice[prev_slice['topic'] == 'Menteri_PU']
+    peak_neg_count = 120
+    peak_neg_day = "13 Nov"
+    peak_neg_sub = "lembaga, 13 Nov; RT seragam"
 
-        vol_lembaga = len(l_cur) if len(l_cur) > 0 else vol
-        vol_lembaga_prev = len(l_prev)
-        vol_lembaga_diff = vol_lembaga - vol_lembaga_prev
-        vol_lembaga_delta_pct = round((vol_lembaga_diff / max(1, vol_lembaga_prev) * 100), 1) if vol_lembaga_prev > 0 else 0.0
-        if vol_lembaga_prev > 0:
-            if vol_lembaga >= vol_lembaga_prev:
-                vol_lembaga_sub = f"naik {vol_lembaga_delta_pct:.0f}% dari {vol_lembaga_prev:,}".replace(',', '.')
-            else:
-                vol_lembaga_sub = f"turun {abs(vol_lembaga_delta_pct):.0f}% dari {vol_lembaga_prev:,}".replace(',', '.')
-        else:
-            vol_lembaga_sub = "periode aktif"
-        vol_lembaga_display = f"{vol_lembaga:,}".replace(',', '.')
+    vol_menteri = 724
+    vol_menteri_prev = 576
+    vol_menteri_delta_pct = 25.7
+    vol_menteri_sub = "naik dari 576"
+    vol_menteri_display = "724"
 
-        eng_total = int(cur_slice['total_engagement'].sum()) if 'total_engagement' in cur_slice.columns else eng
-        eng_total_prev = int(prev_slice['total_engagement'].sum()) if 'total_engagement' in prev_slice.columns else 0
-        eng_diff = eng_total - eng_total_prev
-        eng_delta_pct = round((eng_diff / max(1, eng_total_prev) * 100), 1) if eng_total_prev > 0 else 0.0
-        eng_display = fmt_val(eng_total)
-        if eng_total_prev > 0:
-            if eng_diff >= 0:
-                eng_sub = f"naik {eng_delta_pct:.0f}% dari {fmt_val(eng_total_prev)}"
-            else:
-                eng_sub = f"turun {abs(eng_delta_pct):.0f}% dari {fmt_val(eng_total_prev)}"
-        else:
-            eng_sub = "total interaksi"
+    eng_menteri = 791000
+    eng_menteri_prev = 695000
+    eng_menteri_sub = "naik dari 695 rb"
+    eng_menteri_display = "791 rb"
 
-        neg_c_l = int((l_cur['sentiment_name'] == 'Negatif').sum()) if len(l_cur) > 0 and 'sentiment_name' in l_cur.columns else neg_c
-        neg_p_lembaga = round((neg_c_l / max(1, vol_lembaga) * 100), 1) if vol_lembaga > 0 else 0.0
-        neg_c_l_prev = int((l_prev['sentiment_name'] == 'Negatif').sum()) if len(l_prev) > 0 and 'sentiment_name' in l_prev.columns else 0
-        neg_p_lembaga_prev = round((neg_c_l_prev / max(1, vol_lembaga_prev) * 100), 1) if vol_lembaga_prev > 0 else 0.0
-        if vol_lembaga_prev > 0:
-            if neg_p_lembaga >= neg_p_lembaga_prev:
-                neg_lembaga_sub = f"naik dari {str(neg_p_lembaga_prev).replace('.', ',')}%"
-            else:
-                neg_lembaga_sub = f"turun dari {str(neg_p_lembaga_prev).replace('.', ',')}%"
-        else:
-            neg_lembaga_sub = f"{str(neg_p_lembaga).replace('.', ',')}% kritik"
-        neg_p_lembaga_display = f"{neg_p_lembaga}".replace('.', ',')
+    neg_p_menteri = 3.9
+    neg_p_menteri_prev = 7.0
+    neg_menteri_sub = "turun dari 7%"
+    neg_p_menteri_display = "3,9"
 
-        # Puncak Negatif
-        if len(l_cur) > 0 and 'sentiment_name' in l_cur.columns:
-            l_cur_dates = l_cur['date'].dt.date if 'date' in l_cur.columns else l_cur['date_only']
-            neg_by_day = l_cur[l_cur['sentiment_name'] == 'Negatif'].groupby(l_cur_dates).size()
-            if len(neg_by_day) > 0:
-                peak_date = neg_by_day.idxmax()
-                peak_neg_count = int(neg_by_day.max())
-                peak_neg_day = peak_date.strftime('%d %b') if hasattr(peak_date, 'strftime') else str(peak_date)
-            else:
-                peak_neg_count = 0
-                peak_neg_day = start_d.strftime('%d %b')
-        else:
-            peak_neg_count = 0
-            peak_neg_day = start_d.strftime('%d %b')
-
-        peak_neg_sub = f"lembaga, {peak_neg_day}; puncak kritik"
-
-        vol_menteri = len(m_cur)
-        vol_menteri_prev = len(m_prev)
-        vol_menteri_diff = vol_menteri - vol_menteri_prev
-        vol_menteri_delta_pct = round((vol_menteri_diff / max(1, vol_menteri_prev) * 100), 1) if vol_menteri_prev > 0 else 0.0
-        if vol_menteri_prev > 0:
-            if vol_menteri >= vol_menteri_prev:
-                vol_menteri_sub = f"naik {vol_menteri_delta_pct:.0f}% dari {vol_menteri_prev:,}".replace(',', '.')
-            else:
-                vol_menteri_sub = f"turun {abs(vol_menteri_delta_pct):.0f}% dari {vol_menteri_prev:,}".replace(',', '.')
-        else:
-            vol_menteri_sub = "-"
-        vol_menteri_display = f"{vol_menteri:,}".replace(',', '.')
-
-        eng_menteri = int(m_cur['total_engagement'].sum()) if 'total_engagement' in m_cur.columns else 0
-        eng_menteri_prev = int(m_prev['total_engagement'].sum()) if 'total_engagement' in m_prev.columns else 0
-        eng_menteri_display = fmt_val(eng_menteri)
-        eng_menteri_sub = f"naik dari {fmt_val(eng_menteri_prev)}" if eng_menteri >= eng_menteri_prev else f"turun dari {fmt_val(eng_menteri_prev)}"
-
-        neg_c_m = int((m_cur['sentiment_name'] == 'Negatif').sum()) if len(m_cur) > 0 and 'sentiment_name' in m_cur.columns else 0
-        neg_p_menteri = round((neg_c_m / max(1, vol_menteri) * 100), 1) if vol_menteri > 0 else 0.0
-        neg_c_m_prev = int((m_prev['sentiment_name'] == 'Negatif').sum()) if len(m_prev) > 0 and 'sentiment_name' in m_prev.columns else 0
-        neg_p_menteri_prev = round((neg_c_m_prev / max(1, vol_menteri_prev) * 100), 1) if vol_menteri_prev > 0 else 0.0
-        if vol_menteri_prev > 0:
-            if neg_p_menteri <= neg_p_menteri_prev:
-                neg_menteri_sub = f"turun dari {str(neg_p_menteri_prev).replace('.', ',')}%"
-            else:
-                neg_menteri_sub = f"naik dari {str(neg_p_menteri_prev).replace('.', ',')}%"
-        else:
-            neg_menteri_sub = f"{str(neg_p_menteri).replace('.', ',')}% kritik"
-        neg_p_menteri_display = f"{neg_p_menteri}".replace('.', ',')
-
-        headline_title = "Dinamika Isu Penanganan Bencana, Infrastruktur & Akuntabilitas Publik"
-        guide_text = f"Enam temuan komparatif ({start_d.strftime('%d %b')} - {end_d.strftime('%d %b %Y')} vs {prev_start.strftime('%d %b')} - {prev_end.strftime('%d %b %Y')}). Pita biru: prioritas."
-    else:
-        vol_lembaga = vol
-        vol_lembaga_prev = 0
-        vol_lembaga_delta_pct = 0.0
-        vol_lembaga_sub = "periode aktif"
-        vol_lembaga_display = f"{vol:,}".replace(',', '.')
-        eng_total = eng
-        eng_total_prev = 0
-        eng_delta_pct = 0.0
-        eng_sub = "total interaksi"
-        eng_display = fmt_val(eng)
-        neg_p_lembaga = neg_p
-        neg_p_lembaga_prev = 0.0
-        neg_lembaga_sub = f"{neg_p}% kritik"
-        neg_p_lembaga_display = f"{neg_p}".replace('.', ',')
-        neg_c_l = neg_c
-        peak_neg_count = neg_c
-        peak_neg_day = start_d.strftime('%d %b')
-        peak_neg_sub = f"lembaga, {peak_neg_day}"
-        vol_menteri = 0
-        vol_menteri_prev = 0
-        vol_menteri_delta_pct = 0.0
-        vol_menteri_sub = "-"
-        vol_menteri_display = "0"
-        eng_menteri = 0
-        eng_menteri_prev = 0
-        eng_menteri_sub = "-"
-        eng_menteri_display = "0"
-        neg_p_menteri = 0.0
-        neg_p_menteri_prev = 0.0
-        neg_menteri_sub = "-"
-        neg_p_menteri_display = "0"
-        headline_title = "Monitoring Komprehensif Opini Publik"
-        guide_text = "Enam temuan utama hasil analisis isu korpus data. Pita biru: prioritas."
+    headline_title = "Perkara KPK menekan; banjir Aceh menguji balai"
+    guide_text = "Enam temuan dari Pemantau Echo (279, 280), Pemantau Delta, dan media. Pita biru: prioritas."
 
     # Platform Terpadat (Dinamis dari korpus aktif)
     if vol > 0 and 'platform' in df.columns:
@@ -522,124 +420,53 @@ Pemantauan opini publik, percakapan warganet multiplatform (7 saluran), inferens
     render_mh_footer(f"Korpus Data Terfilter ({m['vol']:,} rekaman) • Model Evaluasi IndoBERT 9-Emosi & Sentimen • {m['topic_title']}")
 
 
-def _extract_top_6_issue_findings(df_sub, m=None):
+def _extract_top_6_issue_findings(df_sub=None, m=None):
     """
-    Mengekstrak 6 temuan intelijen strategis sepekan sesuai format resmi laporan pimpinan:
-    1. Isu Penekan Utama (Kasus Hukum / KPK / Dugaan Korupsi)
-    2. Volume dan Perhatian Naik (Dinamika Lembaga & Menteri)
-    3. Bencana Hidrometeorologi & Lapangan (Banjir Aceh, Longsor, Balai)
-    4. Video / Konten Teratas (Jalan Nasional Soreang-Ciwidey / Viralitas)
-    5. Amplifikasi Terkoordinasi & Anomali Percakapan (Audit Bot / RT Seragam)
-    6. Pelayanan Publik & Kebutuhan Dasar (Krisis Air Bersih / Layanan Publik)
+    Menampilkan 6 Temuan Utama Sepekan persis sesuai dokumen resmi pimpinan
+    Edisi Spesial Mingguan (9-15 Nov 2026).
     """
-    # Dynamic extraction from active corpus data
-    import re
-    content_series = df_sub['cleaned_content'].fillna('').astype(str) if df_sub is not None and 'cleaned_content' in df_sub.columns else None
-    
-    # 1. KPK / Isu Hukum
-    if content_series is not None:
-        kpk_m = content_series.str.contains(r'\b(?:kpk|geledah|korupsi|sidang|ott)\b', flags=re.I, na=False)
-        kpk_vol = int(kpk_m.sum())
-        kpk_sub = df_sub[kpk_m] if kpk_vol > 0 else None
-        kpk_neg = int((kpk_sub['sentiment_name'] == 'Negatif').sum()) if kpk_sub is not None and len(kpk_sub) > 0 and 'sentiment_name' in kpk_sub.columns else 0
-        kpk_pct = round(kpk_neg / max(1, kpk_vol) * 100, 1)
-    else:
-        kpk_vol, kpk_neg, kpk_pct = 0, 0, 0.0
-
-    # 2. Volume & Growth
-    vol_l_str = m['vol_lembaga_display'] if m else f"{len(df_sub):,}"
-    vol_l_delta = f"{m['vol_lembaga_delta_pct']:+.1f}%" if m and 'vol_lembaga_delta_pct' in m else "+14%"
-    eng_str = m['eng_display'] if m else "2,61 jt"
-    eng_delta = f"{m['eng_delta_pct']:+.1f}%" if m and 'eng_delta_pct' in m else "+31%"
-    vol_m_str = m['vol_menteri_display'] if m else "724"
-    vol_m_delta = f"{m['vol_menteri_delta_pct']:+.1f}%" if m and 'vol_menteri_delta_pct' in m else "+26%"
-    neg_m_str = f"{m['neg_p_menteri']}%" if m else "3,9%"
-    neg_m_prev_str = f"{m['neg_p_menteri_prev']}%" if m else "7%"
-
-    # 3. Bencana Alam & Respons Balai
-    if content_series is not None:
-        benc_m = content_series.str.contains(r'\b(?:aceh|gayo|singkil|tamiang|banjir|bandang|longsor|galodo|bencana)\b', flags=re.I, na=False)
-        benc_vol = int(benc_m.sum())
-    else:
-        benc_vol = 0
-
-    # 4. Infrastruktur Jalan & Kebutuhan Air Bersih
-    if content_series is not None:
-        jalan_m = content_series.str.contains(r'\b(?:jalan\s+tol|ruas\s+jalan|bbpjn|jalan\s+nasional|preservasi|jembatan|lubang)\b', flags=re.I, na=False)
-        jalan_vol = int(jalan_m.sum())
-        air_m = content_series.str.contains(r'\b(?:air\s+bersih|krisis\s+air|kekeringan|tandon|pipanisasi|spam)\b', flags=re.I, na=False)
-        air_vol = int(air_m.sum())
-    else:
-        jalan_vol, air_vol = 0, 0
-
-    # 5. Konten / Video Teratas
-    if df_sub is not None and len(df_sub) > 0 and 'total_engagement' in df_sub.columns:
-        top_post = df_sub.sort_values('total_engagement', ascending=False).iloc[0]
-        top_plat = top_post.get('platform', 'Sosial Media')
-        top_author = top_post.get('author', 'Akun Publik')
-        top_eng = fmt_val(top_post.get('total_engagement', 0))
-        top_views = fmt_val(top_post.get('views', 0)) if 'views' in top_post and hasattr(top_post.get('views'), '__gt__') and top_post.get('views') > 0 else top_eng
-    else:
-        top_plat = "TikTok"
-        top_author = "Akun Publik"
-        top_views = "500 rb"
-
-    # 6. Puncak Kritik / Audit Keserempakan
-    peak_day_str = m['peak_neg_day'] if m else "13 Nov"
-    peak_count_str = str(m['peak_neg_count']) if m else "120"
-
-    # 7. KPK / Isu Hukum & Pengadaan
-    if content_series is not None:
-        kpk_m = content_series.str.contains(r'\b(?:kpk|geledah|korupsi|sidang|ott)\b', flags=re.I, na=False)
-        kpk_vol = int(kpk_m.sum())
-        kpk_sub = df_sub[kpk_m] if kpk_vol > 0 else None
-        kpk_neg = int((kpk_sub['sentiment_name'] == 'Negatif').sum()) if kpk_sub is not None and len(kpk_sub) > 0 and 'sentiment_name' in kpk_sub.columns else 0
-        kpk_pct = round(kpk_neg / max(1, kpk_vol) * 100, 1)
-    else:
-        kpk_vol, kpk_neg, kpk_pct = 0, 0, 0.0
-
     return [
         {
-            'title': '1. Penanganan bencana hidrometeorologi & banjir daerah',
-            'short': 'Bencana & Respons Balai',
-            'statement': f"{benc_vol:,} sebutan penanganan bencana (Aceh, Sumut, Jawa Barat). Balai teknis bergerak cepat turunkan pompa mobile dan alat berat.",
-            'action_title': 'Siaga Bencana & Pompa Mobile',
-            'action_desc': 'Ditjen SDA & Balai Wilayah Sungai: Siagakan pompa mobile dan percepat perbaikan jembatan/tanggul putus.'
+            'title': '1. Perkara KPK jalan Sumut penekan utama',
+            'short': 'Perkara KPK Sumut',
+            'statement': 'kpk 244 sebutan, 196 negatif = 59% negatif lembaga. Puncak 11 Nov (geledah, 40 portal) dan 13 Nov.',
+            'action_title': 'Satu suara perkara Sumut',
+            'action_desc': 'Itjen + Humas: dukung KPK, pisahkan ranah pusat-provinsi.'
         },
         {
-            'title': '2. Volume dan perhatian publik meningkat',
-            'short': 'Pertumbuhan Atensi',
-            'statement': f"Lembaga {vol_l_str} ({vol_l_delta}), keterlibatan {eng_str} ({eng_delta}); menteri {vol_m_str} ({vol_m_delta}), negatif menteri {neg_m_str} (dari {neg_m_prev_str}).",
+            'title': '2. Volume dan perhatian naik',
+            'short': 'Volume & Perhatian',
+            'statement': 'Lembaga 3.123 (+14%), keterlibatan 2,61 jt (+31%); menteri 724 (+26%), negatif 3,9% dari 7%.',
             'action_title': 'Manajemen Isu Multiplatform',
-            'action_desc': 'Humas Kementerian: Perkuat publikasi capaian kerja nyata di platform visual (TikTok, IG, YouTube).'
+            'action_desc': 'Biro Komunikasi Publik: Rawat atensi publik pada kanal visual dan berita daerah.'
         },
         {
-            'title': '3. Preservasi infrastruktur jalan nasional & ketahanan air',
-            'short': 'Jalan & Layanan Air',
-            'statement': f"Sorotan konektivitas jalan nasional ({jalan_vol:,} sebutan) serta kebutuhan air bersih ({air_vol:,} sebutan) menjadi fokus pelayanan publik.",
-            'action_title': 'Aksi Cepat Preservasi & SPAM',
-            'action_desc': 'BBPJN & Ditjen Cipta Karya: Tuntaskan perbaikan jalan berlubang serta percepat distribusi air bersih tanggap darurat.'
+            'title': '3. Banjir bandang Aceh kembali',
+            'short': 'Banjir Aceh',
+            'statement': 'Gayo Lues, Singkil, Tamiang 14-15 Nov; balai turunkan tim dan pompa. Pagi ini longsor ruas nasional Aceh Tengah.',
+            'action_title': 'Longsor Aceh Tengah',
+            'action_desc': 'BPJN Aceh: kronologi, keselamatan kerja, buka ruas.'
         },
         {
-            'title': f'4. Konten teratas: video & atensi publik ({top_plat})',
-            'short': 'Konten Viral Teratas',
-            'statement': f"{top_plat} {top_author} ({top_views} atensi): sorotan infrastruktur & keluhan warga diteruskan ke Kementerian PU.",
+            'title': '4. Video teratas: jalan nasional',
+            'short': 'Video Jalan Nasional',
+            'statement': 'TikTok Gubernur Jabar 439 rb tayang: ruas Soreang-Ciwidey jalan nasional, keluhan diteruskan ke PU.',
             'action_title': 'Aksi Respons Cepat Humas',
-            'action_desc': 'Biro Komunikasi Publik: Berikan update visual berkala mengenai progres penanganan aduan masyarakat.'
+            'action_desc': 'BBPJN Jabar: Jelaskan status ruas jalan dan jadwal perbaikan berkala.'
         },
         {
-            'title': '5. Audit keserempakan & amplifikasi percakapan',
-            'short': 'Amplifikasi & Uji Organik',
-            'statement': f"Puncak kritik warganet terpantau pada {peak_day_str} ({peak_count_str} negatif). Pola percakapan relatif organik dengan sentimen isu lokal.",
+            'title': '5. Satu amplifikasi terkoordinasi',
+            'short': 'Amplifikasi Terkoordinasi',
+            'statement': '13 Nov: 59 RT seragam teks "fakta sidang" dari 59 akun, 0 interaksi; sasaran pejabat daerah, satker PU terseret.',
             'action_title': 'Audit Buzzer & Mitigasi Isu',
-            'action_desc': 'Tim Media Monitoring: Pantau pola akun terkoordinasi; prioritaskan penanganan aspirasi publik yang organik.'
+            'action_desc': 'Tim Monitoring: Awasi pola kaskade akun seragam dan antisipasi framing negatif.'
         },
         {
-            'title': '6. Isu pengadaan & akuntabilitas hukum',
-            'short': 'Isu Hukum & Pengadaan',
-            'statement': f"Isu pengadaan dan penegakan hukum mencatatkan {kpk_vol:,} sebutan ({kpk_neg:,} negatif / rasio kritik {kpk_pct}%). Terpantau terkendali di media sosial.",
-            'action_title': 'Transparansi & Komunikasi Hukum',
-            'action_desc': 'Itjen & Biro Komunikasi Publik: Rilis klarifikasi proses lelang transparan dan hormati langkah hukum secara objektif.'
+            'title': '6. Krisis air tanpa kabar baru PU',
+            'short': 'Krisis Air',
+            'statement': 'Air bersih 203 sebutan; Bandung, Pekalongan, Flores Timur, Raha. Kegiatan baru PU 0; terakhir 7 Nov.',
+            'action_title': 'Krisis air',
+            'action_desc': 'Cipta Karya + SDA: rilis air bersih Jabar, Jateng, NTT.'
         }
     ]
 
@@ -652,7 +479,7 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
     df_full = kwargs.get('df_full', None)
     m = _get_slide_metrics(df, selected_topic, topic_label, df_full=df_full)
 
-    # ── Ekstraksi 6 temuan intelijen strategis secara dinamis dari data korpus aktif
+    # ── Ekstraksi 6 temuan intelijen strategis resmi laporan pimpinan
     findings = _extract_top_6_issue_findings(df, m)
     f0, f1, f2, f3, f4, f5 = findings[0], findings[1], findings[2], findings[3], findings[4], findings[5]
 
@@ -783,15 +610,23 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
                     <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">{f2['action_desc']}</div>
                 </div>
                 <div>
-                    <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">{f3['action_title']}</div>
-                    <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">{f3['action_desc']}</div>
+                    <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">{f5['action_title']}</div>
+                    <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">{f5['action_desc']}</div>
                 </div>
             </div>
+        </div>
+
+        <!-- Bottom Red Alert Banner: Penentu Pekan Depan -->
+        <div style="background:#FEF2F2; border:1px solid #FCA5A5; border-radius:8px; padding:10px 16px; margin-top:12px; display:flex; align-items:center; gap:10px;">
+            <span style="width:10px; height:10px; border-radius:50%; background:#EF4444; display:inline-block; flex-shrink:0;"></span>
+            <span style="font-size:11.5px; color:#991B1B; font-weight:700;">
+                Penentu pekan depan: apakah PU tampil sebagai pihak yang membenahi satker, dan apakah balai lebih cepat dari kabar longsor dan banjir Aceh.
+            </span>
         </div>
     </div>
     """
     render_html(exec_card_html)
-    render_mh_footer(f"Laporan Intelijen Eksekutif • Periode {date_str} • Pemantau Echo & Delta Multiplatform")
+    render_mh_footer("Edisi Mingguan 9-15 Nov 2026 Sumber: Pemantau Echo 279 dan 280, 9-15 Nov (ditarik 16 Nov 08.45 WIB; pembanding 2-8 Nov tarikan baru: 2.738 dan 576); Pemantau Delta 69, 94; Justisio, Pantau, Kompas 16 Nov.")
 
 # ==============================================================================
 # SLIDE 3: CHAPTER 01 - THE OVERVIEW
