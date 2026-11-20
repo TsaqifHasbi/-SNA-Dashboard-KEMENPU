@@ -160,6 +160,14 @@ def _get_slide_metrics(df, selected_topic='Semua', topic_label=None, df_full=Non
     n_days = max(1, (end_d - start_d).days + 1)
     prev_end = start_d - timedelta(days=1)
     prev_start = prev_end - timedelta(days=n_days - 1)
+    
+    def _fmt_id_date(d, with_year=True):
+        id_m = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'Mei', 6: 'Jun', 7: 'Jul', 8: 'Agu', 9: 'Sep', 10: 'Okt', 11: 'Nov', 12: 'Des'}
+        m_name = id_m.get(d.month, d.strftime('%b'))
+        return f"{d.day:02d} {m_name} {d.year}" if with_year else f"{d.day:02d} {m_name}"
+
+    cur_str = f"{_fmt_id_date(start_d, False)} – {_fmt_id_date(end_d, True)}"
+    prev_str = f"{_fmt_id_date(prev_start, False)} – {_fmt_id_date(prev_end, True)}"
 
     # Period-over-Period (PoP) comparison window (n_days vs identical n_days preceding start_d)
     is_official_week = False
@@ -269,7 +277,7 @@ def _get_slide_metrics(df, selected_topic='Semua', topic_label=None, df_full=Non
         neg_p_menteri_display = f"{neg_p_menteri}".replace('.', ',')
 
         headline_title = "Dinamika Isu Penanganan Bencana, Infrastruktur & Akuntabilitas Publik"
-        guide_text = f"Enam temuan komparatif ({start_d.strftime('%d %b')} - {end_d.strftime('%d %b %Y')}). Pita biru: prioritas."
+        guide_text = f"Enam temuan komparatif ({cur_str} vs pembanding {prev_str}). Pita biru: prioritas."
     else:
         vol_lembaga = vol
         vol_lembaga_prev = 0
@@ -303,7 +311,7 @@ def _get_slide_metrics(df, selected_topic='Semua', topic_label=None, df_full=Non
         neg_menteri_sub = "-"
         neg_p_menteri_display = "0"
         headline_title = "Monitoring Komprehensif Opini Publik"
-        guide_text = "Enam temuan utama hasil analisis isu korpus data. Pita biru: prioritas."
+        guide_text = f"Enam temuan komparatif ({cur_str} vs pembanding {prev_str}). Pita biru: prioritas."
 
     # Platform Terpadat (Dinamis dari korpus aktif)
     if vol > 0 and 'platform' in df.columns:
@@ -394,7 +402,11 @@ def _get_slide_metrics(df, selected_topic='Semua', topic_label=None, df_full=Non
         'top_issue_name': top_issue_name,
         'top_issue_vol': top_issue_vol,
         'headline_title': headline_title,
-        'guide_text': guide_text
+        'guide_text': guide_text,
+        'cur_str': cur_str,
+        'prev_str': prev_str,
+        'prev_start_str': _fmt_id_date(prev_start, False),
+        'prev_end_str': _fmt_id_date(prev_end, True)
     }
 
 def _get_frequent_words(df, max_words=25, sentiment_filter=None):
@@ -855,7 +867,7 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
     </div>
     """
     render_html(exec_card_html)
-    render_mh_footer(f"Analisis Dinamis Korpus Warganet ({m['vol']:,} sebutan) • Inferensi IndoBERT • {m['topic_title']}")
+    render_mh_footer(f"Analisis Dinamis Korpus Warganet ({m['vol']:,} sebutan) • Periode {m.get('cur_str', '')} (Pembanding: {m.get('prev_str', '')}) • Inferensi IndoBERT • {m['topic_title']}")
 
 # ==============================================================================
 # SLIDE 3: CHAPTER 01 - THE OVERVIEW
@@ -921,7 +933,7 @@ def render_slide_4_overall_media_social(df, selected_topic='Semua', topic_label=
     else:
         s_title = "Overall Media & Social"
         s_sub = f"Dinamika Volume: Lembaga {m['vol_lembaga_display']} & Menteri {m['vol_menteri_display']}"
-        s_guide = "Kiri: lembaga (Kementerian PU) per hari. Kanan: menteri (Menteri PU) per hari. Menampilkan pergerakan sentimen harian."
+        s_guide = f"Kiri: lembaga (Kementerian PU), kanan: menteri (Menteri PU), per hari. Periode {m.get('cur_str', '')} vs rentang pembanding {m.get('prev_str', '')}. Sentimen skema baru sejak 11 Nov."
         chips = [
             {"label": "Lembaga", "val": m['vol_lembaga_display'], "sub": m['vol_lembaga_sub'], "dot": "#2563EB", "val_color": "#2563EB"},
             {"label": "Menteri", "val": m['vol_menteri_display'], "sub": m['vol_menteri_sub'], "dot": "#10B981", "val_color": "#0F2942"},
