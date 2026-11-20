@@ -175,39 +175,45 @@ def render_slide_overall_sentiment(df, selected_topic='Kementerian_PU', topic_la
     render_slide_header("OVERALL SENTIMENT", f"Sentimen Keseluruhan & Komparasi 7 Platform &bull; {topic_label} &bull; {date_str}")
     
     total = len(df)
-    s_counts = df['sentiment_name'].value_counts()
+    # Sentimen Warganet: Memisahkan Berita Daring (News) agar penilaian sentimen murni suara warganet
+    if total > 0 and 'platform' in df.columns and (df['platform'] != 'News').any() and (df['platform'] == 'News').any():
+        df_sent = df[df['platform'] != 'News']
+    else:
+        df_sent = df
+    sent_total = len(df_sent)
+    s_counts = df_sent['sentiment_name'].value_counts()
     pos_c = s_counts.get('Positif', 0)
     neu_c = s_counts.get('Netral', 0)
     neg_c = s_counts.get('Negatif', 0)
     
-    pos_p = round(pos_c / total * 100, 1) if total else 0
-    neu_p = round(neu_c / total * 100, 1) if total else 0
-    neg_p = round(neg_c / total * 100, 1) if total else 0
+    pos_p = round(pos_c / sent_total * 100, 1) if sent_total else 0
+    neu_p = round(neu_c / sent_total * 100, 1) if sent_total else 0
+    neg_p = round(neg_c / sent_total * 100, 1) if sent_total else 0
     
     c1, c2, c3, c4 = st.columns(4)
     with c1:
         render_html(f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
 <div style="font-size:11px; font-weight:700; color:#64748B;">TOTAL MENTIONS</div>
 <div style="font-size:28px; font-weight:800; color:#0F172A; margin:2px 0;">{fmt_val(total)}</div>
-<div style="font-size:11px; color:#64748B;">100% Data Riil</div>
+<div style="font-size:11px; color:#64748B;">7 Saluran Multiplatform</div>
 </div>""")
     with c2:
         render_html(f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
 <div style="font-size:11px; font-weight:700; color:#10B981;">SENTIMEN POSITIF</div>
 <div style="font-size:28px; font-weight:800; color:#10B981; margin:2px 0;">{pos_p}%</div>
-<div style="font-size:11px; color:#64748B;">{pos_c:,} mentions</div>
+<div style="font-size:11px; color:#64748B;">{pos_c:,} suara warganet</div>
 </div>""")
     with c3:
         render_html(f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
 <div style="font-size:11px; font-weight:700; color:#64748B;">SENTIMEN NETRAL</div>
 <div style="font-size:28px; font-weight:800; color:#64748B; margin:2px 0;">{neu_p}%</div>
-<div style="font-size:11px; color:#64748B;">{neu_c:,} mentions</div>
+<div style="font-size:11px; color:#64748B;">{neu_c:,} suara warganet</div>
 </div>""")
     with c4:
         render_html(f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
 <div style="font-size:11px; font-weight:700; color:#EF4444;">SENTIMEN NEGATIF</div>
 <div style="font-size:28px; font-weight:800; color:#EF4444; margin:2px 0;">{neg_p}%</div>
-<div style="font-size:11px; color:#64748B;">{neg_c:,} mentions</div>
+<div style="font-size:11px; color:#64748B;">{neg_c:,} suara warganet</div>
 </div>""")
 
     st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)

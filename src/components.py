@@ -124,7 +124,13 @@ def _base_layout(height=320, **kwargs):
 # 1. OVERALL SENTIMENT DONUT + NSS
 # ======================================================================
 def plot_sentiment_donut(df, nss_score):
-    counts = df['sentiment_name'].value_counts()
+    # Sentimen Publik/Warganet: Memisahkan Berita Daring (News) agar sejalan dengan KPI sentimen warganet
+    if len(df) > 0 and 'platform' in df.columns and (df['platform'] != 'News').any() and (df['platform'] == 'News').any():
+        df_sent = df[df['platform'] != 'News']
+    else:
+        df_sent = df
+
+    counts = df_sent['sentiment_name'].value_counts()
     pos = counts.get('Positif', 0)
     net = counts.get('Netral', 0)
     neg = counts.get('Negatif', 0)
