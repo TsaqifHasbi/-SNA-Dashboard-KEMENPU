@@ -1,4 +1,4 @@
-﻿# pyrefly: ignore[missing-import]
+# pyrefly: ignore[missing-import]
 import numpy as np
 import pandas as pd
 # pyrefly: ignore[missing-import]
