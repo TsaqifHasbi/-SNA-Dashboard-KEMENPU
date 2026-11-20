@@ -238,19 +238,19 @@ PREVENTATIVE_PATTERNS = [
 # Pola Pembelaan Kebijakan & Afirmasi Kebaikan Program (Pro-Policy Defense Patterns)
 # Mengantisipasi makian/slang yang sebenarnya ditujukan kepada pihak pengkritik atau sebagai kata seru kekaguman
 PRO_POLICY_DEFENSE_PATTERNS = [
-    # 1. Afirmasi kebaikan program: "udah baik dikasih makan gratis", "udah dibantu sekolah rakyat", "mending dapat makan gratis"
-    r'(?:udah|sudah)\s+(?:baik|bagus|enak|gratis|mending|dibantu|dikasih|diberi)\s+',
-    r'(?:mending|untung)\s+(?:ada|dikasih|diberi|dapat)\s+(?:mbg|makan\s+gratis|sekolah\s+rakyat|bantuan)',
-    # 2. Kurang bersyukur / masih nyinyir: "udah dikasih makan gratis masih aja nyinyir", "udah gratis masih aja protes"
-    r'(?:udah|sudah)\s+(?:gratis|dikasih|dibantu).*?(?:masih\s+(?:aja|saja|lu)?\s*(?:protes|nyinyir|ngeluh|bacot|komplain|banyak\s+omong|kurang))',
+    # 1. Afirmasi kebaikan program: "udah baik jalan diperbaiki", "udah dibantu air bersih", "mending dibangun jembatan"
+    r'(?:udah|sudah)\s+(?:baik|bagus|enak|gratis|mending|dibantu|dikasih|diberi|selesai|dibangun|diperbaiki)\s+',
+    r'(?:mending|untung)\s+(?:ada|dikasih|diberi|dapat|dibangun)\s+(?:kemenpu|kementerian\s+pu|menteri\s+pu|jalan|jembatan|air\s+bersih|irigasi|bendungan|bantuan)',
+    # 2. Kurang bersyukur / masih nyinyir: "udah diperbaiki jalan masih aja nyinyir", "udah dibantu masih aja protes"
+    r'(?:udah|sudah)\s+(?:diperbaiki|dibangun|dibantu).*?(?:masih\s+(?:aja|saja|lu)?\s*(?:protes|nyinyir|ngeluh|bacot|komplain|banyak\s+omong|kurang))',
     r'(?:ga|gak|tidak)\s+(?:tahu\s+diri|bersyukur|tau\s+diri|terima\s+kasih)',
-    # 3. Mengecam penentang program: "yang nolak mbg tolol", "buzzer yang jelekin mbg babi"
-    r'(?:yang|yg)\s+(?:nolak|nyinyir|hujat|kritik|nyerang|fitnah|benci|gasuka|gak\s+suka|jelek-jelekin|ngejelekin)\s+(?:mbg|kdmp|program|sekolah\s+rakyat).*?\b(?:tolol|goblok|bego|babi|anjing|dungu|kampret|bangsat|sialan)\b',
-    # 4. Melarang menjelekkan program: "jangan fitnah mbg anjing"
-    r'(?:jangan|jgn|ngapain)\s+(?:fitnah|nyinyir|hujat|jelekin|ngejelekin)\s+(?:mbg|kdmp|program|sekolah\s+rakyat)',
-    # 5. Slang penguat pujian (intensifier): "anjir enak banget", "cok mantap pol", "jancuk bergizi tenan"
-    r'\b(?:anjir|njir|cok|cuk|cuks|asu|jancuk|jancok|gila|goblok)\b\s+(?:banget\s+)?(?:enak|keren|mantap|mantul|lezat|nikmat|juara|mewah|lengkap|top|kenyang|bagus|berkah|membantu|bergizi)',
-    r'\b(?:enak|keren|mantap|mantul|lezat|nikmat|juara|mewah|lengkap|top|kenyang|bagus|bergizi)\b\s+(?:banget|bgt|bet|pol|tenan)?\s*(?:cok|cuk|cuks|anjir|njir|jancok|jancuk|asu)'
+    # 3. Mengecam penentang program: "yang nyinyir kemenpu tolol", "buzzer yang jelekin balai babi"
+    r'(?:yang|yg)\s+(?:nolak|nyinyir|hujat|kritik|nyerang|fitnah|benci|gasuka|gak\s+suka|jelek-jelekin|ngejelekin)\s+(?:kemenpu|menteri\s+pu|kementerian\s+pu|balai|proyek|jalan).*?\b(?:tolol|goblok|bego|babi|anjing|dungu|kampret|bangsat|sialan)\b',
+    # 4. Melarang menjelekkan program: "jangan fitnah kemenpu anjing"
+    r'(?:jangan|jgn|ngapain)\s+(?:fitnah|nyinyir|hujat|jelekin|ngejelekin)\s+(?:kemenpu|menteri\s+pu|kementerian\s+pu|balai|proyek|jalan)',
+    # 5. Slang penguat pujian (intensifier): "anjir mulus banget", "cok mantap pol", "jancuk cepat tenan"
+    r'\b(?:anjir|njir|cok|cuk|cuks|asu|jancuk|jancok|gila|goblok)\b\s+(?:banget\s+)?(?:mulus|cepat|keren|mantap|mantul|lancar|bagus|berkah|membantu|juara|top)',
+    r'\b(?:mulus|cepat|keren|mantap|mantul|lancar|bagus|membantu|juara|top)\b\s+(?:banget|bgt|bet|pol|tenan)?\s*(?:cok|cuk|cuks|anjir|njir|jancok|jancuk|asu)'
 ]
 
 DEFENSE_VENT_WORDS = {'bangsat', 'anjing', 'babi', 'tolol', 'goblok', 'bego', 'kampret', 'asu', 'jancuk', 'jancok', 'cok', 'cuk', 'cuks', 'sialan', 'setan', 'iblis'}
@@ -259,26 +259,33 @@ DEFENSE_VENT_WORDS = {'bangsat', 'anjing', 'babi', 'tolol', 'goblok', 'bego', 'k
 # DEFINISI TARGET PROGRAM KEBIJAKAN PEMERINTAH (UNTUK DEKOMPOSISI ASPEK / ABSA)
 # ==============================================================================
 POLICY_TARGET_DEFINITIONS = {
-    'MBG': {
-        'title': 'Makan Bergizi Gratis (MBG)',
-        'agency': 'Badan Gizi Nasional (BGN)',
-        'handle': '@BadanGiziNasional',
-        'hashtag': '#MBG',
-        'keywords': ['mbg', 'mgb', 'makan bergizi', 'makan gratis', 'makan siang gratis', 'bgn', 'badan gizi', 'ompreng']
+    'Kementerian PU': {
+        'title': 'Kementerian Pekerjaan Umum (Kemen PU)',
+        'agency': 'Kementerian PU RI',
+        'handle': '@KemenPU',
+        'hashtag': '#KemenPU',
+        'keywords': ['kemenpu', 'kemen pu', 'kementerian pu', 'kementerian pekerjaan umum', 'pekerjaan umum', 'balai', 'satker', 'cipta karya', 'bina marga', 'sda']
     },
-    'Sekolah Rakyat': {
-        'title': 'Program Sekolah Rakyat',
-        'agency': 'Kementerian Sosial / Kemendikbud',
-        'handle': '@SekolahRakyat_RI',
-        'hashtag': '#SekolahRakyat',
-        'keywords': ['sekolah rakyat', 'program sekolah rakyat', 'sekolah gratis berasrama', 'sekolah dhuafa', 'putus sekolah', 'siswa sekolah rakyat']
+    'Menteri PU': {
+        'title': 'Menteri PU Ir. Dody Hanggodo',
+        'agency': 'Pimpinan Kementerian PU',
+        'handle': '@dodyhanggodo',
+        'hashtag': '#MenteriPU',
+        'keywords': ['menteri pu', 'dody hanggodo', 'menteri dody', 'pak menteri', 'menpu', 'dody']
     },
-    'KDMP': {
-        'title': 'Koperasi Desa Merah Putih (KDMP)',
-        'agency': 'Kementerian Koperasi (Kemenkop)',
-        'handle': '@Kemenkop_KDMP',
-        'hashtag': '#KDMP',
-        'keywords': ['kdmp', 'koperasi desa merah putih', 'koperasi desa', 'koperasi merah putih', 'kopdes', 'sembako desa']
+    'Jalan & Jembatan': {
+        'title': 'Preservasi Jalan & Jembatan Nasional',
+        'agency': 'Ditjen Bina Marga / BBPJN',
+        'handle': '@pu_binamarga',
+        'hashtag': '#InfrastrukturJalan',
+        'keywords': ['jalan nasional', 'jembatan', 'bbpjn', 'jalan rusak', 'aspal', 'jalan tol', 'longsor', 'jembatan gantung', 'ruas']
+    },
+    'Air Bersih & Irigasi': {
+        'title': 'Program Air Bersih, Irigasi & Bendungan',
+        'agency': 'Ditjen Sumber Daya Air (SDA) / BWS',
+        'handle': '@pu_sda',
+        'hashtag': '#AirUntukRakyat',
+        'keywords': ['air bersih', 'irigasi', 'bendungan', 'bws', 'spam', 'lumbung air', 'tanggul', 'krisis air', 'banjir bandang']
     }
 }
 
@@ -291,7 +298,7 @@ def detect_present_policies(text):
             found.append(policy)
     return found
 
-def detect_topic_from_text(text, fallback="MBG"):
+def detect_topic_from_text(text, fallback="Kementerian_PU"):
     """
     Mendeteksi topik kebijakan secara mandiri dari isi teks/opini
     agar visualisasi SNA, entitas, dan klaster opini sinkron dengan konten.
@@ -309,7 +316,7 @@ def decompose_targeted_policy_sentiment(text):
     """
     present_policies = detect_present_policies(text)
     if len(present_policies) <= 1:
-        single_topic = present_policies[0] if present_policies else 'MBG'
+        single_topic = present_policies[0] if present_policies else 'Kementerian PU'
         return {
             'is_multi_target': False,
             'primary_topic': single_topic,
@@ -685,7 +692,7 @@ def analyze_text_nlp(text):
 # ------------------------------------------------------------------------------
 # Pembangun Graf Relasi SNA Mikro
 # ------------------------------------------------------------------------------
-def build_micro_sna_graph(author, analysis, topic="MBG", df_corpus=None, targeted_decomp=None):
+def build_micro_sna_graph(author, analysis, topic="Kementerian_PU", df_corpus=None, targeted_decomp=None):
     """
     Membangun graf jaringan ego mikro berarah menghubungkan Penulis, Sentimen,
     Emosi, Akun Rujukan (@mentions), Tagar (#hashtags), dan Influencer Korpus.
@@ -760,51 +767,51 @@ def render_test_sentiment_page(df=None, selected_topic='Kementerian_PU', topic_l
         "Eksplorasi respons model Deep Learning IndoBERT terhadap opini publik warganet dan aduan kebijakan secara interaktif."
     )
 
-    fallback_topic = topic_label or selected_topic or "MBG"
+    fallback_topic = topic_label or selected_topic or "Kementerian_PU"
 
-    # Presets Kalimat Uji (Tanpa Emoji, Menggunakan Deskripsi Bersih)
+    # Presets Kalimat Uji Khusus Kementerian PU & Menteri PU (Tanpa Emoji, Bahasa Riil Warganet)
     PRESETS = {
-        "MBG Positif (Trust & Joy)": "Program Makan Bergizi Gratis (MBG) sangat membantu anak-anak di sekolah dasar mendapatkan nutrisi sehat dan berkualitas! Pedagang katering lokal juga ikut merasakan berkah dan untung @kemdikbud @bapanas #MBG2026 #GenerasiSehat",
-        "Aduan Negatif MBG (Anger & Disgust)": "Kecewa sekali dengan distribusi makanan MBG di sekolah kemarin! Makanan basi, jorok, dan ada anak yang mengeluh mual keracunan! Tolong jangan jadikan anggaran rakyat bancakan korupsi! @bpom_ri @dpr_ri #UsutTuntas",
-        "KDMP Antisipasi (Harapan Transparansi)": "Koperasi Desa Merah Putih (KDMP) punya prospek dan peluang besar menyejahterakan warga pelosok jika dikelola secara adil, jujur, dan transparan @kemenkopukm #KDMP2026",
-        "Sekolah Rakyat Kritis (Perlindungan Sosial)": "Sekolah Rakyat harus dipastikan tepat sasaran bagi anak putus sekolah dan kaum dhuafa, jangan sampai implementasi di lapangan tidak merata dan terhambat pungli @kemensos #PendidikanAdil",
-        "Komparasi Kebijakan (MBG vs SR)": "wah gila BGN kerjanya ga becus sampe saat ini masih banyak banget kasus keracunan dari pada buat MBG, mending uangnya buat Sekolah Rakyat lebih bermanfaat buat mereka yang mau belajar dari pada ngeracunin anak mending mencerdaskan anak"
+        "Jalan & Jembatan Positif (Trust & Joy)": "Apresiasi respon cepat Kementerian PU dan BBPJN yang telah menyelesaikan preservasi jalan nasional dan jembatan gantung di wilayah kami. Distribusi logistik dan hasil tani kini lancar dan nyaman @KemenPU #KemenPU2026 #KonektivitasRakyat",
+        "Aduan Korupsi & Satker Negatif (Anger & Disgust)": "KPK harus segera periksa oknum pejabat Satker dan pengawas proyek jalan! Proyek belum setahun sudah rusak parah dan berlubang! Jangan jadikan anggaran pembangunan rakyat bancakan korupsi! @KemenPU @KPK_RI #UsutTuntas #JalanRusak",
+        "Air Bersih & Irigasi (Anticipation & Harapan)": "Kementerian PU melalui Ditjen SDA diharapkan mempercepat penyelesaian proyek SPAM air bersih dan jaringan irigasi bendungan agar warga desa tidak lagi kesulitan saat musim kemarau @KemenPU @pu_sda #AirBersihUntukRakyat",
+        "Tanggap Bencana Aceh (Responsif & Mitigasi)": "Bencana banjir bandang dan longsor putuskan akses transportasi jalan nasional Aceh. Balai Kementerian PU segera turunkan alat berat dan pompa darurat untuk buka konektivitas jalan warga @KemenPU #BencanaAceh #SigapMembangun",
+        "Komparasi Proyek (Jalan Tol vs Satker Daerah)": "Pembangunan jalan tol dan bendungan oleh Kementerian PU memang sangat membantu konektivitas, tapi tolong pengawasan proyek jalan daerah di level Satker diperketat agar tidak ada lagi ruas mangkrak dan kualitas aspal buruk."
     }
 
-    # Session State Initialization
-    if 'test_input_text' not in st.session_state:
-        st.session_state.test_input_text = PRESETS["MBG Positif (Trust & Joy)"]
-    if 'test_author_handle' not in st.session_state:
-        st.session_state.test_author_handle = "warganet_aktif"
+    # Session State Initialization (Auto-Migrate dari preset lawas ke Kementerian PU)
+    if 'test_input_text' not in st.session_state or "makan bergizi" in str(st.session_state.test_input_text).lower() or "mbg" in str(st.session_state.test_input_text).lower():
+        st.session_state.test_input_text = PRESETS["Jalan & Jembatan Positif (Trust & Joy)"]
+    if 'test_author_handle' not in st.session_state or st.session_state.test_author_handle in ["orangtua_siswa", "warganet_aktif"]:
+        st.session_state.test_author_handle = "warga_peduli_pu"
 
     # Container Card Input
     with st.container(border=True):
-        st.markdown("<div style='font-size:12px; font-weight:700; color:#0F2942; margin-bottom:6px;'>PILIH CONTOH CEPAT (PRESET):</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size:12px; font-weight:700; color:#0F2942; margin-bottom:6px;'>PILIH CONTOH CEPAT (PRESET KEMENTERIAN PU):</div>", unsafe_allow_html=True)
         col_p1, col_p2, col_p3, col_p4, col_p5 = st.columns(5)
         with col_p1:
-            if st.button("MBG Positif", use_container_width=True, help="Uji opini positif MBG"):
-                st.session_state.test_input_text = PRESETS["MBG Positif (Trust & Joy)"]
-                st.session_state.test_author_handle = "orangtua_siswa"
+            if st.button("Jalan Positif", use_container_width=True, help="Uji opini positif preservasi jalan"):
+                st.session_state.test_input_text = PRESETS["Jalan & Jembatan Positif (Trust & Joy)"]
+                st.session_state.test_author_handle = "warga_transportasi"
                 st.rerun()
         with col_p2:
-            if st.button("Aduan Negatif", use_container_width=True, help="Uji aduan negatif / keracunan"):
-                st.session_state.test_input_text = PRESETS["Aduan Negatif MBG (Anger & Disgust)"]
+            if st.button("Aduan Korupsi", use_container_width=True, help="Uji aduan kritik / dugaan korupsi & satker"):
+                st.session_state.test_input_text = PRESETS["Aduan Korupsi & Satker Negatif (Anger & Disgust)"]
                 st.session_state.test_author_handle = "warga_kritis"
                 st.rerun()
         with col_p3:
-            if st.button("Antisipasi KDMP", use_container_width=True, help="Uji sentimen harapan KDMP"):
-                st.session_state.test_input_text = PRESETS["KDMP Antisipasi (Harapan Transparansi)"]
-                st.session_state.test_author_handle = "tokoh_desa"
+            if st.button("Air Bersih", use_container_width=True, help="Uji sentimen harapan pasokan air & irigasi"):
+                st.session_state.test_input_text = PRESETS["Air Bersih & Irigasi (Anticipation & Harapan)"]
+                st.session_state.test_author_handle = "kelompok_tani"
                 st.rerun()
         with col_p4:
-            if st.button("Sekolah Rakyat", use_container_width=True, help="Uji evaluasi Sekolah Rakyat"):
-                st.session_state.test_input_text = PRESETS["Sekolah Rakyat Kritis (Perlindungan Sosial)"]
-                st.session_state.test_author_handle = "relawan_pendidikan"
+            if st.button("Tanggap Bencana", use_container_width=True, help="Uji respon darurat banjir / longsor"):
+                st.session_state.test_input_text = PRESETS["Tanggap Bencana Aceh (Responsif & Mitigasi)"]
+                st.session_state.test_author_handle = "relawan_bencana"
                 st.rerun()
         with col_p5:
-            if st.button("Komparasi Isu", use_container_width=True, help="Uji dekomposisi opini multitarget (MBG vs Sekolah Rakyat)"):
-                st.session_state.test_input_text = PRESETS["Komparasi Kebijakan (MBG vs SR)"]
-                st.session_state.test_author_handle = "analis_kebijakan"
+            if st.button("Komparasi Proyek", use_container_width=True, help="Uji dekomposisi opini multitarget (Tol vs Satker)"):
+                st.session_state.test_input_text = PRESETS["Komparasi Proyek (Jalan Tol vs Satker Daerah)"]
+                st.session_state.test_author_handle = "analis_infrastruktur"
                 st.rerun()
 
         c_author, c_text = st.columns([1.2, 3.8])
@@ -1029,11 +1036,12 @@ def render_test_sentiment_page(df=None, selected_topic='Kementerian_PU', topic_l
                 
                 # Distinct Policy Palette: tiap kebijakan memiliki palet warna identitas khusus agar tidak tercampur merah/hijau seragam
                 POLICY_CHART_COLORS = {
-                    'MBG': '#2563EB',             # Royal Blue
-                    'Sekolah Rakyat': '#059669',    # Emerald Green
-                    'KDMP': '#D97706'              # Amber Gold
+                    'Kementerian PU': '#0284C7',     # Biru Kementerian PU
+                    'Menteri PU': '#10B981',         # Emerald Green
+                    'Jalan & Jembatan': '#D97706',   # Amber
+                    'Air Bersih & Irigasi': '#06B6D4' # Cyan
                 }
-                DEFAULT_PALETTE = ['#2563EB', '#059669', '#D97706', '#7C3AED', '#DB2777', '#0891B2']
+                DEFAULT_PALETTE = ['#0284C7', '#10B981', '#D97706', '#06B6D4', '#7C3AED', '#DB2777']
                 
                 # Tentukan kategori emosi terpadu (shared categories) across all policies
                 # Ambil 5 emosi dengan nilai puncak tertinggi dari salah satu kebijakan
