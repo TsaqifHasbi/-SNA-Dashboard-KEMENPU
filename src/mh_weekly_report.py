@@ -1933,34 +1933,281 @@ Konteks Penanganan Pihak Lain (14-16 Nov)
 # SLIDE 13: KESEREMPAKAN & UJI ORGANIK
 # ==============================================================================
 def render_slide_13_bot_organic_audit(df, selected_topic='Semua', topic_label=None, **kwargs):
+    import datetime
+    import re
+    from collections import Counter
     m = _get_slide_metrics(df, selected_topic, topic_label)
+    
+    # Deteksi rentang tanggal aktif
+    id_m = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'Mei', 6: 'Jun', 7: 'Jul', 8: 'Agu', 9: 'Sep', 10: 'Okt', 11: 'Nov', 12: 'Des'}
+    valid_dates = sorted(df['date'].dropna().dt.date.unique()) if ('date' in df.columns and len(df) > 0) else []
+    
+    start_d = valid_dates[0] if valid_dates else datetime.date(2026, 11, 9)
+    end_d = valid_dates[-1] if valid_dates else datetime.date(2026, 11, 15)
+    start_str = f"{start_d.day:02d} {id_m.get(start_d.month, start_d.strftime('%b'))}"
+    end_str = f"{end_d.day:02d} {id_m.get(end_d.month, end_d.strftime('%b'))} {end_d.year}"
+    
+    clean_texts = df['raw_content'].astype(str).str.strip().str.replace(r'\s+', ' ', regex=True) if 'raw_content' in df.columns else pd.Series(dtype=str)
+    dup_counts = clean_texts.value_counts() if len(clean_texts) > 0 else pd.Series(dtype=int)
+    
+    patterns = []
+    used_texts = set()
+    
+    # 1. SERANG / KRITIK Negatif Duplikat / Amplifikasi
+    neg_mask = (df['sentiment_name'] == 'Negatif') if 'sentiment_name' in df.columns else pd.Series(False, index=df.index)
+    neg_dups = clean_texts[neg_mask].value_counts() if len(clean_texts) > 0 else pd.Series(dtype=int)
+    neg_dups_gte2 = neg_dups[neg_dups >= 2]
+    
+    if len(neg_dups_gte2) > 0:
+        top_neg_text = neg_dups_gte2.index[0]
+        used_texts.add(top_neg_text)
+        cnt = int(neg_dups_gte2.iloc[0])
+        sub = df[clean_texts == top_neg_text]
+        n_authors = sub['author'].nunique() if 'author' in sub.columns else 1
+        plats = "/".join(sub['platform'].unique()) if 'platform' in sub.columns else 'Multiplatform'
+        zero_eng = int((sub['total_engagement'] == 0).sum()) if 'total_engagement' in sub.columns else 0
+        dates = pd.to_datetime(sub['date']).dt.strftime('%d %b').unique() if 'date' in sub.columns else []
+        d_str = ", ".join(dates[:2]) if len(dates) > 0 else end_str
+        
+        is_attack = any(w in top_neg_text.lower() for w in ['korupsi', 'suap', 'ott', 'kpk', 'hina', 'tersangka', 'nepotisme', 'sidang', 'tolak'])
+        is_coord = n_authors > 1 and (zero_eng >= cnt * 0.4)
+        
+        arah = "SERANG" if is_attack else "KRITIK"
+        penilaian = "Terkoordinasi; sasaran pimpinan/satker" if is_coord else "Kritik berulang; amplifikasi isu lapangan"
+        color = "#EF4444" if arah == "SERANG" else "#F59E0B"
+        
+        snippet = top_neg_text[:38].replace('"', '') + ("..." if len(top_neg_text) > 38 else "")
+        patterns.append({
+            'arah': arah,
+            'pola': f'"{snippet}" ({plats})',
+            'ukuran': f"{cnt} sebutan dari {n_authors} akun, {d_str}; {zero_eng} tanpa interaksi",
+            'penilaian': penilaian,
+            'color': color,
+            'is_coord': is_coord,
+            'is_attack': is_attack,
+            'zero_eng': zero_eng,
+            'priority': 1 if arah == 'SERANG' else 2
+        })
+    elif len(df[neg_mask]) > 0:
+        sub_neg = df[neg_mask]
+        cnt = len(sub_neg)
+        n_authors = sub_neg['author'].nunique() if 'author' in sub_neg.columns else 0
+        patterns.append({
+            'arah': 'KRITIK',
+            'pola': 'Keluhan & aduan preservasi infrastruktur daerah',
+            'ukuran': f"{cnt} sebutan dari {n_authors} akun warganet lintas platform",
+            'penilaian': 'Aspirasi & keluhan warga organik',
+            'color': '#F59E0B',
+            'is_coord': False,
+            'is_attack': False,
+            'zero_eng': 0,
+            'priority': 2
+        })
+
+    # 2. KRITIK: Berita Sindikasi KPK / Isu Sensitif
+    news_mask = (df['platform'] == 'News') if 'platform' in df.columns else pd.Series(False, index=df.index)
+    news_dups = clean_texts[news_mask].value_counts() if len(clean_texts) > 0 else pd.Series(dtype=int)
+    news_gte2 = [t for t in news_dups.index if news_dups[t] >= 2 and t not in used_texts]
+    
+    sensitive_news = [t for t in news_gte2 if re.search(r'\b(?:kpk|suap|anggaran|nepotisme|wamen|geledah|menteri|potong|ott|sidik|kasus)\b', t, re.I)]
+    if sensitive_news:
+        top_sens_text = sensitive_news[0]
+        used_texts.add(top_sens_text)
+        cnt = int(news_dups[top_sens_text])
+        sub = df[clean_texts == top_sens_text]
+        n_portals = sub['author'].nunique() if 'author' in sub.columns else 1
+        d_str = pd.to_datetime(sub['date']).dt.strftime('%d %b').iloc[0] if (len(sub) > 0 and 'date' in sub.columns) else end_str
+        snippet = top_sens_text[:38].replace('"', '') + ("..." if len(top_sens_text) > 38 else "")
+        patterns.append({
+            'arah': 'KRITIK',
+            'pola': f'Kabar Media: "{snippet}"',
+            'ukuran': f"{cnt} berita di {n_portals} portal, {d_str}",
+            'penilaian': 'Siklus berita media massa organik',
+            'color': '#F59E0B',
+            'is_coord': False,
+            'is_attack': False,
+            'zero_eng': 0,
+            'priority': 2
+        })
+    elif news_gte2:
+        top_news_text = news_gte2[0]
+        used_texts.add(top_news_text)
+        cnt = int(news_dups[top_news_text])
+        sub = df[clean_texts == top_news_text]
+        n_portals = sub['author'].nunique() if 'author' in sub.columns else 1
+        d_str = pd.to_datetime(sub['date']).dt.strftime('%d %b').iloc[0] if (len(sub) > 0 and 'date' in sub.columns) else end_str
+        snippet = top_news_text[:38].replace('"', '') + ("..." if len(top_news_text) > 38 else "")
+        patterns.append({
+            'arah': 'NETRAL',
+            'pola': f'Sindikasi Berita: "{snippet}"',
+            'ukuran': f"{cnt} berita di {n_portals} portal media, {d_str}",
+            'penilaian': 'Sindikasi berita media daring',
+            'color': '#2563EB',
+            'is_coord': False,
+            'is_attack': False,
+            'zero_eng': 0,
+            'priority': 4
+        })
+
+    # 3. KRITIK / NETRAL: Salinan Narasi Medsos (Threads / X / TikTok)
+    social_mask = (df['platform'].isin(['Threads', 'Twitter', 'TikTok', 'Instagram'])) if 'platform' in df.columns else pd.Series(True, index=df.index)
+    social_dups = clean_texts[social_mask].value_counts() if len(clean_texts) > 0 else pd.Series(dtype=int)
+    social_gte2 = [t for t in social_dups.index if social_dups[t] >= 2 and 'tol gedebage' not in t.lower() and t not in used_texts]
+    
+    if social_gte2:
+        top_soc_text = social_gte2[0]
+        used_texts.add(top_soc_text)
+        cnt = int(social_dups[top_soc_text])
+        sub = df[clean_texts == top_soc_text]
+        n_authors = sub['author'].nunique() if 'author' in sub.columns else 1
+        plats = "/".join(sub['platform'].unique()) if 'platform' in sub.columns else 'Medsos'
+        tot_reach = sub['views'].sum() if 'views' in sub.columns else sub['total_engagement'].sum()
+        d_str = pd.to_datetime(sub['date']).dt.strftime('%d %b').iloc[0] if (len(sub) > 0 and 'date' in sub.columns) else end_str
+        snippet = top_soc_text[:36].replace('"', '') + ("..." if len(top_soc_text) > 36 else "")
+        
+        is_coord = n_authors > 2
+        penilaian = "Kopas narasi; terkoordinasi" if is_coord else "Salin narasi warganet; skala kecil"
+        sent_mode = sub['sentiment_name'].mode()[0] if ('sentiment_name' in sub.columns and len(sub['sentiment_name']) > 0) else 'Netral'
+        arah = 'KRITIK' if sent_mode == 'Negatif' else ('DUKUNG' if sent_mode == 'Positif' else 'NETRAL')
+        color = '#F59E0B' if arah == 'KRITIK' else ('#10B981' if arah == 'DUKUNG' else '#64748B')
+        
+        patterns.append({
+            'arah': arah,
+            'pola': f'"{snippet}" ({plats})',
+            'ukuran': f"{cnt} salinan dari {n_authors} akun; ~{int(tot_reach):,} tayang ({d_str})",
+            'penilaian': penilaian,
+            'color': color,
+            'is_coord': is_coord,
+            'is_attack': False,
+            'zero_eng': int((sub['total_engagement'] == 0).sum()) if 'total_engagement' in sub.columns else 0,
+            'priority': 3 if arah == 'KRITIK' else (5 if arah == 'DUKUNG' else 6)
+        })
+
+    # 4. DUKUNG: Tagar Kampanye / Koordinasi Internal Humas
+    hashtags = []
+    if 'raw_content' in df.columns:
+        for t in df['raw_content'].dropna():
+            tags = re.findall(r'#(\w+)', str(t))
+            hashtags.extend([tag.lower() for tag in tags])
+    
+    tag_counter = Counter(hashtags)
+    inst_tags = ['pu608', 'sigapmembangunnegeriuntukrakyat', '2tahungeraknyata', 'kemenpu', 'mengelolaairuntuknegeri', '1ck1']
+    target_tag = None
+    for t_name, count in tag_counter.most_common(10):
+        if t_name in inst_tags:
+            target_tag = (t_name, count)
+            break
+    if not target_tag and tag_counter:
+        target_tag = tag_counter.most_common(1)[0]
+        
+    if target_tag:
+        t_name, t_cnt = target_tag
+        sub_tag = df[df['raw_content'].str.contains(f"#{t_name}", case=False, na=False)]
+        n_tag_authors = sub_tag['author'].nunique() if 'author' in sub_tag.columns else 1
+        zero_tag_eng = int((sub_tag['total_engagement'] == 0).sum()) if 'total_engagement' in sub_tag.columns else 0
+        patterns.append({
+            'arah': 'DUKUNG',
+            'pola': f'Tagar Kampanye #{t_name.upper()}',
+            'ukuran': f"{t_cnt} unggahan; {n_tag_authors} akun; {zero_tag_eng} tanpa interaksi",
+            'penilaian': 'Terkoordinasi internal; jaga',
+            'color': '#10B981',
+            'is_coord': True,
+            'is_attack': False,
+            'zero_eng': zero_tag_eng,
+            'priority': 4
+        })
+
+    # 5. NETRAL / BOT: Bot Layanan Publik / Otomatis
+    bot_candidates = [t for t in dup_counts.index if ('tol' in t.lower() or 'gedebage' in t.lower() or 'cuaca' in t.lower() or 'debit' in t.lower() or 'fungsional' in t.lower()) and t not in used_texts]
+    if bot_candidates:
+        top_bot_text = bot_candidates[0]
+        used_texts.add(top_bot_text)
+        cnt = int(dup_counts[top_bot_text])
+        sub = df[clean_texts == top_bot_text]
+        n_authors = sub['author'].nunique() if 'author' in sub.columns else 1
+        plats = "/".join(sub['platform'].unique()) if 'platform' in sub.columns else 'Twitter'
+        zero_eng = int((sub['total_engagement'] == 0).sum()) if 'total_engagement' in sub.columns else 0
+        snippet = top_bot_text[:38].replace('"', '') + ("..." if len(top_bot_text) > 38 else "")
+        patterns.append({
+            'arah': 'NETRAL',
+            'pola': f'Sindikasi Informasi: "{snippet}" ({plats})',
+            'ukuran': f"{cnt} sebutan dari {n_authors} akun; {zero_eng} tanpa interaksi",
+            'penilaian': 'Bot informasi berkala; wajar',
+            'color': '#64748B',
+            'is_coord': True,
+            'is_attack': False,
+            'zero_eng': zero_eng,
+            'priority': 7
+        })
+
+    # 6. DUKUNG: Sindikasi Capaian Kinerja / Rilis Positif
+    pos_mask = (df['sentiment_name'] == 'Positif') if 'sentiment_name' in df.columns else pd.Series(False, index=df.index)
+    pos_dups = clean_texts[pos_mask].value_counts() if len(clean_texts) > 0 else pd.Series(dtype=int)
+    pos_gte2 = [t for t in pos_dups.index if pos_dups[t] >= 2 and t not in used_texts]
+    if pos_gte2:
+        top_pos_text = pos_gte2[0]
+        used_texts.add(top_pos_text)
+        cnt = int(pos_dups[top_pos_text])
+        sub = df[clean_texts == top_pos_text]
+        n_authors = sub['author'].nunique() if 'author' in sub.columns else 1
+        plats = "/".join(sub['platform'].unique()) if 'platform' in sub.columns else 'Multiplatform'
+        snippet = top_pos_text[:38].replace('"', '') + ("..." if len(top_pos_text) > 38 else "")
+        patterns.append({
+            'arah': 'DUKUNG',
+            'pola': f'Publikasi Capaian: "{snippet}"',
+            'ukuran': f"{cnt} publikasi di {n_authors} kanal/akun ({plats})",
+            'penilaian': 'Amplifikasi kinerja balai; wajar',
+            'color': '#10B981',
+            'is_coord': n_authors > 1,
+            'is_attack': False,
+            'zero_eng': int((sub['total_engagement'] == 0).sum()) if 'total_engagement' in sub.columns else 0,
+            'priority': 5
+        })
+
+    # Urutkan pola berdasarkan risiko prioritas (SERANG -> KRITIK -> DUKUNG -> NETRAL)
+    patterns.sort(key=lambda x: x['priority'])
+    
+    # Hitung KPI
+    total_patterns_tested = len(patterns)
+    total_coordinated = sum(1 for p in patterns if p['is_coord'])
+    total_attacks = sum(1 for p in patterns if p['is_attack'])
+    total_zero_eng_accounts = sum(p['zero_eng'] for p in patterns)
+    
+    # Hitung portal berita
+    portal_count = df[df['platform'] == 'News']['author'].nunique() if 'platform' in df.columns else 0
+    portal_news_count = len(df[df['platform'] == 'News']) if 'platform' in df.columns else 0
+    
     render_mh_top_bar(slide_num=13)
+    
+    if total_attacks > 0:
+        sub_title = f"{total_attacks} pola serangan & {total_coordinated} amplifikasi terkoordinasi terdeteksi"
+    elif total_coordinated > 0:
+        sub_title = f"{total_coordinated} amplifikasi terkoordinasi; didominasi tagar internal & sindikasi"
+    else:
+        sub_title = "Percakapan organik dominan; tidak terdeteksi anomali serempak terkoordinasi"
+        
     render_mh_title(
         "Keserempakan & Uji Organik",
-        "Satu amplifikasi terkoordinasi; sasaran pejabat daerah",
-        "Pemantau Echo 279 (penjelajah, judul berita, tagar), 9-15 Nov. Pengukuran untuk periksa ke dalam, bukan tindakan."
+        sub_title,
+        f"Audit anomali keserempakan teks kembar, tagar serentak, dan sindikasi rilis media ({start_str} - {end_str}). Pengukuran untuk evaluasi integritas percakapan publik."
     )
     
     chips = [
-        {"label": "Pola Diuji", "val": "6", "sub": "sepekan", "dot": "#2563EB"},
-        {"label": "Terkoordinasi", "val": "2", "sub": "RT seragam, tagar internal", "dot": "#F59E0B"},
-        {"label": "Serangan ke PU", "val": "0", "sub": "langsung; satker terseret", "dot": "#10B981"},
-        {"label": "RT Seragam", "val": "59", "sub": "akun, 0 interaksi", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "Portal Geledah", "val": "40", "sub": "portal, 56 berita", "dot": "#64748B"}
+        {"label": "Pola Diuji", "val": f"{total_patterns_tested}", "sub": f"rentang {start_str} - {end_str}", "dot": "#2563EB"},
+        {"label": "Terkoordinasi", "val": f"{total_coordinated}", "sub": "amplifikasi & tagar internal", "dot": "#F59E0B"},
+        {"label": "Serangan ke PU", "val": f"{total_attacks}", "sub": "langsung; satker terseret" if total_attacks == 0 else "terdeteksi menyasar PU", "dot": "#10B981" if total_attacks == 0 else "#EF4444", "val_color": "#EF4444" if total_attacks > 0 else None},
+        {"label": "RT/Teks Seragam", "val": f"{total_zero_eng_accounts:,}", "sub": "unggahan 0 interaksi", "dot": "#EF4444", "val_color": "#EF4444"},
+        {"label": "Portal Berita", "val": f"{portal_count:,}", "sub": f"portal, {portal_news_count:,} berita", "dot": "#64748B"}
     ]
     render_kpi_chips(chips)
     
-    audit_data = [
-        ("SERANG", "RT \"fakta sidang\" Rp165 M (X)", "59 RT dari 59 akun, 13 Nov 02.18-23.22; 0 interaksi", "Terkoordinasi; sasaran pejabat daerah", "#EF4444"),
-        ("KRITIK", "Kabar geledah KPK (berita)", "56 berita di 40 portal, 11 Nov", "Siklus berita organik", "#F59E0B"),
-        ("KRITIK", "Narasi nepotisme di Threads", "2 salinan; 931 dan 1.187 tayang (13 Nov)", "Salin narasi; kecil", "#F59E0B"),
-        ("DUKUNG", "Tagar #PU608", "76 unggahan; 42 akun; 43 tanpa interaksi", "Terkoordinasi internal; jaga", "#10B981"),
-        ("KRITIK", "\"Pegawai PU konslet\" (X)", "2 salinan + 2 tagar; ≤17 tayang", "Organik; satu sumber", "#64748B"),
-        ("NETRAL", "Sindikasi tol fungsional Nataru", "91 sebutan di 45 portal; 9 dan 14 Nov", "Sindikasi rilis; wajar", "#2563EB")
-    ]
-    
     rows = []
-    for arah, pola, ukur, nilai, col in audit_data:
+    for p in patterns:
+        col = p['color']
+        arah = p['arah']
+        pola = p['pola']
+        ukur = p['ukuran']
+        nilai = p['penilaian']
         arah_badge = f"""<span style="background:{col}15; color:{col}; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; border:1px solid {col}30;">{arah}</span>"""
         rows.append(f"""<tr style="border-bottom:1px solid #F1F5F9;">
 <td style="width:75px; padding:6px 4px;">{arah_badge}</td>
@@ -1968,6 +2215,9 @@ def render_slide_13_bot_organic_audit(df, selected_topic='Semua', topic_label=No
 <td style="color:#64748B; font-size:10.5px; padding:6px 4px;">{ukur}</td>
 <td style="padding:6px 4px;">{nilai}</td>
 </tr>""")
+
+    if not rows:
+        rows.append("""<tr><td colspan="4" style="text-align:center; padding:15px; color:#94A3B8;">Tidak ada anomali keserempakan signifikan terdeteksi pada dataset aktif.</td></tr>""")
 
     tbl_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
@@ -1990,8 +2240,13 @@ Pola Serempak - Urut dari Risiko
 </div>"""
     render_html(tbl_html)
     
-    render_callout_target("Satu-satunya amplifikasi luar pekan ini menyasar pejabat daerah dan menyeret satker PU; dukungan terkoordinasi tetap dari tagar internal.")
-    render_mh_footer("Edisi Mingguan 9-15 Nov 2026 Sumber: Pemantau Echo 279, 9-15 Nov: penjelajah (teks kembar, tagar, jam WIB, interaksi, pengikut), judul berita lintas portal.")
+    if total_attacks > 0:
+        callout_txt = f"Hasil Audit Keserempakan: Terdeteksi {total_attacks} indikasi serangan terkoordinasi di samping {total_coordinated} pola amplifikasi internal. Mitigasi komunikasi satu pintu dan monitoring siber perlu ditingkatkan."
+    else:
+        callout_txt = f"Hasil Audit Keserempakan: Tidak terdeteksi serangan terkoordinasi langsung ke Kementerian PU ({total_attacks} serangan). Terpantau {total_coordinated} pola amplifikasi didominasi oleh kampanye tagar internal ({target_tag[0] if target_tag else 'humas'}) dan bot informasi layanan berkala."
+        
+    render_callout_target(callout_txt)
+    render_mh_footer(f"Edisi Analisis Keserempakan ({start_str} - {end_str}) | Sumber: Audit keserempakan multiplatform (teks kembar, tagar serentak, metrik interaksi, dan sindikasi portal media daring).")
 
 
 # ==============================================================================
