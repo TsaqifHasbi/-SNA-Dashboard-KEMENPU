@@ -592,6 +592,14 @@ if "Format Laporan Harian" in view_mode or "Laporan Harian" in view_mode or "Sli
     s11_label = f"Slide 11: Sorotan Khusus - {top3_dynamic[1]['name']}" if len(top3_dynamic) > 1 else "Slide 11: Sorotan Khusus II"
     s12_label = f"Slide 12: Sorotan Khusus - {top3_dynamic[2]['name']}" if len(top3_dynamic) > 2 else "Slide 12: Sorotan Khusus III"
 
+    # Penamaan Dinamis Laporan Harian Bab 3
+    _id_m = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'Mei', 6: 'Jun', 7: 'Jul', 8: 'Agu', 9: 'Sep', 10: 'Okt', 11: 'Nov', 12: 'Des'}
+    _valid_d = sorted(df_filtered['date'].dropna().dt.date.unique()) if ('date' in df_filtered.columns and len(df_filtered) > 0) else []
+    _d16_lbl = f"{_valid_d[-2].day:02d} {_id_m.get(_valid_d[-2].month, '')}" if len(_valid_d) >= 2 else (f"{_valid_d[-1].day:02d} {_id_m.get(_valid_d[-1].month, '')}" if len(_valid_d) == 1 else "15 Nov")
+    _d17_lbl = f"{_valid_d[-1].day:02d} {_id_m.get(_valid_d[-1].month, '')}" if len(_valid_d) >= 1 else "16 Nov"
+    s16_label = f"Slide 16: Laporan Harian ({_d16_lbl})"
+    s17_label = f"Slide 17: Laporan Harian Terkini ({_d17_lbl})"
+
     MH_CHAPTERS = {
         "Ringkasan Eksekutif": {
             "Slide 1: Cover Laporan Eksekutif": render_slide_1_cover,
@@ -618,8 +626,8 @@ if "Format Laporan Harian" in view_mode or "Laporan Harian" in view_mode or "Sli
         },
         "Bab 3: Tindakan Strategis (The Action)": {
             "Slide 15: Pembuka Bab 3 (The Action)": render_slide_15_chapter_3,
-            "Slide 16: Laporan Harian 15 November": render_slide_16_daily_nov15,
-            "Slide 17: Laporan Harian 16 November": render_slide_17_daily_nov16,
+            s16_label: render_slide_16_daily_nov15,
+            s17_label: render_slide_17_daily_nov16,
             "Slide 18: Daftar Pantau Sepekan": render_slide_18_watch_list,
             "Slide 19: Prioritas Tindakan & Metodologi": render_slide_19_priorities_methodology,
             "Slide 20: Catatan Metodologi: Perubahan Skema Sentimen": render_slide_20_methodology_sentiment_shift,
