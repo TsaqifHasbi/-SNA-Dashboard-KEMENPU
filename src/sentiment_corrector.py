@@ -324,12 +324,15 @@ def correct_sentiment(text, current_sentiment, current_score=0.0):
     if is_domestic and not _has_profanity(text_lower) and not has_disaster_casualty:
         return 'Netral', 1, 0.0, domestic_reason
 
-    # 0c. CEK ASPIRASI & TUNTUTAN KONSTRUKTIF WARGA (CITIZEN DEMAND / REQUEST)
+    # 0c. CEK ASPIRASI, PENCEGAHAN & TUNTUTAN KONSTRUKTIF WARGA (CITIZEN DEMAND / PREVENTATIVE CONTEXT)
     # Contoh: "diharapkan mempercepat penyelesaian proyek agar warga tidak lagi kesulitan",
+    #         "tolong pengawasan proyek jalan daerah di level Satker diperketat agar tidak ada lagi ruas mangkrak",
     #         "mohon segera selesaikan perbaikan jalan agar tidak ada korban"
-    # Kalimat ini adalah tuntutan / desakan aspiratif masyarakat, bukan pujian kepuasan!
+    # Kalimat ini adalah klausa antisipatif/pencegahan & rekomendasi tata kelola, bukan sentimen permusuhan negatif!
     DEMAND_PATTERNS = [
-        r'\b(?:diharapkan|dimohon|mohon|tolong|minta|menuntut|harus\s+segera|perlu\s+segera|segera|mendesak)\s+(?:mempercepat|diselesaikan|diperbaiki|dibangun|menuntaskan|turunkan|tuntaskan|selesaikan|percepat)\b',
+        r'\b(?:tolong|mohon|harap|diharapkan|dimohon|perlu|harus|minta|menuntut|mendesak)\s+(?:pengawasan|diperketat|perketat|diawasi|mempercepat|percepat|diselesaikan|diperbaiki|dibangun|menuntaskan|turunkan|tuntaskan|selesaikan|dibenahi|benahi|evaluasi)\b',
+        r'\bpengawasan\s+.*?(?:diperketat|diperkuat|ditingkatkan)\b',
+        r'\b(?:agar|supaya|biar|jangan\s+sampai)\s+(?:tidak|tak|gak|nggak|jangan)\s+(?:ada|terjadi|lagi|kesulitan|kekurangan|krisis|kebanjiran|menderita|terisolir|rugi|mangkrak|rusak|korban|terbengkalai)\b',
         r'\bagar\s+(?:warga|rakyat|petani|masyarakat|anak).*?(?:tidak\s+lagi\s+(?:kesulitan|kekurangan|krisis|kebanjiran|menderita|terisolir|rugi)|bisa\s+segera)\b',
         r'\b(?:kapan|kok\s+belum|kapan\s+selesai|jangan\s+ditunda|jangan\s+lambat)\b'
     ]
@@ -587,6 +590,12 @@ def align_emotion_valence_9class(text, predicted_sentiment, raw_emotion):
         return raw_emo
         
     # 3. Valensi Netral / Faktual
+    if sent == 'Netral':
+        # Deteksi emosi Anticipation pada teks aspirasi, desakan pengawasan, dan klausul pencegahan risiko ("agar tidak...")
+        preventative_words = ['agar tidak', 'agar tak', 'supaya tidak', 'jangan sampai', 'diperketat', 'pengawasan', 'antisipasi', 'mitigasi', 'harapan', 'diharapkan', 'tolong', 'mohon', 'minta', 'ke depan']
+        if any(w in text_l for w in preventative_words):
+            return 'Anticipation'
+
     # Koreksi false-positive Joy jika teks memuat indikasi bahaya, keracunan, penipuan, atau kritik
     if raw_emo == 'Joy':
         if any(w in text_l for w in ['keracunan', 'racun', 'korban', 'diare', 'mati', 'ga becus', 'gak becus', 'tidak becus', 'basi', 'busuk', 'bancakan', 'korupsi', 'sia-sia']):

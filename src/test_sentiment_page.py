@@ -5,9 +5,12 @@
 
 import re
 import os
+# pyrefly: ignore [missing-import]
 import streamlit as st
 import pandas as pd
+# pyrefly: ignore [missing-import]
 import numpy as np
+# pyrefly: ignore [missing-import]
 import plotly.graph_objects as go
 import networkx as nx
 
@@ -22,6 +25,7 @@ from src.mh_style import (
 from src.sna_engine import SENTIMENT_COLORS, EMOTION_COLORS, generate_pyvis_html
 from src.sentiment_corrector import SARCASM_PATTERNS, correct_sentiment, align_emotion_valence_9class
 from src.indobert_engine import predict_real_indobert
+# pyrefly: ignore [missing-import]
 import streamlit.components.v1 as components_v1
 
 # ------------------------------------------------------------------------------
