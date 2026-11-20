@@ -1998,74 +1998,202 @@ Pola Serempak - Urut dari Risiko
 # SLIDE 14: REKOMENDASI INTELIJEN - PROYEKSI 7 HARI
 # ==============================================================================
 def render_slide_14_intelligence_projections(df, selected_topic='Semua', topic_label=None, **kwargs):
+    import datetime
     m = _get_slide_metrics(df, selected_topic, topic_label)
+    
+    # Deteksi rentang tanggal aktif dan 1-3 hari terakhir untuk deteksi anomali lonjakan
+    id_m = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'Mei', 6: 'Jun', 7: 'Jul', 8: 'Agu', 9: 'Sep', 10: 'Okt', 11: 'Nov', 12: 'Des'}
+    valid_dates = sorted(df['date'].dropna().dt.date.unique()) if ('date' in df.columns and len(df) > 0) else []
+    
+    if len(valid_dates) >= 6:
+        last_3 = valid_dates[-3:]
+        prior_3 = valid_dates[-6:-3]
+        end_date = valid_dates[-1]
+    elif len(valid_dates) >= 2:
+        mid = len(valid_dates) // 2
+        prior_3 = valid_dates[:mid]
+        last_3 = valid_dates[mid:]
+        end_date = valid_dates[-1]
+    elif len(valid_dates) == 1:
+        last_3 = valid_dates
+        prior_3 = valid_dates
+        end_date = valid_dates[0]
+    else:
+        last_3 = []
+        prior_3 = []
+        end_date = datetime.date(2026, 11, 18)
+        
+    start_recent = last_3[0] if last_3 else end_date
+    start_recent_str = f"{start_recent.day:02d} {id_m.get(start_recent.month, start_recent.strftime('%b'))}"
+    end_str = f"{end_date.day:02d} {id_m.get(end_date.month, end_date.strftime('%b'))}"
+    
+    review_d = end_date + datetime.timedelta(days=7)
+    review_str = f"{review_d.day:02d} {id_m.get(review_d.month, review_d.strftime('%b'))}"
+    
+    df_last_3 = df[df['date'].dt.date.isin(last_3)] if (last_3 and 'date' in df.columns) else df
+    df_prior_3 = df[df['date'].dt.date.isin(prior_3)] if (prior_3 and 'date' in df.columns) else df
+    
+    # Analisis pergerakan volume & sentimen untuk setiap kluster isu Kementerian PU
+    trends = []
+    for defn in ISSUE_DEFINITIONS:
+        pat = defn['pattern']
+        m_last = df_last_3['raw_content'].str.contains(pat, case=False, na=False) if 'raw_content' in df_last_3.columns else pd.Series(False, index=df_last_3.index)
+        m_prior = df_prior_3['raw_content'].str.contains(pat, case=False, na=False) if 'raw_content' in df_prior_3.columns else pd.Series(False, index=df_prior_3.index)
+        
+        cnt_l = int(m_last.sum())
+        cnt_p = int(m_prior.sum())
+        
+        pos_l = int((m_last & (df_last_3['sentiment_name'] == 'Positif')).sum()) if 'sentiment_name' in df_last_3.columns else 0
+        neg_l = int((m_last & (df_last_3['sentiment_name'] == 'Negatif')).sum()) if 'sentiment_name' in df_last_3.columns else 0
+        neu_l = int((m_last & (df_last_3['sentiment_name'] == 'Netral')).sum()) if 'sentiment_name' in df_last_3.columns else 0
+        
+        pos_pct = round(pos_l / max(1, cnt_l) * 100, 1)
+        neg_pct = round(neg_l / max(1, cnt_l) * 100, 1)
+        neu_pct = round(neu_l / max(1, cnt_l) * 100, 1)
+        
+        growth = cnt_l - cnt_p
+        growth_pct = round(growth / max(1, cnt_p) * 100, 1) if cnt_p > 0 else (100.0 if cnt_l > 0 else 0.0)
+        
+        trends.append({
+            'defn': defn,
+            'id': defn['id'],
+            'name': defn['name'],
+            'short_name': defn['short_name'],
+            'cnt_last': cnt_l,
+            'cnt_prior': cnt_p,
+            'pos_pct': pos_pct,
+            'neg_pct': neg_pct,
+            'neu_pct': neu_pct,
+            'growth': growth,
+            'growth_pct': growth_pct
+        })
+        
+    # Klasifikasi 3 Skenario Intelijen Berdasarkan Pergerakan Nyata Data:
+    # 1. Paling Mungkin: isu dengan volume terbesar / traksi atensi tertinggi di 1-3 hari terakhir
+    most_likely = max(trends, key=lambda x: (x['cnt_last'], x['growth']))
+    
+    # 2. Paling Berbahaya (Konvergensi): isu dengan sentimen negatif tertinggi atau lonjakan negatif
+    worst_candidates = [t for t in trends if t['id'] != most_likely['id']]
+    worst_case = max(worst_candidates, key=lambda x: (x['neg_pct'], x['growth'])) if worst_candidates else max(trends, key=lambda x: x['neg_pct'])
+    
+    # 3. Terkendali: isu dengan sentimen negatif terendah dan dukungan positif stabil
+    stable_candidates = [t for t in trends if t['id'] not in (most_likely['id'], worst_case['id'])]
+    stable = min(stable_candidates, key=lambda x: x['neg_pct']) if stable_candidates else min(trends, key=lambda x: x['neg_pct'])
+    
+    # Estimasi rentang proyeksi negatif kementerian harian
+    tot_vol_l = len(df_last_3)
+    tot_neg_l = int((df_last_3['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in df_last_3.columns else 0
+    avg_neg_p = round(tot_neg_l / max(1, tot_vol_l) * 100, 1) if tot_vol_l > 0 else 5.0
+    neg_min = max(1, round(avg_neg_p - 2))
+    neg_max = max(neg_min + 2, round(avg_neg_p + 3))
+    
     render_mh_top_bar(slide_num=14)
     render_mh_title(
         "Rekomendasi Intelijen - Proyeksi 7 Hari",
-        "Ujian pekan depan: perkara Sumut dan hujan Aceh",
-        "Sintesis Pemantau Echo 279/280, Pemantau Delta, dan media terbuka. Skenario 7 hari dan tanda bahaya."
+        f"Ujian pekan depan: dominasi {most_likely['short_name']} dan dinamika risiko {worst_case['short_name']}",
+        f"Sintesis analisis anomali lonjakan 1-3 hari terakhir ({start_recent_str} - {end_str}). Skenario 7 hari ke depan dan tanda bahaya dini."
     )
     
+    growth_sub = f"Tren lonjakan +{most_likely['growth_pct']}%" if most_likely['growth_pct'] > 0 else f"{most_likely['cnt_last']:,} sebutan 3 hari"
     chips = [
-        {"label": "Paling Mungkin", "val": "Hujan", "sub": "Aceh, Jabar jadi panggung", "dot": "#2563EB"},
-        {"label": "Paling Berbahaya", "val": "Konvergensi", "sub": "KPK, longsor, krisis air", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "Tidak Mungkin", "val": "Serangan", "sub": "terorganisir ke PU", "dot": "#10B981"},
-        {"label": "Negatif Harian", "val": "4-9%", "sub": "proyeksi negatif lembaga", "dot": "#64748B"},
-        {"label": "Review", "val": "23 Nov", "sub": "evaluasi mingguan", "dot": "#2563EB"}
+        {"label": "Paling Mungkin", "val": most_likely['short_name'][:12], "sub": growth_sub, "dot": "#2563EB"},
+        {"label": "Paling Berbahaya", "val": "Konvergensi", "sub": f"{worst_case['short_name'][:13]} ({worst_case['neg_pct']}%)", "dot": "#EF4444", "val_color": "#EF4444"},
+        {"label": "Terkendali", "val": stable['short_name'][:12], "sub": f"Negatif minim ({stable['neg_pct']}%)", "dot": "#10B981"},
+        {"label": "Negatif Harian", "val": f"{neg_min}-{neg_max}%", "sub": "proyeksi negatif lembaga", "dot": "#64748B"},
+        {"label": "Review", "val": review_str, "sub": "evaluasi mingguan", "dot": "#2563EB"}
     ]
     render_kpi_chips(chips)
     
     c_scen, c_warn = st.columns([1, 1], gap="medium")
     
     with c_scen:
-        scen_html = """<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+        scen_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
 <span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
-Tiga Skenario
+Tiga Skenario Intelijen (Proyeksi 7 Hari)
 </div>
 <div style="background:#F0FDF4; border-left:3px solid #10B981; padding:8px 10px; margin-bottom:8px; border-radius:3px;">
-<div style="font-weight:700; font-size:11px; color:#065F46;">Paling mungkin: hujan Aceh dan Jabar jadi panggung</div>
-<div style="font-size:10px; color:#064E3B; line-height:1.4;">Negatif lembaga 4-9% per hari; banjir dan longsor Aceh, Tasikmalaya menentukan nada; perkara Sumut mereda di luar agenda KPK.</div>
+<div style="font-weight:700; font-size:11px; color:#065F46;">Paling mungkin: {most_likely['name']} mendominasi ruang publik</div>
+<div style="font-size:10px; color:#064E3B; line-height:1.4;">Proyeksi negatif kementerian berkisar {neg_min}-{neg_max}% per hari; dinamika percakapan terpusat pada {most_likely['name'].lower()} dengan akumulasi {most_likely['cnt_last']:,} sebutan di 3 hari terakhir (tren pergerakan {most_likely['growth_pct']:+0.1f}%). Porsi negatif {most_likely['neg_pct']}%, menuntut kesiapsiagaan operasional dan publikasi tanggap cepat balai wilayah.</div>
 </div>
 <div style="background:#FEF2F2; border-left:3px solid #EF4444; padding:8px 10px; margin-bottom:8px; border-radius:3px;">
-<div style="font-weight:700; font-size:11px; color:#991B1B;">Paling berbahaya: konvergensi</div>
-<div style="font-size:10px; color:#7F1D1D; line-height:1.4;">Agenda KPK baru bersamaan dengan longsor ruas nasional berkorban jiwa dan krisis air Jawa tanpa kabar Cipta Karya.</div>
+<div style="font-weight:700; font-size:11px; color:#991B1B;">Paling berbahaya: konvergensi risiko {worst_case['name']}</div>
+<div style="font-size:10px; color:#7F1D1D; line-height:1.4;">Potensi eskalasi sentimen negatif ({worst_case['neg_pct']}%) dipicu isu {worst_case['name'].lower()} (pergerakan {worst_case['growth_pct']:+0.1f}%). Skenario terburuk terjadi jika resistensi ini berpadu dengan insiden kegagalan struktur fisik atau musibah di lapangan tanpa klarifikasi terkoordinasi satu pintu Itjen dan Pimpinan.</div>
 </div>
 <div style="background:#F8FAFC; border-left:3px solid #64748B; padding:8px 10px; border-radius:3px;">
-<div style="font-weight:700; font-size:11px; color:#1E293B;">Tidak mungkin: serangan terorganisir ke PU</div>
-<div style="font-size:10px; color:#475569; line-height:1.4;">Amplifikasi 13 Nov menyasar pejabat daerah; isu Wamen mengecil; tidak ada kaskade yang menyasar menteri.</div>
+<div style="font-weight:700; font-size:11px; color:#1E293B;">Terkendali: {stable['name']} stabil & minim resistensi</div>
+<div style="font-size:10px; color:#475569; line-height:1.4;">Isu {stable['name'].lower()} mencatat resistensi rendah dengan sentimen negatif hanya {stable['neg_pct']}% didukung respon positif ({stable['pos_pct']}%). Tidak terdeteksi kaskade serangan terorganisir yang mampu mendelegitimasi program ini dalam kurun waktu sepekan ke depan.</div>
 </div>
 </div>"""
         render_html(scen_html)
 
+    # Kalibrasi Tanda Bahaya Dini Sesuai Profil Isu Kritis
+    if worst_case['id'] == 'kpk':
+        tanda_1 = "Agenda penegakan hukum KPK (periksa saksi, geledah)"
+        ambang_1 = ">50 sebutan"
+        respons_1 = "Satu pernyataan resmi Itjen / Pimpinan"
+    elif worst_case['id'] == 'bencana':
+        tanda_1 = "Banjir meluas / longsor ruas nasional berulang"
+        ambang_1 = "1 kejadian"
+        respons_1 = "Rilis BPJN / BWS respon darurat 24 jam"
+    elif worst_case['id'] == 'jalan':
+        tanda_1 = "Video aduan jalan rusak parah / berlubang viral"
+        ambang_1 = ">50 sebutan"
+        respons_1 = "Tim Sapu Lubang BBPJN tanggapi di medsos"
+    elif worst_case['id'] == 'air':
+        tanda_1 = "Aduan kekeringan irigasi sawah / pipa SPAM bocor"
+        ambang_1 = ">30 sebutan"
+        respons_1 = "Mobilisasi tangki Cipta Karya & gilir air BWS"
+    else:
+        tanda_1 = f"Lonjakan kritik tajam {worst_case['short_name']}"
+        ambang_1 = ">30 sebutan"
+        respons_1 = "Klarifikasi teknis unit kerja terkait 24 jam"
+
+    if most_likely['id'] == 'bencana':
+        tanda_2 = "Longsor / banjir ruas arteri berulang berkorban"
+        ambang_2 = "1 kejadian"
+        respons_2 = "Pengerahan alat berat & jembatan bailey balai"
+    elif most_likely['id'] == 'jalan':
+        tanda_2 = "Aduan kemacetan parah / lubang jalan jalur logistik"
+        ambang_2 = ">40 sebutan"
+        respons_2 = "Patroli preservasi rutin BBPJN & perbaikan cepat"
+    elif most_likely['id'] == 'air':
+        tanda_2 = "Fluktuasi debit air waduk / tanggul kritis"
+        ambang_2 = "24 jam"
+        respons_2 = "Monitoring posko hidrologi BWS & rilis berkala"
+    else:
+        tanda_2 = f"Eskalasi atensi publik {most_likely['short_name']}"
+        ambang_2 = f">{max(30, int(most_likely['cnt_last'] * 0.25))} sebutan"
+        respons_2 = "Publikasi dokumentasi visual lapangan di kanal medsos"
+
     with c_warn:
-        warn_html = """<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+        warn_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
 <span style="width:7px; height:7px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
-Tanda Bahaya dan Respons
+Tanda Bahaya dan Respons Cepat
 </div>
 <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
 <thead>
 <tr style="border-bottom:1.5px solid #CBD5E1; color:#64748B; font-size:10px; font-weight:700;">
 <th style="padding:6px 4px;">TANDA</th>
-<th style="padding:6px 4px; width:75px;">AMBANG ▼</th>
+<th style="padding:6px 4px; width:80px;">AMBANG ▼</th>
 <th style="padding:6px 4px;">RESPONS</th>
 </tr>
 </thead>
 <tbody>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">Agenda KPK baru (periksa, geledah)</td><td style="color:#EF4444; font-weight:700;">>50 sebutan</td><td>Satu pernyataan Itjen</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">Longsor ruas nasional berulang</td><td style="color:#EF4444; font-weight:700;">1 kejadian</td><td>Rilis BPJN Aceh 24 jam</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">RT seragam perkara Sumut kembali</td><td style="color:#D97706; font-weight:700;">>30 akun</td><td>Fakta ranah pusat-provinsi</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">Banjir Tamiang, Singkil meluas</td><td style="color:#2563EB; font-weight:700;">24 jam</td><td>Rilis BWS Sumatera I</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">Krisis air Jawa, NTT tanpa kabar</td><td style="color:#64748B; font-weight:700;">3 hari</td><td>Rilis Cipta Karya</td></tr>
-<tr><td style="font-weight:600; padding:6px 4px;">Video jalan baru viral</td><td style="color:#2563EB; font-weight:700;">>100 rb tayang</td><td>Jawab di kanal sama</td></tr>
+<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">{tanda_1}</td><td style="color:#EF4444; font-weight:700;">{ambang_1}</td><td>{respons_1}</td></tr>
+<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">{tanda_2}</td><td style="color:#EF4444; font-weight:700;">{ambang_2}</td><td>{respons_2}</td></tr>
+<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">Amplifikasi RT / tagar seragam menyasar PU</td><td style="color:#D97706; font-weight:700;">>30 akun</td><td>Fakta ranah pusat-daerah & klarifikasi</td></tr>
+<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">Banjir atau tanggul kritis meluas</td><td style="color:#2563EB; font-weight:700;">24 jam</td><td>Rilis update BWS & kesiapsiagaan posko</td></tr>
+<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">Krisis pasokan air bersih tanpa progres</td><td style="color:#64748B; font-weight:700;">3 hari</td><td>Rilis Ditjen Cipta Karya & dropping tangki</td></tr>
+<tr><td style="font-weight:600; padding:6px 4px;">Video komplain jalan baru viral di medsos</td><td style="color:#2563EB; font-weight:700;">>100 rb tayang</td><td>Jawab di kanal sama dalam kurun 6 jam</td></tr>
 </tbody>
 </table>
 </div>"""
         render_html(warn_html)
 
-    render_callout_target("Dua tanda terdekat: longsor Aceh Tengah pagi ini dan agenda KPK berikutnya; keduanya perlu jawaban satu pintu hari ini.")
-    render_mh_footer("Edisi Mingguan 9-15 Nov 2026 Sumber: Pemantau Echo 279/280, 9-16 Nov; Pemantau Delta 69, 94; Kompas, Pikiran Rakyat, Justisio.")
+    render_callout_target(f"Fokus Kewaspadaan: Antisipasi dinamika isu {most_likely['short_name']} dan mitigasi potensi risiko {worst_case['short_name']}. Respon proaktif balai wilayah di lapangan sebelum review {review_str} menentukan kestabilan reputasi kementerian.")
+    render_mh_footer(f"Edisi Proyeksi Intelijen 7 Hari ({start_recent_str} - {end_str} {end_date.year}) | Sumber: Analisis anomali lonjakan 1-3 hari terakhir, proyeksi sentimen IndoBERT & pantauan media terbuka.")
 
 
 # ==============================================================================
