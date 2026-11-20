@@ -78,6 +78,10 @@ from src.mh_weekly_report import (
     render_slide_7_issues_minister,
     render_slide_8_chapter_2,
     render_slide_9_main_topics,
+    extract_top_3_issues,
+    render_slide_10_special_issue_1,
+    render_slide_11_special_issue_2,
+    render_slide_12_special_issue_3,
     render_slide_10_special_chronology_kpk,
     render_slide_11_framing_narrative_layers,
     render_slide_12_disaster_response_kemenpu,
@@ -582,6 +586,12 @@ kpis = calculate_kpis(df_filtered)
 # MAIN CONTENT DISPATCHER
 # -------------------------------------------------------------
 if "Format Laporan Harian" in view_mode or "Laporan Harian" in view_mode or "Slide MH" in view_mode:
+    # Ekstraksi Dinamis 3 Isu Teratas untuk Bab 2 Sorotan Khusus
+    top3_dynamic = extract_top_3_issues(df_filtered)
+    s10_label = f"Slide 10: Sorotan Khusus - {top3_dynamic[0]['name']}" if len(top3_dynamic) > 0 else "Slide 10: Sorotan Khusus I"
+    s11_label = f"Slide 11: Sorotan Khusus - {top3_dynamic[1]['name']}" if len(top3_dynamic) > 1 else "Slide 11: Sorotan Khusus II"
+    s12_label = f"Slide 12: Sorotan Khusus - {top3_dynamic[2]['name']}" if len(top3_dynamic) > 2 else "Slide 12: Sorotan Khusus III"
+
     MH_CHAPTERS = {
         "Ringkasan Eksekutif": {
             "Slide 1: Cover Laporan Eksekutif": render_slide_1_cover,
@@ -597,13 +607,14 @@ if "Format Laporan Harian" in view_mode or "Laporan Harian" in view_mode or "Sli
         "Bab 2: Analisis Mendalam (The Deep Dive)": {
             "Slide 8: Pembuka Bab 2 (The Deep Dive)": render_slide_8_chapter_2,
             "Slide 9: Topik & Narasi - Kementerian PU (279)": render_slide_9_main_topics,
-            "Slide 10: Sorotan Khusus: Kronologi Perkara KPK Sumut": render_slide_10_special_chronology_kpk,
-            "Slide 11: Sorotan Khusus: Lapis Narasi Perkara Sumut": render_slide_11_framing_narrative_layers,
-            "Slide 12: Penanganan Bencana oleh Kementerian PU": render_slide_12_disaster_response_kemenpu,
+            s10_label: render_slide_10_special_issue_1,
+            s11_label: render_slide_11_special_issue_2,
+            s12_label: render_slide_12_special_issue_3,
             "Slide 13: Keserempakan & Uji Organik": render_slide_13_bot_organic_audit,
             "Slide 14: Rekomendasi Intelijen - Proyeksi 7 Hari": render_slide_14_intelligence_projections,
             "Suplemen 1: Pemetaan Pemangku Kepentingan (Stakeholder Matrix)": render_slide_stakeholder_mapping,
             "Suplemen 2: Analisis Pembingkaian Robert Entman (Framing Analysis)": render_slide_framing_analysis,
+            "Suplemen 3: Rekap Khusus Penanganan Bencana": render_slide_12_disaster_response_kemenpu,
         },
         "Bab 3: Tindakan Strategis (The Action)": {
             "Slide 15: Pembuka Bab 3 (The Action)": render_slide_15_chapter_3,

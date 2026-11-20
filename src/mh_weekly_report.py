@@ -1404,25 +1404,204 @@ Tiga Isu Penekan (Negatif)
 
 
 # ==============================================================================
+# DEFINISI & EKSTRAKSI DINAMIS 3 TEMUAN UTAMA (SOROTAN KHUSUS) KEMENTERIAN PU
+# ==============================================================================
+ISSUE_DEFINITIONS = [
+    {
+        'id': 'bencana',
+        'name': 'Tanggap Bencana & Pemulihan Infrastruktur',
+        'short_name': 'Bencana & Pemulihan',
+        'pattern': r'\b(?:banjir|longsor|gempa|bencana|tanggul|darurat|jembatan putus|posko|aceh|gayo|pidie)\b',
+        'sub_headline': 'Penanganan darurat bencana alam, jembatan putus, dan pemulihan infrastruktur wilayah terdampak',
+        'color': '#2563EB',
+        'counter_narrative': 'Kementerian PU bergerak cepat memobilisasi alat berat, memasang jembatan bailey, dan memastikan konektivitas logistik serta tanggul darurat pulih.',
+        'layers': [
+            ("L1 Tanggap Darurat & Jembatan Bailey", "Positif", "#10B981", "Apresiasi respon cepat penanganan jembatan putus & pemulihan akses jalan."),
+            ("L2 Penanganan Banjir & Normalisasi Sungai", "Netral", "#64748B", "Laporan debit air sungai, kondisi tanggul, dan posko siaga banjir balai."),
+            ("L3 Korban & Dampak Terisolir", "Negatif", "#EF4444", "Kekhawatiran warga terkait ruas jalan putus dan desa yang sempat terisolir."),
+            ("L4 Kesiapsiagaan Alat Berat di Lapangan", "Positif", "#10B981", "Pengerahan excavator dan dump truck balai di titik-titik rawan longsor."),
+            ("L5 Kebutuhan Bantuan Logistik & Air Bersih", "Netral", "#64748B", "Distribusi mobil tangki air bersih kementerian ke posko pengungsian.")
+        ]
+    },
+    {
+        'id': 'air',
+        'name': 'Air Bersih, Irigasi & Bendungan',
+        'short_name': 'Air Bersih & Irigasi',
+        'pattern': r'\b(?:air bersih|irigasi|bendungan|spam|kekeringan|krisis air|bws|sda|lumbung air)\b',
+        'sub_headline': 'Penyediaan akses air minum SPAM, ketahanan irigasi sawah rakyat, dan pengelolaan bendungan nasional',
+        'color': '#10B981',
+        'counter_narrative': 'Kementerian PU memastikan keandalan pasokan SPAM air bersih dan revitalisasi saluran irigasi guna menopang swasembada pangan rakyat.',
+        'layers': [
+            ("L1 Pasokan Air Minum & Jaringan SPAM", "Positif", "#10B981", "Apresiasi peresmian dan perluasan pipa sambungan rumah air bersih SPAM."),
+            ("L2 Irigasi Sawah & Ketahanan Pangan", "Positif", "#10B981", "Dukungan petani terhadap normalisasi saluran primer/sekunder penunjang panen."),
+            ("L3 Keluhan Debit Air Musim Kemarau", "Netral", "#64748B", "Aspirasi kelompok tani agar pembagian air bendungan proporsional dan merata."),
+            ("L4 Pemeliharaan Fisik Bendungan & Waduk", "Netral", "#64748B", "Monitoring kapasitas tampung waduk dan pengerukan sedimentasi berkala."),
+            ("L5 Aduan Pipa Bocor & Tekanan Rendah", "Negatif", "#EF4444", "Aduan warga terkait keterlambatan perbaikan pipa distribusi di pemukiman.")
+        ]
+    },
+    {
+        'id': 'sekolah',
+        'name': 'Sekolah Rakyat & Fasilitas Publik',
+        'short_name': 'Sekolah Rakyat & Fasilitas',
+        'pattern': r'\b(?:sekolah rakyat|madrasah|sekolah|vokasi|pasar|fasilitas|nagan raya|gedung)\b',
+        'sub_headline': 'Pembangunan gedung Sekolah Rakyat, renovasi madrasah, dan penyediaan fasilitas sosial bagi masyarakat',
+        'color': '#8B5CF6',
+        'counter_narrative': 'Pembangunan prasarana pendidikan Sekolah Rakyat difokuskan untuk memfasilitasi anak-anak kurang mampu dengan standar mutu terbaik.',
+        'layers': [
+            ("L1 Apresiasi Gedung Sekolah Rakyat Baru", "Positif", "#10B981", "Pujian atas fasilitas belajar modern, asrama, dan ruang kelas yang representatif."),
+            ("L2 Revitalisasi Madrasah & Sekolah Daerah", "Positif", "#10B981", "Dukungan terhadap program rehabilitasi ruang belajar rusak di daerah 3T."),
+            ("L3 Kebutuhan Sarana Penunjang & Akses Jalan", "Netral", "#64748B", "Permintaan penataan trotoar dan akses jalan lingkungan menuju sekolah."),
+            ("L4 Harapan Pemerataan Fasilitas ke Pelosok", "Netral", "#64748B", "Aspirasi agar pembangunan sekolah rakyat menjangkau lebih banyak kabupaten."),
+            ("L5 Pengawasan Kualitas Konstruksi Bangunan", "Netral", "#64748B", "Desakan agar pengawasan mutu beton dan atap bangunan sekolah diperketat.")
+        ]
+    },
+    {
+        'id': 'jalan',
+        'name': 'Preservasi Jalan & Jembatan Nasional',
+        'short_name': 'Jalan & Jembatan Nasional',
+        'pattern': r'\b(?:jalan tol|jalan nasional|aspal|jembatan|lubang|bolong|jalan rusak|trans sumatera|nataru|preservasi|bbpjn)\b',
+        'sub_headline': 'Kesiapan jalan tol libur Nataru, penanganan aduan jalan berlubang, dan kemantapan jalan nasional',
+        'color': '#F59E0B',
+        'counter_narrative': 'Tim Reaksi Cepat Bina Marga gencar melakukan patroli sapu lubang dan percepatan perbaikan aspal ruas arteri.',
+        'layers': [
+            ("L1 Kesiapan Tol Fungsional Libur Nataru", "Positif", "#10B981", "Antusiasme masyarakat terhadap pembukaan ruas tol baru pengurai macet."),
+            ("L2 Patroli Sapu Lubang & Perbaikan Aspal", "Positif", "#10B981", "Respon tanggap tim balai jalan atas aduan lubang jalan di media sosial."),
+            ("L3 Aduan Kerusakan Jalan Daerah & Aspal Buruk", "Negatif", "#EF4444", "Keluhan warganet atas jalan berlubang dan ruas jalan yang belum diperbaiki."),
+            ("L4 Pembangunan Jembatan Gantung Perintis", "Positif", "#10B981", "Konektivitas antardesa terisolir melalui jembatan gantung pejalan kaki."),
+            ("L5 Sorotan Pengawasan Mutu Proyek Daerah", "Negatif", "#EF4444", "Tuntutan transparansi pelaksanaan lelang dan mutu preservasi berkala.")
+        ]
+    },
+    {
+        'id': 'kpk',
+        'name': 'Akuntabilitas & Perkara KPK',
+        'short_name': 'Perkara KPK & Integritas',
+        'pattern': r'\b(?:kpk|korupsi|geledah|ott|sidang|perkara|satker|tersangka|penyidikan|jaksa|sidik)\b',
+        'sub_headline': 'Sorotan perkara hukum, penggeledahan proyek jalan daerah, dan desakan pengawasan akuntabilitas satker',
+        'color': '#EF4444',
+        'counter_narrative': 'Kementerian PU mendukung penuh proses penegakan hukum KPK dan memperketat pengawasan pengadaan melalui Itjen.',
+        'layers': [
+            ("L1 Pemberitaan Penyidikan & Penggeledahan", "Negatif", "#EF4444", "Liputan media daring mengenai pemeriksaan saksi dan penggeledahan berkas."),
+            ("L2 Sorotan Integritas Pejabat Satker Daerah", "Negatif", "#EF4444", "Kritik publik atas dugaan penyimpangan pelaksanaan lelang proyek jalan."),
+            ("L3 Dukungan Pembenahan Pengawasan Internal", "Netral", "#64748B", "Aspirasi agar Inspektorat Jenderal Kementerian memperketat audit preventif."),
+            ("L4 Klarifikasi Pemisahan Ranah Proyek", "Netral", "#64748B", "Penjelasan pemisahan antara kewenangan jalan provinsi dengan jalan nasional."),
+            ("L5 Komitmen Dukungan Penuh Penegakan Hukum", "Positif", "#10B981", "Pernyataan resmi komitmen pimpinan kementerian kooperatif membantu KPK.")
+        ]
+    }
+]
+
+def extract_top_3_issues(df_active):
+    """
+    Mengekstrak 3 Isu / Temuan Utama teratas secara dinamis dari korpus aktif
+    berdasarkan volume sebutan, polaritas sentimen IndoBERT, dan sebaran multiplatform.
+    """
+    if df_active is None or len(df_active) == 0:
+        return []
+    
+    total_len = len(df_active)
+    scored_issues = []
+    
+    for defn in ISSUE_DEFINITIONS:
+        pat = defn['pattern']
+        mask = df_active['raw_content'].str.contains(pat, case=False, na=False) if 'raw_content' in df_active.columns else pd.Series(False, index=df_active.index)
+        sub_df = df_active[mask]
+        vol = len(sub_df)
+        if vol == 0:
+            continue
+            
+        pos = int((sub_df['sentiment_name'] == 'Positif').sum()) if 'sentiment_name' in sub_df.columns else 0
+        neu = int((sub_df['sentiment_name'] == 'Netral').sum()) if 'sentiment_name' in sub_df.columns else 0
+        neg = int((sub_df['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in sub_df.columns else 0
+        
+        pos_pct = round(pos / vol * 100, 1)
+        neu_pct = round(neu / vol * 100, 1)
+        neg_pct = round(neg / vol * 100, 1)
+        
+        if pos >= neu and pos >= neg:
+            prim_sent = "Positif"
+            prim_color = "#10B981"
+        elif neg >= pos and neg >= neu:
+            prim_sent = "Negatif"
+            prim_color = "#EF4444"
+        else:
+            prim_sent = "Netral"
+            prim_color = "#64748B"
+            
+        if 'platform' in sub_df.columns and len(sub_df) > 0:
+            top_plat = sub_df['platform'].value_counts().index[0]
+            top_plat_count = int(sub_df['platform'].value_counts().iloc[0])
+        else:
+            top_plat = 'Multiplatform'
+            top_plat_count = vol
+            
+        # Daily timeline
+        daily_series = []
+        if 'date' in sub_df.columns and not sub_df['date'].dropna().empty:
+            date_grp = sub_df.groupby(sub_df['date'].dt.date).size()
+            for d_val, c_val in date_grp.items():
+                daily_series.append((d_val, c_val))
+            daily_series.sort(key=lambda x: x[0])
+            peak_entry = max(daily_series, key=lambda x: x[1]) if daily_series else (None, 0)
+            id_m = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'Mei', 6: 'Jun', 7: 'Jul', 8: 'Agu', 9: 'Sep', 10: 'Okt', 11: 'Nov', 12: 'Des'}
+            if peak_entry[0]:
+                peak_str = f"{peak_entry[0].day:02d} {id_m.get(peak_entry[0].month, peak_entry[0].strftime('%b'))}"
+            else:
+                peak_str = '-'
+            peak_vol = peak_entry[1]
+        else:
+            peak_str = '-'
+            peak_vol = 0
+            
+        scored_issues.append({
+            'id': defn['id'],
+            'name': defn['name'],
+            'short_name': defn['short_name'],
+            'sub_headline': defn['sub_headline'],
+            'counter_narrative': defn['counter_narrative'],
+            'layers': defn['layers'],
+            'vol': vol,
+            'vol_pct': round(vol / total_len * 100, 1),
+            'pos': pos, 'pos_pct': pos_pct,
+            'neu': neu, 'neu_pct': neu_pct,
+            'neg': neg, 'neg_pct': neg_pct,
+            'primary_sentiment': prim_sent,
+            'primary_color': prim_color,
+            'top_platform': top_plat,
+            'top_platform_count': top_plat_count,
+            'peak_str': peak_str,
+            'peak_vol': peak_vol,
+            'daily_series': daily_series,
+            'sub_df': sub_df
+        })
+        
+    scored_issues.sort(key=lambda x: x['vol'], reverse=True)
+    return scored_issues[:3]
+
+
+# ==============================================================================
 # SLIDE 8: CHAPTER 02 - THE DEEP DIVE
 # ==============================================================================
 def render_slide_8_chapter_2(df, selected_topic='Semua', topic_label=None, **kwargs):
     m = _get_slide_metrics(df, selected_topic, topic_label)
+    top3 = extract_top_3_issues(df)
+    iss1 = top3[0]['short_name'] if len(top3) > 0 else "Temuan Utama I"
+    iss2 = top3[1]['short_name'] if len(top3) > 1 else "Temuan Utama II"
+    iss3 = top3[2]['short_name'] if len(top3) > 2 else "Temuan Utama III"
+
     render_chapter_break(
         2,
         "The Deep Dive",
-        "Berkas analisis topik lembaga (279) dari Pemantau Echo, sorotan khusus perkara KPK Sumut (kronologi dan lapis narasi), penanganan bencana, keserempakan, dan rekomendasi intelijen 7 hari.",
+        f"Analisis topik dan narasi lembaga ({m.get('vol', 0):,} sebutan), tiga sorotan khusus isu teratas ({iss1}, {iss2}, dan {iss3}), audit keserempakan akun, serta proyeksi intelijen 7 hari.",
         2,
         [
-            (9, "Topik & Narasi - Kementerian PU (279)"),
-            (10, "Sorotan Khusus: Kronologi Perkara KPK Sumut"),
-            (11, "Sorotan Khusus: Lapis Narasi Perkara Sumut"),
-            (12, "Penanganan Bencana oleh Kementerian PU"),
+            (9, f"Topik & Narasi - {m.get('topic_title', 'Kementerian PU')}"),
+            (10, f"Sorotan Khusus I: {iss1}"),
+            (11, f"Sorotan Khusus II: {iss2}"),
+            (12, f"Sorotan Khusus III: {iss3}"),
             (13, "Keserempakan & Uji Organik"),
             (14, "Rekomendasi Intelijen - Proyeksi 7 Hari")
         ]
     )
-    render_mh_footer("Bab Pendalaman Isu Strategis • Evaluasi Multiplatform Terpadu")
+    render_mh_footer(f"Bab Pendalaman Isu Strategis • Evaluasi Multiplatform Terpadu • Periode {m.get('cur_str', '')}")
 
 
 # ==============================================================================
@@ -1499,148 +1678,182 @@ Yang Dibaca dari Data
 
 
 # ==============================================================================
-# SLIDE 10: SOROTAN KHUSUS: KRONOLOGI PERKARA KPK SUMUT
+# RENDER MASTER DINAMIS UNTUK 3 SLIDE SOROTAN KHUSUS (SLIDE 10, 11, 12)
 # ==============================================================================
-def render_slide_10_special_chronology_kpk(df, selected_topic='Semua', topic_label=None, **kwargs):
+def render_dynamic_special_issue_slide(df, rank=1, slide_num=10, selected_topic='Semua', topic_label=None, **kwargs):
     m = _get_slide_metrics(df, selected_topic, topic_label)
-    render_mh_top_bar(slide_num=10)
-    render_mh_title(
-        "Sorotan Khusus: Kronologi Perkara KPK Sumut",
-        "Dari geledah enam lokasi ke RT seragam \"fakta sidang\"",
-        "Sorotan khusus. Isu terbesar pekan menurut nada: perkara KPK proyek jalan Sumut. Kronologi, lapis, status."
-    )
+    render_mh_top_bar(slide_num=slide_num)
     
+    top3 = extract_top_3_issues(df)
+    if rank <= len(top3):
+        issue = top3[rank - 1]
+    else:
+        fallback_defn = ISSUE_DEFINITIONS[(rank - 1) % len(ISSUE_DEFINITIONS)]
+        issue = {
+            'id': fallback_defn['id'],
+            'name': fallback_defn['name'],
+            'short_name': fallback_defn['short_name'],
+            'sub_headline': fallback_defn['sub_headline'],
+            'counter_narrative': fallback_defn['counter_narrative'],
+            'layers': fallback_defn['layers'],
+            'vol': 0,
+            'vol_pct': 0.0,
+            'pos': 0, 'pos_pct': 0.0,
+            'neu': 0, 'neu_pct': 0.0,
+            'neg': 0, 'neg_pct': 0.0,
+            'primary_sentiment': 'Netral',
+            'primary_color': '#64748B',
+            'top_platform': 'Multiplatform',
+            'top_platform_count': 0,
+            'peak_str': '-',
+            'peak_vol': 0,
+            'daily_series': [],
+            'sub_df': pd.DataFrame()
+        }
+
+    id_m = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'Mei', 6: 'Jun', 7: 'Jul', 8: 'Agu', 9: 'Sep', 10: 'Okt', 11: 'Nov', 12: 'Des'}
+    rank_labels = {1: "Utama #1", 2: "Utama #2", 3: "Utama #3"}
+    r_label = rank_labels.get(rank, f"#{rank}")
+
+    s_title = f"Sorotan Khusus: {issue['name']}"
+    s_sub = issue['sub_headline']
+    s_guide = f"Sorotan khusus temuan {r_label}. Dinamika isu teratas menurut volume sebutan ({issue['vol']:,} sebutan, {issue['vol_pct']}% korpus aktif). Kronologi harian, lapis narasi, dan respon kebijakan.".replace(',', '.')
+
+    render_mh_title(s_title, s_sub, s_guide)
+
+    vol_disp = f"{issue['vol']:,}".replace(',', '.')
+    pos_sub = f"{issue['pos']:,} sebutan".replace(',', '.')
+    neu_sub = f"{issue['neu']:,} sebutan".replace(',', '.')
+    neg_sub = f"{issue['neg']:,} sebutan".replace(',', '.')
+    plat_sub = f"puncak {issue['peak_str']} ({issue['peak_vol']:,} sebutan)".replace(',', '.')
+
     chips = [
-        {"label": "Sebutan", "val": "244", "sub": "kpk, proyek 279", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "Berita Geledah", "val": "56", "sub": "dari 40 portal, 11 Nov", "dot": "#2563EB"},
-        {"label": "Negatif", "val": "196", "sub": "dari 244 sebutan", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "RT Seragam", "val": "59", "sub": "akun X, 13 Nov", "dot": "#F59E0B"},
-        {"label": "Puncak", "val": "13 Nov", "sub": "97 sebutan sehari", "dot": "#EF4444", "val_color": "#EF4444"}
+        {"label": "Sebutan Isu", "val": vol_disp, "sub": f"{issue['vol_pct']}% dari total sebutan", "dot": issue['primary_color'], "val_color": issue['primary_color']},
+        {"label": "Positif", "val": f"{issue['pos_pct']}%", "sub": pos_sub, "dot": "#10B981", "val_color": "#10B981"},
+        {"label": "Netral", "val": f"{issue['neu_pct']}%", "sub": neu_sub, "dot": "#64748B"},
+        {"label": "Negatif", "val": f"{issue['neg_pct']}%", "sub": neg_sub, "dot": "#EF4444", "val_color": "#EF4444"},
+        {"label": "Kanal Terbanyak", "val": issue['top_platform'], "sub": plat_sub, "dot": "#2563EB", "val_color": "#0F2942"}
     ]
     render_kpi_chips(chips)
-    
-    chronology_data = [
-        ("9-10 Nov", "KPK geledah enam lokasi terkait proyek jalan Sumut (Justisio 11 Nov)", "BERITA", "BERJALAN", "#2563EB"),
-        ("11 Nov", "56 berita geledah dari 40 portal; kpk 95 sebutan, 86 negatif", "BERITA", "MELUAS", "#EF4444"),
-        ("12 Nov", "Surut: 16 sebutan, 8 negatif; satker dan BBPJN tetap disebut", "BERITA", "PANTAU", "#F59E0B"),
-        ("12-13 Nov", "Berita: KPK dalami proyek jalan Sumut, pejabat diperiksa", "BERITA", "BERJALAN", "#2563EB"),
-        ("13 Nov", "FB: \"anggaran Rp165 M lewat 6 Pergub\", 6.535 interaksi", "MEDSOS", "KLAIM", "#D97706"),
-        ("13 Nov", "X: 59 RT teks \"fakta sidang\" 02.18-23.22 WIB, 0 interaksi", "MEDSOS", "TINGGI", "#EF4444"),
-        ("14 Nov", "FB ulang kabar geledah: 3.407 interaksi; 23 sebutan", "MEDSOS", "BERLANJUT", "#2563EB"),
-        ("15 Nov", "X: klaim pejabat daerah \"masuk antrian KPK\"; 9 sebutan", "MEDSOS", "KLAIM", "#D97706"),
-        ("16 Nov", "Pagi: 0 sebutan kpk hingga 08.45 WIB", "MEDSOS", "MEREDA", "#10B981")
-    ]
-    
-    rows = []
-    for d, ev, lap, stat, col in chronology_data:
-        badge = f"""<span style="background:{col}15; color:{col}; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; border:1px solid {col}30;">{stat}</span>"""
-        rows.append(f"""<tr style="border-bottom:1px solid #F1F5F9;">
-<td style="font-weight:700; padding:6px 4px; width:90px;">{d}</td>
-<td style="padding:6px 4px;">{ev}</td>
-<td style="color:#64748B; font-size:10.5px; width:80px;">{lap}</td>
-<td style="width:90px;">{badge}</td>
-</tr>""")
 
-    tbl_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+    c_left, c_right = st.columns([1.05, 0.95], gap="medium")
+
+    with c_left:
+        d_series = issue['daily_series']
+        if len(d_series) > 7:
+            d_series = d_series[-7:]
+            
+        rows_chrono = []
+        max_v = max([x[1] for x in d_series]) if d_series else 1
+        for d_date, d_vol in d_series:
+            d_str = f"{d_date.day:02d} {id_m.get(d_date.month, d_date.strftime('%b'))}"
+            d_pct = round(d_vol / max(1, issue['vol']) * 100, 1)
+            
+            if d_vol == max_v and max_v > 0:
+                stat = "PUNCAK"
+                col = "#EF4444"
+            elif d_vol >= max_v * 0.7:
+                stat = "TINGGI"
+                col = "#D97706"
+            elif d_vol >= max_v * 0.3:
+                stat = "BERJALAN"
+                col = "#2563EB"
+            else:
+                stat = "MEREDA"
+                col = "#10B981"
+                
+            badge = f'<span style="background:{col}15; color:{col}; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; border:1px solid {col}30;">{stat}</span>'
+            
+            rows_chrono.append(f"""<tr style="border-bottom:1px solid #F1F5F9;">
+<td style="font-weight:700; padding:6px 4px; width:75px;">{d_str}</td>
+<td style="padding:6px 4px; font-weight:600; color:#0F2942; width:85px;">{d_vol:,} <span style="font-size:10px; color:#64748B; font-weight:400;">({d_pct}%)</span></td>
+<td style="padding:6px 4px; font-size:10.5px; color:#475569;">Penyebutan isu & dinamika respon publik</td>
+<td style="width:80px; text-align:right;">{badge}</td>
+</tr>""".replace(',', '.'))
+
+        if not rows_chrono:
+            rows_chrono.append('<tr><td colspan="4" style="text-align:center; padding:12px; color:#64748B;">Data harian belum tersedia pada rentang waktu ini.</td></tr>')
+
+        tbl_left = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-<span style="width:7px; height:7px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
-Kronologi dan Lapis Narasi
+<span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
+Dinamika Kronologi Harian (Tren Sebutan)
 </div>
 <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
 <thead>
 <tr style="border-bottom:1.5px solid #CBD5E1; color:#64748B; font-size:10px; font-weight:700;">
 <th style="padding:6px 4px;">TANGGAL ▼</th>
-<th style="padding:6px 4px;">PERISTIWA</th>
-<th style="padding:6px 4px;">LAPIS</th>
-<th style="padding:6px 4px;">STATUS</th>
+<th style="padding:6px 4px;">SEBUTAN</th>
+<th style="padding:6px 4px;">DESKRIPSI DINAMIKA</th>
+<th style="padding:6px 4px; text-align:right;">STATUS</th>
 </tr>
 </thead>
 <tbody>
-{"".join(rows)}
+{"".join(rows_chrono)}
 </tbody>
 </table>
 </div>"""
-    render_html(tbl_html)
-    
-    render_callout_target("Perkara bergerak dari berita penyidikan ke narasi media sosial yang menyasar pejabat daerah; PU terseret lewat satker. Status hukum mengikuti KPK.")
-    render_mh_footer("Edisi Mingguan 9-15 Nov 2026 Sumber: Pemantau Echo 279, 9-15 Nov; Justisio 11 Nov; Pantau 13 Nov; Kompas 16 Nov.")
-
-
-# ==============================================================================
-# SLIDE 11: SOROTAN KHUSUS: LAPIS NARASI PERKARA SUMUT
-# ==============================================================================
-def render_slide_11_framing_narrative_layers(df, selected_topic='Semua', topic_label=None, **kwargs):
-    m = _get_slide_metrics(df, selected_topic, topic_label)
-    render_mh_top_bar(slide_num=11)
-    render_mh_title(
-        "Sorotan Khusus: Lapis Narasi Perkara Sumut",
-        "Lapis satker dan \"fakta sidang\" membawa jangkauan",
-        "Pemantau Echo 279, perkara KPK Sumut, 9-15 Nov. Kiri: lima lapis narasi. Kanan: bingkai lawan dan jawaban."
-    )
-    
-    chips = [
-        {"label": "Sebutan", "val": "244", "sub": "9-15 Nov", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "Geledah", "val": "60", "sub": "sebutan; 56 negatif", "dot": "#2563EB"},
-        {"label": "Satker", "val": "102", "sub": "sebutan; 96 negatif", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "BBPJN", "val": "143", "sub": "sebutan; 122 negatif", "dot": "#F59E0B"},
-        {"label": "Facebook", "val": "6.535", "sub": "interaksi teratas, 13 Nov", "dot": "#2563EB"}
-    ]
-    render_kpi_chips(chips)
-    
-    c_left, c_right = st.columns([0.9, 1.1], gap="medium")
-    
-    with c_left:
-        lapis_html = """<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
-<div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-<span style="width:7px; height:7px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
-Lima Lapis Narasi - Pencarian Kata
-</div>
-<table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
-<thead>
-<tr style="border-bottom:1.5px solid #CBD5E1; color:#64748B; font-size:10px; font-weight:700;">
-<th style="padding:6px 4px;">BINGKAI</th>
-<th style="padding:6px 4px; width:95px;">SEBUTAN ▼</th>
-</tr>
-</thead>
-<tbody>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">L1 Satker dan balai jalan terseret</td><td style="color:#EF4444; font-weight:700;">negatif 102</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">L2 Pejabat daerah dikaitkan</td><td style="color:#EF4444; font-weight:700;">negatif 74</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">L3 Satu ruas: Sipiongot-Hutaimbaru</td><td style="color:#EF4444; font-weight:700;">negatif 64</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">L4 Penyidikan dan geledah KPK</td><td style="color:#EF4444; font-weight:700;">negatif 60</td></tr>
-<tr><td style="font-weight:600; padding:6px 4px;">L5 \"Fakta sidang\", anggaran via Pergub</td><td style="color:#D97706; font-weight:700;">KLAIM 59</td></tr>
-</tbody>
-</table>
-</div>"""
-        render_html(lapis_html)
+        render_html(tbl_left)
 
     with c_right:
-        counter_html = """<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+        rows_layers = []
+        for l_title, l_sent, l_col, l_desc in issue['layers']:
+            s_badge = f'<span style="background:{l_col}15; color:{l_col}; font-size:9.5px; font-weight:700; padding:2px 6px; border-radius:4px; border:1px solid {l_col}30;">{l_sent}</span>'
+            rows_layers.append(f"""<tr style="border-bottom:1px solid #F1F5F9;">
+<td style="font-weight:600; padding:6px 4px; width:160px; color:#0F2942;">{l_title}</td>
+<td style="width:70px; padding:6px 4px;">{s_badge}</td>
+<td style="padding:6px 4px; font-size:10.5px; color:#475569;">{l_desc}</td>
+</tr>""")
+
+        tbl_right = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-<span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
-Bingkai Lawan dan Jawaban
+<span style="width:7px; height:7px; border-radius:50%; background:#10B981; display:inline-block;"></span>
+Lapis Narasi & Pembingkaian Opini Publik
 </div>
 <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
 <thead>
 <tr style="border-bottom:1.5px solid #CBD5E1; color:#64748B; font-size:10px; font-weight:700;">
-<th style="padding:6px 4px;">BINGKAI LAWAN</th>
-<th style="padding:6px 4px;">NARASI TANDINGAN</th>
-<th style="padding:6px 4px; width:80px;">KANAL</th>
+<th style="padding:6px 4px;">BINGKAI NARASI</th>
+<th style="padding:6px 4px;">NADA</th>
+<th style="padding:6px 4px;">INTI OPINI / ASPIRASI WARGANET</th>
 </tr>
 </thead>
 <tbody>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="color:#991B1B; font-weight:600; padding:6px 4px;">\"PU sarang korupsi jalan\"</td><td>Dukung KPK, benahi satker</td><td style="color:#64748B;">Rilis, berita</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="color:#991B1B; font-weight:600; padding:6px 4px;">\"Pusat ikut terlibat\" - <span style="font-size:9.5px; color:#D97706;">KLAIM</span></td><td>Status hukum ikut KPK</td><td style="color:#64748B;">Berita</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="color:#991B1B; font-weight:600; padding:6px 4px;">\"Anggaran via Pergub\" - <span style="font-size:9.5px; color:#D97706;">KLAIM</span></td><td>Pisahkan ranah provinsi</td><td style="color:#64748B;">X, FB</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="color:#991B1B; font-weight:600; padding:6px 4px;">\"Proyek mangkrak, warga rugi\"</td><td>Status ruas dan jadwal</td><td style="color:#64748B;">Berita, IG</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="color:#991B1B; font-weight:600; padding:6px 4px;">\"Pengawasan internal lemah\"</td><td>Itjen: perbaikan pengadaan</td><td style="color:#64748B;">Berita</td></tr>
-<tr><td style="color:#991B1B; font-weight:600; padding:6px 4px;">\"Pejabat daerah antre KPK\" - <span style="font-size:9.5px; color:#D97706;">KLAIM</span></td><td>Tidak mengomentari</td><td style="color:#64748B;">X</td></tr>
+{"".join(rows_layers)}
 </tbody>
 </table>
 </div>"""
-        render_html(counter_html)
+        render_html(tbl_right)
 
-    render_callout_target("Pesan tandingan: \"Kementerian mendukung penuh KPK dan membenahi satker\" - integritas disajikan sebagai pembenahan yang berjalan, bukan pembelaan.")
-    render_mh_footer("Edisi Mingguan 9-15 Nov 2026 Sumber: Pemantau Echo 279 topTerms dan penjelajah, 9-15 Nov; Justisio 11 Nov.")
+    render_callout_target(f"Arah Komunikasi Kebijakan: \"{issue['counter_narrative']}\"")
+    render_mh_footer(f"Analisis Dinamis Korpus Warganet ({issue['vol']:,} sebutan isu) • Periode {m.get('cur_str', '')} • Inferensi IndoBERT • Kementerian Pekerjaan Umum")
+
+
+# ==============================================================================
+# SLIDE 10: SOROTAN KHUSUS I (TEMUAN UTAMA #1)
+# ==============================================================================
+def render_slide_10_special_issue_1(df, selected_topic='Semua', topic_label=None, **kwargs):
+    render_dynamic_special_issue_slide(df, rank=1, slide_num=10, selected_topic=selected_topic, topic_label=topic_label, **kwargs)
+
+# Alias backward compatibility
+render_slide_10_special_chronology_kpk = render_slide_10_special_issue_1
+
+
+# ==============================================================================
+# SLIDE 11: SOROTAN KHUSUS II (TEMUAN UTAMA #2)
+# ==============================================================================
+def render_slide_11_special_issue_2(df, selected_topic='Semua', topic_label=None, **kwargs):
+    render_dynamic_special_issue_slide(df, rank=2, slide_num=11, selected_topic=selected_topic, topic_label=topic_label, **kwargs)
+
+# Alias backward compatibility
+render_slide_11_framing_narrative_layers = render_slide_11_special_issue_2
+
+
+# ==============================================================================
+# SLIDE 12: SOROTAN KHUSUS III (TEMUAN UTAMA #3)
+# ==============================================================================
+def render_slide_12_special_issue_3(df, selected_topic='Semua', topic_label=None, **kwargs):
+    render_dynamic_special_issue_slide(df, rank=3, slide_num=12, selected_topic=selected_topic, topic_label=topic_label, **kwargs)
 
 
 # ==============================================================================
