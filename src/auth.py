@@ -729,12 +729,12 @@ def render_login_page():
 
         username_val = st.text_input(
             "ID Pengguna / Username",
-            placeholder="Masukkan ID pengguna..."
+            placeholder="Username"
         )
         password_val = st.text_input(
             "Kata Sandi / Password",
             type="password",
-            placeholder="••••••••••••"
+            placeholder="Password"
         )
         remember_me = st.checkbox(
             "Ingat sesi login di perangkat ini",
