@@ -378,7 +378,7 @@ def delete_user_by_admin(target_key: str):
 
 
 def _load_active_sessions() -> dict:
-    """Memuat data sesi login yang masih valid dari data/active_sessions.json."""
+    """Memuat data sesi login yang masih valid (maksimal 3 jam) dari data/active_sessions.json."""
     if not os.path.exists(SESSIONS_FILE):
         return {"tokens": {}, "last_local_token": None}
     try:
@@ -390,6 +390,8 @@ def _load_active_sessions() -> dict:
             now = time.time()
             valid_tokens = {k: v for k, v in tokens.items() if v.get("expires_at", 0) > now}
             data["tokens"] = valid_tokens
+            if data.get("last_local_token") not in valid_tokens:
+                data["last_local_token"] = None
             return data
     except Exception:
         return {"tokens": {}, "last_local_token": None}
@@ -405,12 +407,15 @@ def _save_active_sessions(sessions_dict: dict):
         pass
 
 
+# Batas durasi token sesi: Tepat 3 Jam (10.800 detik)
+SESSION_DURATION_SECONDS = 3 * 3600
+
+
 def _register_session(username: str, remember: bool = True) -> str:
-    """Membuat token sesi baru dan menyimpannya ke berkas sesi lokal."""
+    """Membuat token sesi baru dengan batas waktu kedaluwarsa 3 jam."""
     token = secrets.token_hex(24)
-    # Default 14 hari jika remember=True, atau 1 hari jika False
-    duration_days = 14 if remember else 1
-    expires_at = time.time() + (duration_days * 86400)
+    # Batas durasi sesi tepat 3 jam (10.800 detik)
+    expires_at = time.time() + SESSION_DURATION_SECONDS
     
     sessions = _load_active_sessions()
     sessions["tokens"][token] = {
@@ -425,7 +430,7 @@ def _register_session(username: str, remember: bool = True) -> str:
 
 
 def _validate_session(token: str) -> str | None:
-    """Memverifikasi validitas token sesi. Mengembalikan username jika valid."""
+    """Memverifikasi validitas token sesi (maksimal 3 jam). Mengembalikan username jika valid."""
     if not token or not isinstance(token, str):
         return None
     sessions = _load_active_sessions()
@@ -434,6 +439,7 @@ def _validate_session(token: str) -> str | None:
         if session_data.get("expires_at", 0) > time.time():
             return session_data.get("username")
         else:
+            # Sesi sudah kedaluwarsa (> 3 jam)
             if token in sessions.get("tokens", {}):
                 del sessions["tokens"][token]
             if sessions.get("last_local_token") == token:
@@ -455,15 +461,18 @@ def _revoke_session(token: str):
 
 
 def login_user(username: str, user_info: dict, remember: bool = True):
-    """Menyimpan sesi login ke dalam st.session_state dan st.query_params agar tidak logout saat reload."""
+    """Menyimpan sesi login ke dalam st.session_state dan st.query_params agar tidak logout saat reload (batas 3 jam)."""
     clean_u = username.strip().lower()
     token = _register_session(clean_u, remember=remember)
+    now_ts = time.time()
+    expires_at = now_ts + SESSION_DURATION_SECONDS
     
     st.session_state["authenticated"] = True
     st.session_state["username"] = clean_u
     st.session_state["user_info"] = user_info
     st.session_state["session_token"] = token
-    st.session_state["login_time"] = datetime.datetime.now().strftime("%d %b %Y, %H:%M WIB")
+    st.session_state["login_time"] = datetime.datetime.now().strftime("%H:%M WIB")
+    st.session_state["session_expires_at"] = expires_at
     
     # Simpan token ke query params browser agar sesi bertahan saat reload halaman (F5)
     try:
@@ -474,7 +483,7 @@ def login_user(username: str, user_info: dict, remember: bool = True):
     st.rerun()
 
 
-def logout_user():
+def logout_user(reason: str = None):
     """Menghapus sesi login dan mengarahkan kembali ke halaman login."""
     token = st.session_state.get("session_token")
     if not token:
@@ -498,18 +507,34 @@ def logout_user():
     st.session_state["user_info"] = None
     st.session_state["session_token"] = None
     st.session_state["login_time"] = None
+    st.session_state["session_expires_at"] = None
+    if reason == "expired":
+        st.session_state["session_expired_alert"] = True
     st.rerun()
 
 
 def check_authentication() -> bool:
     """
     Penjaga pintu utama aplikasi.
-    Mengembalikan True jika sesi aktif.
-    Mendukung pemulihan sesi otomatis saat reload (F5) via URL parameter dan berkas sesi lokal.
-    Jika belum login, akan langsung merender halaman login dan menghentikan eksekusi dashboard (st.stop()).
+    Memastikan sesi aktif dan belum melewati batas durasi 3 jam.
+    Jika sudah melewati 3 jam, sesi dicabut dan pengguna diminta login kembali.
     """
+    now = time.time()
+
     # 1. Cek sesi aktif di runtime session_state
     if st.session_state.get("authenticated", False) is True:
+        token = st.session_state.get("session_token")
+        expires_at = st.session_state.get("session_expires_at")
+        
+        # Validasi batas durasi sesi 3 jam
+        if expires_at and now > expires_at:
+            logout_user(reason="expired")
+            return False
+            
+        if token and not _validate_session(token):
+            logout_user(reason="expired")
+            return False
+            
         return True
 
     # 2. Cek apakah ada token sesi di query_params URL browser (bertahan saat reload F5)
@@ -526,18 +551,23 @@ def check_authentication() -> bool:
         if candidate and _validate_session(candidate):
             token = candidate
 
-    # 3. Validasi token sesi jika ada
+    # 3. Validasi token sesi jika ada (harus <= 3 jam)
     if token:
         valid_username = _validate_session(token)
         if valid_username:
             users = get_all_users()
             if valid_username in users:
                 user_info = users[valid_username]
+                sessions = _load_active_sessions()
+                s_info = sessions.get("tokens", {}).get(token, {})
+                exp_ts = s_info.get("expires_at", now + SESSION_DURATION_SECONDS)
+                
                 st.session_state["authenticated"] = True
                 st.session_state["username"] = valid_username
                 st.session_state["user_info"] = user_info
                 st.session_state["session_token"] = token
-                st.session_state["login_time"] = datetime.datetime.now().strftime("%d %b %Y, %H:%M WIB")
+                st.session_state["login_time"] = s_info.get("created_at", datetime.datetime.now().strftime("%H:%M WIB"))
+                st.session_state["session_expires_at"] = exp_ts
                 
                 # Sinkronkan kembali query param di URL
                 try:
@@ -548,14 +578,14 @@ def check_authentication() -> bool:
                     
                 return True
 
-    # Jika token tidak valid / kedaluwarsa, bersihkan dari URL
+    # Jika token tidak valid / kedaluwarsa (> 3 jam), bersihkan dari URL
     try:
         if "session_token" in st.query_params:
             del st.query_params["session_token"]
     except Exception:
         pass
 
-    # 4. Jika belum login, tampilkan halaman login eksekutif
+    # 4. Jika belum login atau sesi habis, tampilkan halaman login eksekutif
     render_login_page()
     st.stop()
     return False
@@ -723,7 +753,12 @@ def render_login_page():
     </div>
     """)
 
-    # 2. Card Form Terpadu
+    # 2. Notifikasi jika sesi sebelumnya kedaluwarsa setelah 3 jam
+    if st.session_state.get("session_expired_alert"):
+        st.warning("⏱️ Batas waktu sesi login (3 jam) telah berakhir. Silakan masuk kembali ke akun Anda.", icon="⏱️")
+        st.session_state["session_expired_alert"] = False
+
+    # 3. Card Form Terpadu
     with st.form("login_form", clear_on_submit=False):
         render_clean_html("""
         <div style="margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #F1F5F9;">
@@ -747,9 +782,9 @@ def render_login_page():
             placeholder="Password"
         )
         remember_me = st.checkbox(
-            "Ingat sesi login di perangkat ini",
+            "Ingat sesi login (berlaku 3 jam)",
             value=True,
-            help="Sesi akan tetap aktif saat halaman di-reload (F5) sehingga Anda tidak perlu login berulang kali."
+            help="Sesi akan aktif selama 3 jam dan bertahan saat halaman di-reload (F5). Setelah 3 jam, Anda akan diminta login kembali."
         )
         
         st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
@@ -768,12 +803,12 @@ def render_login_page():
             else:
                 st.error("Nama pengguna atau kata sandi tidak sesuai. Silakan periksa kembali.")
 
-    # 3. Footer Keamanan
+    # 4. Footer Keamanan
     render_clean_html("""
     <div style="text-align: center; margin-top: 22px; font-size: 11px; color: #64748B;">
         <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:4px; font-weight:600; color:#475569;">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            <span>Sistem Informasi Terbatas • Terproteksi SHA-256</span>
+            <span>Sistem Informasi Terbatas • Batas Sesi 3 Jam • Terproteksi SHA-256</span>
         </div>
         <div>Kementerian Pekerjaan Umum Republik Indonesia • 2026</div>
     </div>
@@ -814,8 +849,9 @@ def render_user_sidebar_profile():
                 <span>Online</span>
             </span>
         </div>
-        <div style="font-size: 9px; color: #94A3B8; margin-top: 6px; padding-top: 5px; border-top: 1px solid #F1F5F9;">
-            Sesi: {login_time}
+        <div style="font-size: 9px; color: #94A3B8; margin-top: 6px; padding-top: 5px; border-top: 1px solid #F1F5F9; display: flex; justify-content: space-between; align-items: center;">
+            <span>Masuk: {login_time}</span>
+            <span style="color: #64748B; font-weight: 600;">Batas Sesi: 3 Jam</span>
         </div>
     </div>
     """)
