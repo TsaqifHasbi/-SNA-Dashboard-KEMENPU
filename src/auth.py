@@ -410,9 +410,27 @@ def _save_active_sessions(sessions_dict: dict):
 # Batas durasi token sesi: Tepat 3 Jam (10.800 detik)
 SESSION_DURATION_SECONDS = 3 * 3600
 
+# Versi sesi global. Jika diubah atau direset, seluruh sesi lama di semua perangkat akan otomatis gugur/logout.
+GLOBAL_SESSION_VERSION = "2026.11.21.force_reset_v1"
+
+
+def revoke_all_sessions() -> int:
+    """
+    Mencabut dan menghapus seluruh token sesi login aktif dari data/active_sessions.json.
+    Semua pengguna di seluruh perangkat otomatis ter-logout dan wajib login kembali.
+    Mengembalikan jumlah token yang dicabut.
+    """
+    sessions = _load_active_sessions()
+    tokens = sessions.get("tokens", {})
+    count = len(tokens)
+    sessions["tokens"] = {}
+    sessions["last_local_token"] = None
+    _save_active_sessions(sessions)
+    return count
+
 
 def _register_session(username: str, remember: bool = True) -> str:
-    """Membuat token sesi baru dengan batas waktu kedaluwarsa 3 jam."""
+    """Membuat token sesi baru dengan batas waktu kedaluwarsa 3 jam dan versi sesi aktif."""
     token = secrets.token_hex(24)
     # Batas durasi sesi tepat 3 jam (10.800 detik)
     expires_at = time.time() + SESSION_DURATION_SECONDS
@@ -422,6 +440,7 @@ def _register_session(username: str, remember: bool = True) -> str:
         "username": username.strip().lower(),
         "created_at": datetime.datetime.now().strftime("%d %b %Y, %H:%M WIB"),
         "expires_at": expires_at,
+        "version": GLOBAL_SESSION_VERSION,
         "remember": remember
     }
     sessions["last_local_token"] = token
@@ -430,12 +449,21 @@ def _register_session(username: str, remember: bool = True) -> str:
 
 
 def _validate_session(token: str) -> str | None:
-    """Memverifikasi validitas token sesi (maksimal 3 jam). Mengembalikan username jika valid."""
+    """Memverifikasi validitas token sesi (maksimal 3 jam dan versi sesi aktif). Mengembalikan username jika valid."""
     if not token or not isinstance(token, str):
         return None
     sessions = _load_active_sessions()
     session_data = sessions.get("tokens", {}).get(token)
     if session_data:
+        # Validasi versi sesi: jika sesi dibuat sebelum pembaruan/force-reset, gugurkan
+        if session_data.get("version") != GLOBAL_SESSION_VERSION:
+            if token in sessions.get("tokens", {}):
+                del sessions["tokens"][token]
+            if sessions.get("last_local_token") == token:
+                sessions["last_local_token"] = None
+            _save_active_sessions(sessions)
+            return None
+
         if session_data.get("expires_at", 0) > time.time():
             return session_data.get("username")
         else:
@@ -471,6 +499,7 @@ def login_user(username: str, user_info: dict, remember: bool = True):
     st.session_state["username"] = clean_u
     st.session_state["user_info"] = user_info
     st.session_state["session_token"] = token
+    st.session_state["session_version"] = GLOBAL_SESSION_VERSION
     st.session_state["login_time"] = datetime.datetime.now().strftime("%H:%M WIB")
     st.session_state["session_expires_at"] = expires_at
     
@@ -506,6 +535,7 @@ def logout_user(reason: str = None):
     st.session_state["username"] = None
     st.session_state["user_info"] = None
     st.session_state["session_token"] = None
+    st.session_state["session_version"] = None
     st.session_state["login_time"] = None
     st.session_state["session_expires_at"] = None
     if reason == "expired":
@@ -517,7 +547,7 @@ def check_authentication() -> bool:
     """
     Penjaga pintu utama aplikasi.
     Memastikan sesi aktif dan belum melewati batas durasi 3 jam.
-    Jika sudah melewati 3 jam, sesi dicabut dan pengguna diminta login kembali.
+    Jika sudah melewati 3 jam atau sesi telah dicabut, sesi dicabut dan pengguna diminta login kembali.
     """
     now = time.time()
 
@@ -525,13 +555,13 @@ def check_authentication() -> bool:
     if st.session_state.get("authenticated", False) is True:
         token = st.session_state.get("session_token")
         expires_at = st.session_state.get("session_expires_at")
+        s_version = st.session_state.get("session_version")
         
-        # Validasi batas durasi sesi 3 jam
-        if expires_at and now > expires_at:
-            logout_user(reason="expired")
-            return False
-            
-        if token and not _validate_session(token):
+        # Validasi: Jika tidak ada token, versi sesi lama, token tidak valid, atau lewat 3 jam -> force logout
+        if (not token or 
+            s_version != GLOBAL_SESSION_VERSION or 
+            not _validate_session(token) or 
+            (expires_at and now > expires_at)):
             logout_user(reason="expired")
             return False
             
@@ -551,7 +581,7 @@ def check_authentication() -> bool:
         if candidate and _validate_session(candidate):
             token = candidate
 
-    # 3. Validasi token sesi jika ada (harus <= 3 jam)
+    # 3. Validasi token sesi jika ada (harus <= 3 jam dan versi aktif)
     if token:
         valid_username = _validate_session(token)
         if valid_username:
@@ -566,6 +596,7 @@ def check_authentication() -> bool:
                 st.session_state["username"] = valid_username
                 st.session_state["user_info"] = user_info
                 st.session_state["session_token"] = token
+                st.session_state["session_version"] = GLOBAL_SESSION_VERSION
                 st.session_state["login_time"] = s_info.get("created_at", datetime.datetime.now().strftime("%H:%M WIB"))
                 st.session_state["session_expires_at"] = exp_ts
                 
@@ -970,6 +1001,28 @@ def render_user_management_panel():
                 </div>
             </div>
             """)
+
+        # Kontrol Sesi Aktif & Force Logout Semua Perangkat
+        act_sessions = _load_active_sessions().get("tokens", {})
+        act_count = len(act_sessions)
+
+        st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            col_sess1, col_sess2 = st.columns([2.5, 1.2])
+            with col_sess1:
+                render_clean_html(f"""
+                <div style="font-size:13px; font-weight:700; color:#0F172A;">
+                    Kontrol Sesi Pengguna & Force Logout
+                </div>
+                <div style="font-size:11.5px; color:#64748B; margin-top:2px;">
+                    Tercatat <b>{act_count}</b> token sesi aktif (maksimal 3 jam per sesi). Anda dapat mencabut seluruh sesi untuk memaksa semua perangkat login ulang.
+                </div>
+                """)
+            with col_sess2:
+                if st.button("Logout Semua Sesi", key="btn_force_logout_all", use_container_width=True, type="secondary", icon=":material/power_settings_new:"):
+                    num = revoke_all_sessions()
+                    st.success(f"Berhasil mencabut seluruh ({num}) sesi aktif! Semua pengguna wajib login ulang.")
+                    st.rerun()
 
         st.markdown("<div style='height:16px;'></div>", unsafe_allow_html=True)
 
