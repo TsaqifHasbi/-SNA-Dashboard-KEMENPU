@@ -1598,10 +1598,10 @@ ISSUE_DEFINITIONS = [
         'counter_narrative': 'Kementerian PU bergerak cepat memobilisasi alat berat, memasang jembatan bailey, dan memastikan konektivitas logistik serta tanggul darurat pulih.',
         'layers': [
             ("L1 Tanggap Darurat & Jembatan Bailey", "Positif", "#10B981", "Apresiasi respon cepat penanganan jembatan putus & pemulihan akses jalan."),
-            ("L2 Penanganan Banjir & Normalisasi Sungai", "Netral", "#F59E0B", "Laporan debit air sungai, kondisi tanggul, dan posko siaga banjir balai."),
+            ("L2 Penanganan Banjir & Normalisasi Sungai", "Netral", "#94A3B8", "Laporan debit air sungai, kondisi tanggul, dan posko siaga banjir balai."),
             ("L3 Korban & Dampak Terisolir", "Negatif", "#EF4444", "Kekhawatiran warga terkait ruas jalan putus dan desa yang sempat terisolir."),
             ("L4 Kesiapsiagaan Alat Berat di Lapangan", "Positif", "#10B981", "Pengerahan excavator dan dump truck balai di titik-titik rawan longsor."),
-            ("L5 Kebutuhan Bantuan Logistik & Air Bersih", "Netral", "#F59E0B", "Distribusi mobil tangki air bersih kementerian ke posko pengungsian.")
+            ("L5 Kebutuhan Bantuan Logistik & Air Bersih", "Netral", "#94A3B8", "Distribusi mobil tangki air bersih kementerian ke posko pengungsian.")
         ]
     },
     {
@@ -1615,8 +1615,8 @@ ISSUE_DEFINITIONS = [
         'layers': [
             ("L1 Pasokan Air Minum & Jaringan SPAM", "Positif", "#10B981", "Apresiasi peresmian dan perluasan pipa sambungan rumah air bersih SPAM."),
             ("L2 Irigasi Sawah & Ketahanan Pangan", "Positif", "#10B981", "Dukungan petani terhadap normalisasi saluran primer/sekunder penunjang panen."),
-            ("L3 Keluhan Debit Air Musim Kemarau", "Netral", "#F59E0B", "Aspirasi kelompok tani agar pembagian air bendungan proporsional dan merata."),
-            ("L4 Pemeliharaan Fisik Bendungan & Waduk", "Netral", "#F59E0B", "Monitoring kapasitas tampung waduk dan pengerukan sedimentasi berkala."),
+            ("L3 Keluhan Debit Air Musim Kemarau", "Netral", "#94A3B8", "Aspirasi kelompok tani agar pembagian air bendungan proporsional dan merata."),
+            ("L4 Pemeliharaan Fisik Bendungan & Waduk", "Netral", "#94A3B8", "Monitoring kapasitas tampung waduk dan pengerukan sedimentasi berkala."),
             ("L5 Aduan Pipa Bocor & Tekanan Rendah", "Negatif", "#EF4444", "Aduan warga terkait keterlambatan perbaikan pipa distribusi di pemukiman.")
         ]
     },
@@ -1631,9 +1631,9 @@ ISSUE_DEFINITIONS = [
         'layers': [
             ("L1 Apresiasi Gedung Sekolah Rakyat Baru", "Positif", "#10B981", "Pujian atas fasilitas belajar modern, asrama, dan ruang kelas yang representatif."),
             ("L2 Revitalisasi Madrasah & Sekolah Daerah", "Positif", "#10B981", "Dukungan terhadap program rehabilitasi ruang belajar rusak di daerah 3T."),
-            ("L3 Kebutuhan Sarana Penunjang & Akses Jalan", "Netral", "#F59E0B", "Permintaan penataan trotoar dan akses jalan lingkungan menuju sekolah."),
-            ("L4 Harapan Pemerataan Fasilitas ke Pelosok", "Netral", "#F59E0B", "Aspirasi agar pembangunan sekolah rakyat menjangkau lebih banyak kabupaten."),
-            ("L5 Pengawasan Kualitas Konstruksi Bangunan", "Netral", "#F59E0B", "Desakan agar pengawasan mutu beton dan atap bangunan sekolah diperketat.")
+            ("L3 Kebutuhan Sarana Penunjang & Akses Jalan", "Netral", "#94A3B8", "Permintaan penataan trotoar dan akses jalan lingkungan menuju sekolah."),
+            ("L4 Harapan Pemerataan Fasilitas ke Pelosok", "Netral", "#94A3B8", "Aspirasi agar pembangunan sekolah rakyat menjangkau lebih banyak kabupaten."),
+            ("L5 Pengawasan Kualitas Konstruksi Bangunan", "Netral", "#94A3B8", "Desakan agar pengawasan mutu beton dan atap bangunan sekolah diperketat.")
         ]
     },
     {
@@ -1663,8 +1663,8 @@ ISSUE_DEFINITIONS = [
         'layers': [
             ("L1 Pemberitaan Penyidikan & Penggeledahan", "Negatif", "#EF4444", "Liputan media daring mengenai pemeriksaan saksi dan penggeledahan berkas."),
             ("L2 Sorotan Integritas Pejabat Satker Daerah", "Negatif", "#EF4444", "Kritik publik atas dugaan penyimpangan pelaksanaan lelang proyek jalan."),
-            ("L3 Dukungan Pembenahan Pengawasan Internal", "Netral", "#F59E0B", "Aspirasi agar Inspektorat Jenderal Kementerian memperketat audit preventif."),
-            ("L4 Klarifikasi Pemisahan Ranah Proyek", "Netral", "#F59E0B", "Penjelasan pemisahan antara kewenangan jalan provinsi dengan jalan nasional."),
+            ("L3 Dukungan Pembenahan Pengawasan Internal", "Netral", "#94A3B8", "Aspirasi agar Inspektorat Jenderal Kementerian memperketat audit preventif."),
+            ("L4 Klarifikasi Pemisahan Ranah Proyek", "Netral", "#94A3B8", "Penjelasan pemisahan antara kewenangan jalan provinsi dengan jalan nasional."),
             ("L5 Komitmen Dukungan Penuh Penegakan Hukum", "Positif", "#10B981", "Pernyataan resmi komitmen pimpinan kementerian kooperatif membantu KPK.")
         ]
     }

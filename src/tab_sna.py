@@ -71,7 +71,7 @@ def render_tab_sna(df_filtered, selected_topic, selected_platform, sna_max_nodes
         st.markdown("""
         <div style="background:#FFFFFF; border:1px solid #E2E8F0; padding:8px 14px; border-radius:8px; margin-bottom:12px; font-size:12px; display:flex; gap:20px; color:#334155;">
             <span><b style="color:#10B981;">●</b> Positif (Mendukung / Apresiasi)</span>
-            <span><b style="color:#F59E0B;">●</b> Netral (Informasi / Berita Formal)</span>
+            <span><b style="color:#94A3B8;">●</b> Netral (Informasi / Berita Formal)</span>
             <span><b style="color:#EF4444;">●</b> Negatif (Kritik / Sentimen Skeptis)</span>
         </div>
         """, unsafe_allow_html=True)

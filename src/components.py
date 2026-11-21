@@ -24,7 +24,7 @@ from collections import Counter
 # ======================================================================
 COLORS = {
     'Positif': '#10B981',
-    'Netral': '#F59E0B',
+    'Netral': '#94A3B8',
     'Negatif': '#EF4444',
     'bg_dark': '#0F172A',
     'bg_card': '#1E293B',
@@ -38,7 +38,7 @@ COLORS = {
     'accent_cyan': '#22D3EE',
 }
 
-SENTIMENT_COLORS = ['#10B981', '#F59E0B', '#EF4444']
+SENTIMENT_COLORS = ['#10B981', '#94A3B8', '#EF4444']
 EMOTION_COLORS = {
     # Positif
     'Joy': '#10B981',
@@ -56,12 +56,12 @@ EMOTION_COLORS = {
     'Disgust': '#B91C1C',
     'Sedih': '#991B1B',
     'Sadness': '#991B1B',
-    # Netral / Sedang / Diantara (Kuning / Amber)
+    # Netral / Sedang / Diantara
     'Surprise': '#F59E0B',
     'Terkejut': '#F59E0B',
-    'Informatif': '#F59E0B',
-    'Netral': '#F59E0B',
-    'Neutral': '#F59E0B',
+    'Informatif': '#94A3B8',
+    'Netral': '#94A3B8',
+    'Neutral': '#94A3B8',
 }
 
 PLATFORM_COLORS = {

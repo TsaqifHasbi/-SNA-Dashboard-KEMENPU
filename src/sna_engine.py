@@ -9,7 +9,7 @@ from pyvis.network import Network
 
 SENTIMENT_COLORS = {
     'Positif': '#10B981',  # Emerald Green
-    'Netral': '#F59E0B',   # Amber / Yellow
+    'Netral': '#94A3B8',   # Slate Gray
     'Negatif': '#EF4444',  # Crimson Red
 }
 
@@ -30,12 +30,12 @@ EMOTION_COLORS = {
     'Disgust': '#B91C1C',
     'Sedih': '#991B1B',        # Deep Red / Burgundy
     'Sadness': '#991B1B',
-    # Netral / Sedang / Diantara (Kuning / Amber)
+    # Netral / Sedang / Diantara
     'Surprise': '#F59E0B',     # Amber
     'Terkejut': '#F59E0B',
-    'Informatif': '#F59E0B',   # Amber
-    'Netral': '#F59E0B',
-    'Neutral': '#F59E0B',
+    'Informatif': '#94A3B8',   # Slate Gray
+    'Netral': '#94A3B8',       # Slate Gray
+    'Neutral': '#94A3B8',      # Slate Gray
 }
 
 def extract_mentions(text):

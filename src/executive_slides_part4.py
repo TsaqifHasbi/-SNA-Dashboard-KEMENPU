@@ -653,9 +653,9 @@ def render_slide_top_influencers_twitter(df, selected_topic='Kementerian_PU', to
             render_html("""<div style="font-size:13px; font-weight:700; color:#1E293B; margin-bottom:8px;">Matriks Pengaruh: Keterlibatan vs Jangkauan</div>""")
             fig = go.Figure()
             
-            sent_colors = {'Positif': '#10B981', 'Netral': '#F59E0B', 'Negatif': '#EF4444'}
+            sent_colors = {'Positif': '#10B981', 'Netral': '#94A3B8', 'Negatif': '#EF4444'}
             for row in top_tw.itertuples():
-                col = sent_colors.get(row.sentiment, '#F59E0B')
+                col = sent_colors.get(row.sentiment, '#94A3B8')
                 clean_name = f"@{str(row.author).strip().lstrip('@')}"
                 fig.add_trace(go.Scatter(
                     x=[row.mentions], y=[row.engagement],
