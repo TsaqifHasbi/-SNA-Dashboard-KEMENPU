@@ -895,87 +895,104 @@ def render_slide_3_chapter_1(df, selected_topic='Semua', topic_label=None, **kwa
 # SLIDE 4: OVERALL MEDIA & SOCIAL
 # ==============================================================================
 def render_slide_4_overall_media_social(df, selected_topic='Semua', topic_label=None, **kwargs):
+    import datetime
+    m = _get_slide_metrics(df, selected_topic, topic_label)
     render_mh_top_bar(slide_num=4)
     
-    df_full = kwargs.get('df_full', None)
-    if df_full is None:
-        try:
-            from src.data_loader import load_main_data
-            df_full = load_main_data()
-        except Exception:
-            df_full = df
-
-    m = _get_slide_metrics(df, selected_topic, topic_label, df_full=df_full)
-
-    kemen_df = df_full[df_full['topic'] == 'Kementerian_PU'] if 'topic' in df_full.columns else df_full
-    men_df = df_full[df_full['topic'] == 'Menteri_PU'] if 'topic' in df_full.columns else pd.DataFrame()
+    id_m = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'Mei', 6: 'Jun', 7: 'Jul', 8: 'Agu', 9: 'Sep', 10: 'Okt', 11: 'Nov', 12: 'Des'}
     
-    valid_dates = sorted(df_full['date'].dropna().dt.date.unique()) if 'date' in df_full.columns else []
-    dates_7 = valid_dates[-7:] if len(valid_dates) >= 7 else valid_dates
-
-    if m.get('is_official_week'):
-        s_title = "Overall Media & Social"
-        s_sub = "Volume naik; negatif lembaga naik, menteri turun"
-        s_guide = "Kiri: lembaga (279), kanan: menteri (280), per hari. Pembanding 2-8 Nov. Sentimen skema baru sejak 11 Nov."
-        chips = [
-            {"label": "Lembaga", "val": "3.123", "sub": "naik dari 2.738", "dot": "#2563EB", "val_color": "#2563EB"},
-            {"label": "Menteri", "val": "724", "sub": "naik dari 576", "dot": "#10B981", "val_color": "#0F2942"},
-            {"label": "Puncak Negatif", "val": "13 Nov", "sub": "lembaga 120 dari 613", "dot": "#EF4444", "val_color": "#EF4444"},
-            {"label": "Negatif Menteri", "val": "3,9%", "sub": "28 dari 724; dari 7%", "dot": "#EF4444", "val_color": "#EF4444"},
-            {"label": "Keterlibatan Menteri", "val": "791 rb", "sub": "naik dari 695 rb", "dot": "#2563EB", "val_color": "#2563EB"}
-        ]
-        x_labels = ['9 Nov', '10 Nov', '11 Nov', '12 Nov', '13 Nov', '14 Nov', '15 Nov']
-        k_pos = [1050, 240, 160, 210, 150, 180, 195]
-        k_net = [200, 75, 45, 52, 41, 45, 50]
-        k_neg = [49, 34, 95, 32, 120, 23, 13]
-        m_pos = [75, 60, 80, 110, 140, 125, 52]
-        m_net = [12, 10, 15, 20, 22, 18, 4]
-        m_neg = [3, 2, 8, 4, 7, 3, 1]
-        m_labels = ['3%', '3%', '8%', '3%', '4%', '2%', '2%']
+    # Lembaga & Menteri subsets according to active filtered df
+    if 'topic' in df.columns:
+        kemen_df = df[df['topic'] == 'Kementerian_PU']
+        men_df = df[(df['topic'] == 'Menteri_PU') | (df['raw_content'].astype(str).str.contains(r'menteri|dody|hanggodo', case=False, na=False))]
     else:
-        s_title = "Overall Media & Social"
-        s_sub = f"Dinamika Volume: Lembaga {m['vol_lembaga_display']} & Menteri {m['vol_menteri_display']}"
-        s_guide = f"Kiri: lembaga (Kementerian PU), kanan: menteri (Menteri PU), per hari. Periode {m.get('cur_str', '')} vs rentang pembanding {m.get('prev_str', '')}. Sentimen skema baru sejak 11 Nov."
-        chips = [
-            {"label": "Lembaga", "val": m['vol_lembaga_display'], "sub": m['vol_lembaga_sub'], "dot": "#2563EB", "val_color": "#2563EB"},
-            {"label": "Menteri", "val": m['vol_menteri_display'], "sub": m['vol_menteri_sub'], "dot": "#10B981", "val_color": "#0F2942"},
-            {"label": "Puncak Negatif", "val": m['peak_neg_day'], "sub": m['peak_neg_sub'], "dot": "#EF4444", "val_color": "#EF4444"},
-            {"label": "Negatif Menteri", "val": f"{m['neg_p_menteri_display']}%", "sub": m['neg_menteri_sub'], "dot": "#EF4444", "val_color": "#EF4444"},
-            {"label": "Keterlibatan Total", "val": m['eng_display'], "sub": m['eng_sub'], "dot": "#2563EB", "val_color": "#2563EB"}
-        ]
-        x_labels = [d.strftime('%d %b') for d in dates_7] if dates_7 else ['H-6', 'H-5', 'H-4', 'H-3', 'H-2', 'H-1', 'Hari Ini']
-        k_pos, k_net, k_neg = [], [], []
-        for d in dates_7:
-            sub = kemen_df[kemen_df['date'].dt.date == d] if 'date' in kemen_df.columns else pd.DataFrame()
-            k_pos.append(int((sub['sentiment_name'] == 'Positif').sum()) if len(sub) > 0 else 0)
-            k_net.append(int((sub['sentiment_name'] == 'Netral').sum()) if len(sub) > 0 else 0)
-            k_neg.append(int((sub['sentiment_name'] == 'Negatif').sum()) if len(sub) > 0 else 0)
+        kemen_df = df
+        men_df = df[df['raw_content'].astype(str).str.contains(r'menteri|dody|hanggodo', case=False, na=False)] if 'raw_content' in df.columns else df
 
-        m_pos, m_net, m_neg, m_labels = [], [], [], []
-        for d in dates_7:
-            sub = men_df[men_df['date'].dt.date == d] if 'date' in men_df.columns else pd.DataFrame()
-            p = int((sub['sentiment_name'] == 'Positif').sum()) if len(sub) > 0 else 0
-            n = int((sub['sentiment_name'] == 'Netral').sum()) if len(sub) > 0 else 0
-            g = int((sub['sentiment_name'] == 'Negatif').sum()) if len(sub) > 0 else 0
-            t = len(sub)
-            pct = round(g / t * 100) if t > 0 else 0
-            m_pos.append(p)
-            m_net.append(n)
-            m_neg.append(g)
-            m_labels.append(f"{pct}%")
+    vol_k = len(kemen_df)
+    neg_k = int((kemen_df['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in kemen_df.columns else 0
+    neg_p_k = round(neg_k / max(1, vol_k) * 100, 1)
+
+    vol_m = len(men_df)
+    neg_m = int((men_df['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in men_df.columns else 0
+    neg_p_m = round(neg_m / max(1, vol_m) * 100, 1)
+
+    # Deteksi hari puncak kritik negatif dari data riil
+    valid_dates = sorted(df['date'].dropna().dt.date.unique()) if 'date' in df.columns and len(df) > 0 else []
+    
+    if len(valid_dates) > 0 and 'sentiment_name' in df.columns:
+        neg_series = df[df['sentiment_name'] == 'Negatif'].groupby(df['date'].dt.date).size()
+        if len(neg_series) > 0 and neg_series.max() > 0:
+            peak_d = neg_series.idxmax()
+            peak_d_str = f"{peak_d.day:02d} {id_m.get(peak_d.month, peak_d.strftime('%b'))}"
+            peak_val = int(neg_series.max())
+            total_day_vol = int((df['date'].dt.date == peak_d).sum())
+            peak_sub = f"{peak_val:,} negatif dari {total_day_vol:,} sebutan"
+        else:
+            peak_d_str = "-"
+            peak_val = 0
+            total_day_vol = 0
+            peak_sub = "tidak ada anomali kritik"
+    else:
+        peak_d_str = "-"
+        peak_val = 0
+        total_day_vol = 0
+        peak_sub = "data tanggal belum tersedia"
+
+    total_eng = int(df['total_engagement'].sum()) if 'total_engagement' in df.columns and len(df) > 0 else 0
+
+    s_title = "Overall Media & Social"
+    s_sub = f"Dinamika Volume: Lembaga {vol_k:,} & Menteri {vol_m:,} Sebutan"
+    s_guide = f"Kiri: tren harian Lembaga (Kementerian PU), kanan: tren Menteri PU. Periode aktif {m.get('cur_str', '')}. Inferensi IndoBERT Multiplatform."
 
     render_mh_title(s_title, s_sub, s_guide)
+
+    chips = [
+        {"label": "Lembaga (PU)", "val": f"{vol_k:,}", "sub": f"negatif {neg_k:,} ({neg_p_k}%)", "dot": "#2563EB", "val_color": "#2563EB"},
+        {"label": "Menteri PU", "val": f"{vol_m:,}", "sub": f"negatif {neg_m:,} ({neg_p_m}%)", "dot": "#10B981", "val_color": "#0F2942"},
+        {"label": "Puncak Negatif", "val": peak_d_str, "sub": peak_sub, "dot": "#EF4444", "val_color": "#EF4444" if peak_val > 0 else "#10B981"},
+        {"label": "Negatif Menteri", "val": f"{neg_p_m}%", "sub": f"{neg_m:,} dari {vol_m:,} sebutan", "dot": "#EF4444", "val_color": "#EF4444" if neg_m > 0 else "#10B981"},
+        {"label": "Keterlibatan Total", "val": fmt_val(total_eng), "sub": "akumulasi interaksi warganet", "dot": "#2563EB", "val_color": "#2563EB"}
+    ]
     render_kpi_chips(chips)
+
+    # Batasi tanggal plot maksimal 14 hari agar diagram batang tetap proporsional dan mudah dibaca
+    dates_plot = valid_dates[-14:] if len(valid_dates) > 14 else valid_dates
+    x_labels = [f"{d.day:02d} {id_m.get(d.month, d.strftime('%b'))}" for d in dates_plot] if dates_plot else ['Hari Ini']
+
+    k_pos, k_net, k_neg = [], [], []
+    for d in dates_plot:
+        sub = kemen_df[kemen_df['date'].dt.date == d] if 'date' in kemen_df.columns else pd.DataFrame()
+        k_pos.append(int((sub['sentiment_name'] == 'Positif').sum()) if len(sub) > 0 else 0)
+        k_net.append(int((sub['sentiment_name'] == 'Netral').sum()) if len(sub) > 0 else 0)
+        k_neg.append(int((sub['sentiment_name'] == 'Negatif').sum()) if len(sub) > 0 else 0)
+
+    m_pos, m_net, m_neg, m_labels = [], [], [], []
+    for d in dates_plot:
+        sub = men_df[men_df['date'].dt.date == d] if 'date' in men_df.columns else pd.DataFrame()
+        p = int((sub['sentiment_name'] == 'Positif').sum()) if len(sub) > 0 else 0
+        n = int((sub['sentiment_name'] == 'Netral').sum()) if len(sub) > 0 else 0
+        g = int((sub['sentiment_name'] == 'Negatif').sum()) if len(sub) > 0 else 0
+        t = len(sub)
+        pct = round(g / t * 100) if t > 0 else 0
+        m_pos.append(p)
+        m_net.append(n)
+        m_neg.append(g)
+        m_labels.append(f"{pct}%" if g > 0 else "")
+
+    if not dates_plot:
+        k_pos, k_net, k_neg = [0], [0], [0]
+        m_pos, m_net, m_neg, m_labels = [0], [0], [0], [""]
 
     col_left, col_right = st.columns(2, gap="medium")
     with col_left:
         fig_l = go.Figure()
         fig_l.add_trace(go.Bar(name='Positif', x=x_labels, y=k_pos, marker_color='#10B981'))
-        fig_l.add_trace(go.Bar(name='Netral', x=x_labels, y=k_net, marker_color='#F59E0B'))
+        fig_l.add_trace(go.Bar(name='Netral', x=x_labels, y=k_net, marker_color='#94A3B8'))  # Warna netral abu-abu elegan
         fig_l.add_trace(go.Bar(name='Negatif', x=x_labels, y=k_neg, marker_color='#EF4444'))
         fig_l.update_layout(
             barmode='stack',
-            title=dict(text="<b>Lembaga - Penyebutan per Hari</b>", font=dict(size=12, color='#0F2942')),
+            title=dict(text=f"<b>Lembaga - Tren Harian ({vol_k:,} sebutan)</b>", font=dict(size=12, color='#0F2942')),
             height=280,
             margin=dict(l=10, r=10, t=30, b=10),
             paper_bgcolor='#FFFFFF',
@@ -987,11 +1004,11 @@ def render_slide_4_overall_media_social(df, selected_topic='Semua', topic_label=
     with col_right:
         fig_r = go.Figure()
         fig_r.add_trace(go.Bar(name='Positif', x=x_labels, y=m_pos, marker_color='#10B981'))
-        fig_r.add_trace(go.Bar(name='Netral', x=x_labels, y=m_net, marker_color='#F59E0B'))
+        fig_r.add_trace(go.Bar(name='Netral', x=x_labels, y=m_net, marker_color='#94A3B8'))  # Warna netral abu-abu elegan
         fig_r.add_trace(go.Bar(name='Negatif', x=x_labels, y=m_neg, marker_color='#EF4444', text=m_labels, textposition='outside'))
         fig_r.update_layout(
             barmode='stack',
-            title=dict(text="<b>Menteri - Jumlah Penyebutan per Hari</b>", font=dict(size=12, color='#0F2942')),
+            title=dict(text=f"<b>Menteri - Tren Harian ({vol_m:,} sebutan)</b>", font=dict(size=12, color='#0F2942')),
             height=280,
             margin=dict(l=10, r=10, t=30, b=10),
             paper_bgcolor='#FFFFFF',
@@ -1000,11 +1017,16 @@ def render_slide_4_overall_media_social(df, selected_topic='Semua', topic_label=
         )
         st.plotly_chart(fig_r, use_container_width=True, config={'displayModeBar': False})
 
-    render_callout_target(
-        "Mengapa Negatif 11 dan 13 Nov Melonjak",
-        "Negatif lembaga 13-36 per hari kecuali 11 Nov (95) dan 13 Nov (120); keduanya dari perkara KPK jalan Sumut: geledah di 40 portal, lalu 59 RT seragam di X. Tanpa KPK tinggal 9 dan 35. Menteri 1-8 per hari. Keterlibatan lembaga naik 31% (1,99 jt ke 2,61 jt), menteri naik 14% (695 rb ke 791 rb): video jalan nasional dan tol membawa perhatian."
-    )
-    render_mh_footer("Edisi Mingguan 9-15 Nov 2026 Sumber: Pemantau Echo 279 dan 280, 9-15 Nov (ditarik 16 Nov 08.45 WIB)")
+    # Callout Dinamis berbasis temuan data riil
+    if peak_val > 0:
+        callout_title = f"Dinamika Puncak Kritik: {peak_d_str}"
+        callout_desc = f"Puncak sebutan negatif tercatat pada {peak_d_str} sebanyak {peak_val:,} kritik dari total {total_day_vol:,} percakapan harian. Lembaga mencatat total {vol_k:,} sebutan dengan rasio kritik {neg_p_k}%, sementara figur Menteri mencatat {vol_m:,} sebutan dengan rasio kritik {neg_p_m}%. Akumulasi keterlibatan publik pada periode ini mencapai {fmt_val(total_eng)} interaksi."
+    else:
+        callout_title = "Sentimen Multiplatform Terkendali"
+        callout_desc = f"Selama periode {m.get('cur_str', '')}, percakapan publik terpantau kondusif dengan rasio sentimen positif Lembaga mencapai {round(int((kemen_df['sentiment_name'] == 'Positif').sum()) / max(1, vol_k) * 100, 1) if 'sentiment_name' in kemen_df.columns else 0}% dan total keterlibatan {fmt_val(total_eng)} interaksi."
+
+    render_callout_target(callout_title, callout_desc)
+    render_mh_footer(f"Edisi Evaluasi Multiplatform • Periode {m.get('cur_str', '')} • Sumber: Agregasi Percakapan Warganet IndoBERT & Pemantau Terintegrasi")
 
 
 # ==============================================================================
