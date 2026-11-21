@@ -614,7 +614,7 @@ if "Format Laporan Harian" in view_mode or "Laporan Harian" in view_mode or "Sli
         },
         "Bab 2: Analisis Mendalam (The Deep Dive)": {
             "Slide 8: Pembuka Bab 2 (The Deep Dive)": render_slide_8_chapter_2,
-            "Slide 9: Topik & Narasi - Kementerian PU (279)": render_slide_9_main_topics,
+            "Slide 9: Topik & Narasi - Kementerian PU": render_slide_9_main_topics,
             s10_label: render_slide_10_special_issue_1,
             s11_label: render_slide_11_special_issue_2,
             s12_label: render_slide_12_special_issue_3,
