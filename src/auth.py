@@ -81,8 +81,14 @@ def render_clean_html(html_str: str):
     st.markdown(clean, unsafe_allow_html=True)
 
 
+# Konfigurasi Integrasi Basis Data (Setel False agar murni menggunakan JSON lokal yang cepat dan mandiri)
+USE_DB_AUTH = False
+
+
 def _load_users_from_db():
-    """Mencoba memuat data akun pengguna dari tabel PostgreSQL 'users' lokal."""
+    """Mencoba memuat data akun pengguna dari tabel database (hanya jika USE_DB_AUTH=True)."""
+    if not USE_DB_AUTH:
+        return None
     try:
         from src.db_manager import get_db_engine
         from sqlalchemy import text
@@ -106,7 +112,9 @@ def _load_users_from_db():
 
 
 def _sync_user_to_db(username: str, user_dict: dict):
-    """Menyinkronkan satu akun pengguna ke tabel PostgreSQL 'users'."""
+    """Menyinkronkan satu akun pengguna ke tabel database (hanya jika USE_DB_AUTH=True)."""
+    if not USE_DB_AUTH:
+        return True
     try:
         from src.db_manager import get_db_engine
         from sqlalchemy import text
@@ -136,7 +144,9 @@ def _sync_user_to_db(username: str, user_dict: dict):
 
 
 def _delete_user_from_db(username: str):
-    """Menghapus akun dari tabel PostgreSQL 'users' jika username berganti."""
+    """Menghapus akun dari tabel database (hanya jika USE_DB_AUTH=True)."""
+    if not USE_DB_AUTH:
+        return True
     try:
         from src.db_manager import get_db_engine
         from sqlalchemy import text
@@ -151,12 +161,13 @@ def _delete_user_from_db(username: str):
 def _load_stored_credentials() -> dict:
     """
     Memuat data kredensial:
-    1. Prioritas utama: Membaca langsung dari PostgreSQL database lokal jika tersedia.
-    2. Fallback: Membaca dari file JSON lokal (untuk cloud/offline).
+    1. Membaca langsung dari berkas JSON lokal (data/user_credentials.json) secara instan (0 ms).
+    2. Fallback ke DEFAULT_USERS jika berkas belum tersedia.
     """
-    db_users = _load_users_from_db()
-    if db_users and len(db_users) > 0:
-        return db_users
+    if USE_DB_AUTH:
+        db_users = _load_users_from_db()
+        if db_users and len(db_users) > 0:
+            return db_users
 
     if not os.path.exists(CREDENTIALS_FILE):
         _save_stored_credentials(DEFAULT_USERS)
@@ -174,17 +185,16 @@ def _load_stored_credentials() -> dict:
 def _save_stored_credentials(users_dict: dict) -> bool:
     """
     Menyimpan seluruh data pengguna & kredensial:
-    1. Simpan ke berkas JSON lokal secara aman.
-    2. Sinkronkan ke database PostgreSQL lokal jika terhubung.
+    Simpan ke berkas JSON lokal secara aman.
     """
     try:
         os.makedirs(os.path.dirname(CREDENTIALS_FILE), exist_ok=True)
         with open(CREDENTIALS_FILE, "w", encoding="utf-8") as f:
             json.dump(users_dict, f, indent=2, ensure_ascii=False)
             
-        # Sinkronkan ke PostgreSQL
-        for u_id, u_info in users_dict.items():
-            _sync_user_to_db(u_id, u_info)
+        if USE_DB_AUTH:
+            for u_id, u_info in users_dict.items():
+                _sync_user_to_db(u_id, u_info)
             
         return True
     except Exception:
@@ -834,14 +844,15 @@ def render_user_management_panel():
     # Header Resmi Konsisten dengan Seluruh Modul Aplikasi
     render_slide_header("Manajemen Pengguna & Akses", "Sistem Intelijen Kebijakan Publik • Administrasi Hak Akses RBAC")
 
-    # Deteksi status koneksi PostgreSQL lokal secara dinamis
+    # Status penyimpanan kredensial
     is_pg_connected = False
-    try:
-        from src.db_manager import test_db_connection
-        res = test_db_connection()
-        is_pg_connected = isinstance(res, dict) and res.get("status") == "connected"
-    except Exception:
-        is_pg_connected = (_load_users_from_db() is not None)
+    if USE_DB_AUTH:
+        try:
+            from src.db_manager import test_db_connection
+            res = test_db_connection()
+            is_pg_connected = isinstance(res, dict) and res.get("status") == "connected"
+        except Exception:
+            is_pg_connected = False
 
     users = get_all_users()
     total_users = len(users)
@@ -851,12 +862,12 @@ def render_user_management_panel():
     db_pill = (
         '<span style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:#047857; background:#ECFDF5; border:1px solid #A7F3D0; padding:4px 10px; border-radius:6px;">'
         '<span style="width:6px; height:6px; border-radius:50%; background:#10B981;"></span>'
-        '<span>Basis Data: PostgreSQL 18 (db_kemenpu_sna)</span>'
+        '<span>Basis Kredensial: PostgreSQL 18</span>'
         '</span>'
     ) if is_pg_connected else (
-        '<span style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:#B45309; background:#FEF3C7; border:1px solid #FDE68A; padding:4px 10px; border-radius:6px;">'
-        '<span style="width:6px; height:6px; border-radius:50%; background:#F59E0B;"></span>'
-        '<span>Basis Data: File JSON Lokal (Fallback)</span>'
+        '<span style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:#047857; background:#ECFDF5; border:1px solid #A7F3D0; padding:4px 10px; border-radius:6px;">'
+        '<span style="width:6px; height:6px; border-radius:50%; background:#10B981;"></span>'
+        '<span>Basis Kredensial: File Terenkripsi Lokal (JSON)</span>'
         '</span>'
     )
 
