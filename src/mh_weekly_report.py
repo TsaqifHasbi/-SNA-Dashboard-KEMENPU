@@ -529,7 +529,7 @@ Pemantauan opini publik, percakapan warganet multiplatform (7 saluran), inferens
             labels=['Positif', 'Netral', 'Negatif'],
             values=[m['pos_c'], m['net_c'], m['neg_c']],
             hole=.65,
-            marker_colors=['#10B981', '#F59E0B', '#EF4444'],
+            marker_colors=['#10B981', '#94A3B8', '#EF4444'],
             textinfo='label+percent',
             textposition='outside',
             showlegend=False

@@ -226,7 +226,7 @@ def render_slide_overall_sentiment(df, selected_topic='Kementerian_PU', topic_la
                 labels=['Positif', 'Netral', 'Negatif'],
                 values=[pos_c, neu_c, neg_c],
                 hole=0.62,
-                marker=dict(colors=['#10B981', '#F59E0B', '#EF4444'], line=dict(color='#FFFFFF', width=2)),
+                marker=dict(colors=['#10B981', '#94A3B8', '#EF4444'], line=dict(color='#FFFFFF', width=2)),
                 textinfo='percent',
                 hoverinfo='label+value'
             )])
