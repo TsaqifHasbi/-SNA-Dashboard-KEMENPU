@@ -44,7 +44,7 @@
     "Neutral": "Netral"
   },
   "samples_per_class": 3500,
-  "total_train": 25200,
-  "total_val": 3150,
-  "total_test": 3150
+  "total_train": 16453,
+  "total_val": 2057,
+  "total_test": 2057
 }

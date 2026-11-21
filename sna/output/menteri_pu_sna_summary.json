@@ -1,38 +1,51 @@
 {
   "topic": "Menteri_PU",
-  "total_nodes": 4224,
-  "total_edges": 2306,
+  "total_nodes": 4555,
+  "total_edges": 2341,
   "top_influencers": [
     {
       "rank": 1,
       "user": "kementerianpu",
-      "in_degree": 164,
-      "out_degree": 156,
+      "in_degree": 212,
+      "out_degree": 160,
       "sentiment": "Netral",
       "emotion": "Neutral",
-      "nss": 22.3,
+      "nss": 22.15,
       "platform": "Threads",
-      "engagement": 219969,
-      "post_count": 139,
-      "composite_score": 1998.97
+      "engagement": 220177,
+      "post_count": 149,
+      "composite_score": 2489.18
     },
     {
       "rank": 2,
-      "user": "bakom.ri",
-      "in_degree": 165,
-      "out_degree": 0,
+      "user": "beritaonline",
+      "in_degree": 3,
+      "out_degree": 42,
       "sentiment": "Netral",
       "emotion": "Neutral",
-      "nss": 14.55,
-      "platform": "Mentioned",
+      "nss": 0.61,
+      "platform": "News",
       "engagement": 0,
-      "post_count": 0,
-      "composite_score": 1650.0
+      "post_count": 1958,
+      "composite_score": 1988.0
     },
     {
       "rank": 3,
+      "user": "bakom.ri",
+      "in_degree": 187,
+      "out_degree": 0,
+      "sentiment": "Netral",
+      "emotion": "Neutral",
+      "nss": 16.04,
+      "platform": "Mentioned",
+      "engagement": 0,
+      "post_count": 0,
+      "composite_score": 1870.0
+    },
+    {
+      "rank": 4,
       "user": "dody_hanggodo",
-      "in_degree": 147,
+      "in_degree": 156,
       "out_degree": 11,
       "sentiment": "Netral",
       "emotion": "Anticipation",
@@ -40,33 +53,20 @@
       "platform": "Instagram",
       "engagement": 16550,
       "post_count": 8,
-      "composite_score": 1494.55
-    },
-    {
-      "rank": 4,
-      "user": "beritaonline",
-      "in_degree": 1,
-      "out_degree": 35,
-      "sentiment": "Netral",
-      "emotion": "Neutral",
-      "nss": 0.42,
-      "platform": "News",
-      "engagement": 0,
-      "post_count": 1439,
-      "composite_score": 1449.0
+      "composite_score": 1584.55
     },
     {
       "rank": 5,
       "user": "kemenpu",
-      "in_degree": 67,
-      "out_degree": 227,
+      "in_degree": 65,
+      "out_degree": 244,
       "sentiment": "Netral",
       "emotion": "Neutral",
-      "nss": 10.83,
+      "nss": 10.31,
       "platform": "Twitter",
-      "engagement": 400515,
-      "post_count": 277,
-      "composite_score": 1347.51
+      "engagement": 552869,
+      "post_count": 291,
+      "composite_score": 1493.87
     },
     {
       "rank": 6,
@@ -75,16 +75,29 @@
       "out_degree": 0,
       "sentiment": "Netral",
       "emotion": "Trust",
-      "nss": 25.0,
+      "nss": 8.33,
       "platform": "Threads",
-      "engagement": 1037666,
-      "post_count": 8,
-      "composite_score": 1045.67
+      "engagement": 1037669,
+      "post_count": 12,
+      "composite_score": 1049.67
     },
     {
       "rank": 7,
+      "user": "ir.",
+      "in_degree": 76,
+      "out_degree": 0,
+      "sentiment": "Netral",
+      "emotion": "Neutral",
+      "nss": 9.21,
+      "platform": "Mentioned",
+      "engagement": 0,
+      "post_count": 0,
+      "composite_score": 760.0
+    },
+    {
+      "rank": 8,
       "user": "prabowo",
-      "in_degree": 72,
+      "in_degree": 76,
       "out_degree": 0,
       "sentiment": "Netral",
       "emotion": "Neutral",
@@ -92,33 +105,20 @@
       "platform": "Mentioned",
       "engagement": 0,
       "post_count": 0,
-      "composite_score": 720.0
-    },
-    {
-      "rank": 8,
-      "user": "badan",
-      "in_degree": 62,
-      "out_degree": 0,
-      "sentiment": "Netral",
-      "emotion": "Neutral",
-      "nss": 17.74,
-      "platform": "Mentioned",
-      "engagement": 0,
-      "post_count": 0,
-      "composite_score": 620.0
+      "composite_score": 760.0
     },
     {
       "rank": 9,
-      "user": "ir.",
-      "in_degree": 62,
+      "user": "badan",
+      "in_degree": 72,
       "out_degree": 0,
       "sentiment": "Netral",
       "emotion": "Neutral",
-      "nss": 16.13,
+      "nss": 13.89,
       "platform": "Mentioned",
       "engagement": 0,
       "post_count": 0,
-      "composite_score": 620.0
+      "composite_score": 720.0
     },
     {
       "rank": 10,
@@ -127,11 +127,11 @@
       "out_degree": 0,
       "sentiment": "Netral",
       "emotion": "Joy",
-      "nss": 25.0,
+      "nss": 35.71,
       "platform": "Threads",
-      "engagement": 608423,
-      "post_count": 8,
-      "composite_score": 616.42
+      "engagement": 608427,
+      "post_count": 14,
+      "composite_score": 622.43
     },
     {
       "rank": 11,
@@ -148,6 +148,19 @@
     },
     {
       "rank": 12,
+      "user": "sekretariat.kabinet",
+      "in_degree": 25,
+      "out_degree": 0,
+      "sentiment": "Netral",
+      "emotion": "Neutral",
+      "nss": 0.0,
+      "platform": "Instagram",
+      "engagement": 310469,
+      "post_count": 1,
+      "composite_score": 561.47
+    },
+    {
+      "rank": 13,
       "user": "laporan8.id",
       "in_degree": 0,
       "out_degree": 0,
@@ -160,20 +173,20 @@
       "composite_score": 553.36
     },
     {
-      "rank": 13,
-      "user": "sekretariat.kabinet",
-      "in_degree": 23,
-      "out_degree": 0,
-      "sentiment": "Netral",
-      "emotion": "Neutral",
-      "nss": 0.0,
-      "platform": "Instagram",
-      "engagement": 310469,
-      "post_count": 1,
-      "composite_score": 541.47
+      "rank": 14,
+      "user": "dodyhanggodo",
+      "in_degree": 51,
+      "out_degree": 20,
+      "sentiment": "Positif",
+      "emotion": "Surprise",
+      "nss": 38.46,
+      "platform": "TikTok",
+      "engagement": 5557,
+      "post_count": 13,
+      "composite_score": 528.56
     },
     {
-      "rank": 14,
+      "rank": 15,
       "user": "tapberita",
       "in_degree": 0,
       "out_degree": 0,
@@ -186,20 +199,20 @@
       "composite_score": 519.47
     },
     {
-      "rank": 15,
+      "rank": 16,
       "user": "pu_setjen_biroumum",
       "in_degree": 47,
       "out_degree": 7,
       "sentiment": "Netral",
       "emotion": "Neutral",
-      "nss": 41.86,
+      "nss": 43.18,
       "platform": "TikTok",
-      "engagement": 2882,
-      "post_count": 43,
-      "composite_score": 515.88
+      "engagement": 2940,
+      "post_count": 44,
+      "composite_score": 516.94
     },
     {
-      "rank": 16,
+      "rank": 17,
       "user": "kicaumedia_",
       "in_degree": 0,
       "out_degree": 0,
@@ -212,7 +225,7 @@
       "composite_score": 507.85
     },
     {
-      "rank": 17,
+      "rank": 18,
       "user": "depokhariini",
       "in_degree": 0,
       "out_degree": 0,
@@ -225,47 +238,34 @@
       "composite_score": 504.41
     },
     {
-      "rank": 18,
-      "user": "sahabatpu",
-      "in_degree": 44,
-      "out_degree": 15,
-      "sentiment": "Netral",
-      "emotion": "Neutral",
-      "nss": 12.0,
-      "platform": "News",
-      "engagement": 0,
-      "post_count": 50,
-      "composite_score": 490.0
-    },
-    {
       "rank": 19,
-      "user": "dodyhanggodo",
-      "in_degree": 46,
-      "out_degree": 20,
+      "user": "ubegebe1",
+      "in_degree": 0,
+      "out_degree": 3,
       "sentiment": "Positif",
-      "emotion": "Surprise",
-      "nss": 36.36,
-      "platform": "TikTok",
-      "engagement": 5155,
-      "post_count": 11,
-      "composite_score": 476.15
+      "emotion": "Anticipation",
+      "nss": 50.0,
+      "platform": "Threads",
+      "engagement": 500730,
+      "post_count": 2,
+      "composite_score": 502.73
     },
     {
       "rank": 20,
-      "user": "metropolitanid_",
+      "user": "gedeadnyana",
       "in_degree": 0,
-      "out_degree": 0,
-      "sentiment": "Negatif",
-      "emotion": "Anger",
-      "nss": -100.0,
-      "platform": "Instagram",
-      "engagement": 446657,
+      "out_degree": 3,
+      "sentiment": "Netral",
+      "emotion": "Sadness",
+      "nss": 0.0,
+      "platform": "Threads",
+      "engagement": 500022,
       "post_count": 1,
-      "composite_score": 447.66
+      "composite_score": 501.02
     }
   ],
   "edge_layers": {
-    "mention_edges": 1511,
-    "co_keyword_edges": 1609
+    "mention_edges": 1711,
+    "co_keyword_edges": 1545
   }
 }

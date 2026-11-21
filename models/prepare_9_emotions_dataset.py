@@ -26,7 +26,7 @@ if sys.platform == 'win32':
         pass
 
 # Paths
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'IndoBERT_SNA_MT_PP'))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 DATA_DIR = os.path.join(BASE_DIR, 'data')
 PARQUET_PATH = os.path.join(DATA_DIR, 'enriched_corpus_for_sna.parquet')
 
