@@ -24,6 +24,13 @@ from pathlib import Path
 # pyrefly: ignore[missing-import]
 import streamlit as st
 
+# Zona Waktu Resmi Indonesia Barat (WIB = UTC+7)
+WIB_TZ = datetime.timezone(datetime.timedelta(hours=7))
+
+def get_now_wib() -> datetime.datetime:
+    """Mengembalikan objek datetime terkini dalam zona waktu resmi WIB (UTC+7)."""
+    return datetime.datetime.now(WIB_TZ)
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 CREDENTIALS_FILE = os.path.join(BASE_DIR, "data", "user_credentials.json")
 SESSIONS_FILE = os.path.join(BASE_DIR, "data", "active_sessions.json")
@@ -302,7 +309,7 @@ def update_user_credentials(target_key: str, new_username: str, new_password: st
             return False, "Kata sandi baru minimal harus 6 karakter."
         user_record["password_hash"] = _hash_string(new_password.strip())
         
-    user_record["updated_at"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S WIB")
+    user_record["updated_at"] = get_now_wib().strftime("%Y-%m-%d %H:%M:%S WIB")
     
     # Hapus key lama jika username berganti
     if new_u_clean != target_key:
@@ -350,7 +357,7 @@ def create_new_user_by_admin(username: str, full_name: str, password: str, role:
         "role": role,
         "badge_color": meta["badge_color"],
         "email": email.strip() if email else f"{u_clean}@pu.go.id",
-        "created_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S WIB")
+        "created_at": get_now_wib().strftime("%Y-%m-%d %H:%M:%S WIB")
     }
     
     if not _save_stored_credentials(users):
@@ -438,7 +445,8 @@ def _register_session(username: str, remember: bool = True) -> str:
     sessions = _load_active_sessions()
     sessions["tokens"][token] = {
         "username": username.strip().lower(),
-        "created_at": datetime.datetime.now().strftime("%d %b %Y, %H:%M WIB"),
+        "created_at": get_now_wib().strftime("%H:%M WIB"),
+        "created_at_full": get_now_wib().strftime("%d %b %Y, %H:%M WIB"),
         "expires_at": expires_at,
         "version": GLOBAL_SESSION_VERSION,
         "remember": remember
@@ -500,7 +508,7 @@ def login_user(username: str, user_info: dict, remember: bool = True):
     st.session_state["user_info"] = user_info
     st.session_state["session_token"] = token
     st.session_state["session_version"] = GLOBAL_SESSION_VERSION
-    st.session_state["login_time"] = datetime.datetime.now().strftime("%H:%M WIB")
+    st.session_state["login_time"] = get_now_wib().strftime("%H:%M WIB")
     st.session_state["session_expires_at"] = expires_at
     
     # Simpan token ke query params browser agar sesi bertahan saat reload halaman (F5)
@@ -597,7 +605,10 @@ def check_authentication() -> bool:
                 st.session_state["user_info"] = user_info
                 st.session_state["session_token"] = token
                 st.session_state["session_version"] = GLOBAL_SESSION_VERSION
-                st.session_state["login_time"] = s_info.get("created_at", datetime.datetime.now().strftime("%H:%M WIB"))
+                s_created = s_info.get("created_at") or get_now_wib().strftime("%H:%M WIB")
+                if "," in s_created:
+                    s_created = s_created.split(",")[-1].strip()
+                st.session_state["login_time"] = s_created
                 st.session_state["session_expires_at"] = exp_ts
                 
                 # Sinkronkan kembali query param di URL
