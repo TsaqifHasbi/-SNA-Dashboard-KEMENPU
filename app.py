@@ -439,18 +439,18 @@ with st.sidebar:
     """)
     
     # 1. Topic Selector
-    topic_options = ["Kementerian_PU", "Menteri_PU", "Semua Topik"]
+    topic_options = ["Semua Topik", "Kementerian_PU", "Menteri_PU"]
     topic_display = {
+        "Semua Topik": "Semua Topik",
         "Kementerian_PU": "Kementerian Pekerjaan Umum",
-        "Menteri_PU": "Menteri Pekerjaan Umum",
-        "Semua Topik": "Semua Topik"
+        "Menteri_PU": "Menteri Pekerjaan Umum"
     }
     selected_topic_raw = st.selectbox(
         "Topik Fokus Kebijakan:",
         topic_options,
         index=0,
         format_func=lambda x: topic_display.get(x, x),
-        help="Pilih fokus kebijakan: Kementerian Pekerjaan Umum, Menteri Pekerjaan Umum, atau Semua Topik"
+        help="Pilih fokus kebijakan: Semua Topik, Kementerian Pekerjaan Umum, atau Menteri Pekerjaan Umum"
     )
     selected_topic = "Semua" if selected_topic_raw == "Semua Topik" else selected_topic_raw
 
