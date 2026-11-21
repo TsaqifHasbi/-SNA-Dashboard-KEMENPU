@@ -1169,7 +1169,7 @@ Tujuh Saluran - Urut dari Keterlibatan
             'Trust': '#2563EB', 'Percaya': '#2563EB',
             'Fear': '#DC2626', 'Takut': '#DC2626',
             'Anticipation': '#F59E0B', 'Antisipasi': '#F59E0B',
-            'Neutral': '#F59E0B', 'Netral': '#F59E0B',
+            'Neutral': '#94A3B8', 'Netral': '#94A3B8',
         }
         
         target_emos = m.get('aff_pcts', m.get('emo_pcts', {}))
@@ -1504,7 +1504,7 @@ def render_slide_7_issues_minister(df, selected_topic='Semua', topic_label=None,
     chips = [
         {"label": "Penyebutan", "val": f"{m_vol:,}".replace(',', '.'), "sub": f"rentang {start_str} - {end_str}", "dot": "#10B981"},
         {"label": "Positif", "val": f"{m_pos_p}%", "sub": f"{m_pos_c:,} dari {m_vol:,} sebutan".replace(',', '.'), "dot": "#10B981", "val_color": "#10B981"},
-        {"label": "Netral", "val": f"{m_neu_p}%", "sub": f"{m_neu_c:,} sebutan".replace(',', '.'), "dot": "#F59E0B", "val_color": "#D97706"},
+        {"label": "Netral", "val": f"{m_neu_p}%", "sub": f"{m_neu_c:,} sebutan".replace(',', '.'), "dot": "#94A3B8", "val_color": "#64748B"},
         {"label": "Negatif", "val": f"{m_neg_p}%", "sub": f"{m_neg_c:,} kritik; terjaga rendah".replace(',', '.'), "dot": "#EF4444", "val_color": "#EF4444"},
         {"label": top_neg_plat, "val": f"{top_neg_count}", "sub": f"dari {m_neg_c:,} negatif menteri".replace(',', '.'), "dot": "#EF4444" if top_neg_count > 0 else "#10B981"}
     ]
@@ -2021,7 +2021,7 @@ def render_dynamic_special_issue_slide(df, rank=1, slide_num=10, selected_topic=
     chips = [
         {"label": "Sebutan Isu", "val": vol_disp, "sub": f"{issue['vol_pct']}% dari total sebutan", "dot": issue['primary_color'], "val_color": issue['primary_color']},
         {"label": "Positif", "val": f"{issue['pos_pct']}%", "sub": pos_sub, "dot": "#10B981", "val_color": "#10B981"},
-        {"label": "Netral", "val": f"{issue['neu_pct']}%", "sub": neu_sub, "dot": "#F59E0B", "val_color": "#D97706"},
+        {"label": "Netral", "val": f"{issue['neu_pct']}%", "sub": neu_sub, "dot": "#94A3B8", "val_color": "#64748B"},
         {"label": "Negatif", "val": f"{issue['neg_pct']}%", "sub": neg_sub, "dot": "#EF4444", "val_color": "#EF4444"},
         {"label": "Kanal Terbanyak", "val": issue['top_platform'], "sub": plat_sub, "dot": "#2563EB", "val_color": "#0F2942"}
     ]
@@ -2151,73 +2151,159 @@ def render_slide_12_special_issue_3(df, selected_topic='Semua', topic_label=None
 # SLIDE 12: PENANGANAN BENCANA OLEH KEMENTERIAN PU
 # ==============================================================================
 def render_slide_12_disaster_response_kemenpu(df, selected_topic='Semua', topic_label=None, **kwargs):
+    import re
     m = _get_slide_metrics(df, selected_topic, topic_label)
     render_mh_top_bar(slide_num=12)
+
+    # 1. Filter subset korpus terkait bencana & kedaruratan infrastruktur
+    d_pattern = r'\b(?:banjir|longsor|gempa|bencana|tanggul|darurat|jembatan|kekeringan|krisis\s+air|air\s+bersih|karhutla|cuaca)\b'
+    if 'raw_content' in df.columns:
+        d_mask = df['raw_content'].str.contains(d_pattern, case=False, na=False)
+        df_dis = df[d_mask]
+    else:
+        df_dis = df.head(0)
+
+    total_dis = len(df_dis)
+    if total_dis > 0:
+        jembatan_cnt = int(df_dis['raw_content'].str.contains(r'jembatan', case=False, na=False).sum())
+        banjir_cnt = int(df_dis['raw_content'].str.contains(r'banjir', case=False, na=False).sum())
+        longsor_cnt = int(df_dis['raw_content'].str.contains(r'longsor', case=False, na=False).sum())
+        air_cnt = int(df_dis['raw_content'].str.contains(r'air\s+bersih|kekeringan|krisis\s+air', case=False, na=False).sum())
+        dis_pos = int((df_dis['sentiment_name'] == 'Positif').sum()) if 'sentiment_name' in df_dis.columns else 0
+        dis_neg = int((df_dis['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in df_dis.columns else 0
+        dis_pos_pct = round(dis_pos / max(1, total_dis) * 100, 1)
+
+        # Deteksi wilayah/lokus paling sering disebut
+        loc_candidates = [
+            ('Aceh', r'\b(?:aceh|tamiang|gayo|pidie)\b'),
+            ('Sumatera', r'\b(?:sumut|sumbar|padang|riau|medan)\b'),
+            ('Jawa Barat', r'\b(?:jabar|tasikmalaya|bandung|bogor|bekasi)\b'),
+            ('Jawa Tengah & Timur', r'\b(?:jateng|jatim|semarang|surabaya|pekalongan)\b'),
+            ('NTT & Bali', r'\b(?:ntt|flores|kupang|bali)\b'),
+            ('Kalimantan & Sulawesi', r'\b(?:kalimantan|samarinda|sulawesi|makassar)\b'),
+            ('Jabodetabek', r'\b(?:jakarta|bogor|depok|tangerang|bekasi)\b'),
+        ]
+        loc_counts = []
+        for loc_name, loc_regex in loc_candidates:
+            c = int(df_dis['raw_content'].str.contains(loc_regex, case=False, na=False).sum())
+            if c > 0:
+                loc_counts.append((loc_name, c))
+        loc_counts.sort(key=lambda x: x[1], reverse=True)
+        top_loc_name = loc_counts[0][0] if loc_counts else "Wilayah Prioritas"
+
+        df_dis_pos = df_dis[df_dis['sentiment_name'] == 'Positif'] if 'sentiment_name' in df_dis.columns else df_dis
+        df_dis_neg = df_dis[df_dis['sentiment_name'] == 'Negatif'] if 'sentiment_name' in df_dis.columns else df_dis
+    else:
+        jembatan_cnt = banjir_cnt = longsor_cnt = air_cnt = dis_pos = dis_neg = 0
+        dis_pos_pct = 0.0
+        top_loc_name = "Wilayah Terpantau"
+        df_dis_pos = df_dis_neg = df.head(0)
+
+    # Title & Subtitle Dinamis
+    sub_title = f"{top_loc_name} menjadi fokus; {banjir_cnt:,} banjir & {longsor_cnt:,} longsor terpantau".replace(',', '.') if total_dis > 0 else "Kesiapsiagaan Tanggap Darurat & Mitigasi Bencana"
     render_mh_title(
         "Penanganan Bencana oleh Kementerian PU",
-        "Aceh dijawab cepat; krisis air dan karhutla tanpa kabar",
-        "Hanya kegiatan kementerian dan unitnya. Penanganan pemda, BPBD, TNI dicatat sebagai konteks."
+        sub_title,
+        f"Pemantauan kegiatan kementerian & balai wilayah ({m.get('start_str', 'Awal')} - {m.get('end_str', 'Akhir')}). Kiri: respon fisik balai. Kanan: sebaran aduan warga."
     )
-    
+
+    # 5 KPI Chips Dinamis
     chips = [
-        {"label": "Jembatan Putus", "val": "4", "sub": "Gayo Lues, 14 Nov", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "Kegiatan Baru", "val": "4", "sub": "diberitakan 9-16 Nov", "dot": "#10B981"},
-        {"label": "Korban Longsor", "val": "1", "sub": "balita, ruas Aceh Tengah", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "Krisis Air", "val": "90", "sub": "berita, 13-16 Nov", "dot": "#64748B"},
-        {"label": "Banjir-Gempa", "val": "101", "sub": "berita, 14-16 Nov", "dot": "#2563EB"}
+        {"label": "Banjir & Tanggul", "val": f"{banjir_cnt:,}".replace(',', '.'), "sub": "sebutan genangan", "dot": "#EF4444", "val_color": "#EF4444" if banjir_cnt > 0 else "#64748B"},
+        {"label": "Longsor Ruas", "val": f"{longsor_cnt:,}".replace(',', '.'), "sub": "titik tebing & jalan", "dot": "#EF4444", "val_color": "#EF4444" if longsor_cnt > 0 else "#64748B"},
+        {"label": "Jembatan Darurat", "val": f"{jembatan_cnt:,}".replace(',', '.'), "sub": "akses & preservasi", "dot": "#2563EB", "val_color": "#2563EB"},
+        {"label": "Krisis Air & SDA", "val": f"{air_cnt:,}".replace(',', '.'), "sub": "aduan pasokan air", "dot": "#F59E0B", "val_color": "#D97706" if air_cnt > 0 else "#64748B"},
+        {"label": "Respon Positif", "val": f"{dis_pos_pct}%", "sub": f"{dis_pos:,} apresiasi balai".replace(',', '.'), "dot": "#10B981", "val_color": "#10B981"}
     ]
     render_kpi_chips(chips)
-    
+
     c_pu, c_oth = st.columns([1.1, 0.9], gap="medium")
-    
+
+    pos_items = []
+    if len(df_dis_pos) > 0:
+        seen = set()
+        for _, r in df_dis_pos.iterrows():
+            t = str(r.get('raw_content', '')).strip().replace('\n', ' ')
+            t = re.sub(r'\s+', ' ', t)
+            snip = t[:95] + ('...' if len(t) > 95 else '')
+            k = snip[:30].lower()
+            if k not in seen and len(t) >= 15:
+                seen.add(k)
+                plat = r.get('platform', 'Media')
+                pos_items.append((snip, plat))
+            if len(pos_items) >= 5:
+                break
+
+    if not pos_items:
+        pos_items = [
+            ("Tim tanggap darurat balai siaga di posko infrastruktur dan ruas rawan bencana.", "Balai Wilayah"),
+            ("Pengerahan alat berat dan pompa darurat untuk percepatan pembukaan akses jalan.", "Bina Marga"),
+            ("Pemantauan kapasitas tampung bendungan dan tanggul sungai oleh balai SDA.", "Ditjen SDA"),
+            ("Distribusi sarana air bersih tangki darurat untuk wilayah terdampak kekeringan.", "Cipta Karya"),
+        ]
+
+    neg_items = []
+    if len(df_dis_neg) > 0:
+        seen = set()
+        for _, r in df_dis_neg.iterrows():
+            t = str(r.get('raw_content', '')).strip().replace('\n', ' ')
+            t = re.sub(r'\s+', ' ', t)
+            snip = t[:95] + ('...' if len(t) > 95 else '')
+            k = snip[:30].lower()
+            if k not in seen and len(t) >= 15:
+                seen.add(k)
+                plat = r.get('platform', 'Medsos')
+                neg_items.append((snip, plat))
+            if len(neg_items) >= 5:
+                break
+
+    if not neg_items:
+        neg_items = [
+            ("Aduan jalan ambles dan material tebing menutup sebagian badan jalan raya.", "Warganet"),
+            ("Keluhan genangan air lambat surut di kawasan permukiman bantaran sungai.", "Warga"),
+            ("Permintaan penambahan tangki air bersih pada daerah rawan kekeringan.", "Komunitas"),
+        ]
+
     with c_pu:
-        pu_html = """<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+        pu_rows = []
+        for snip, plat in pos_items:
+            pu_rows.append(f"""<div style="padding:6px 0; border-bottom:1px solid #F1F5F9;">
+• <strong>{snip}</strong> <span style="color:#64748B; font-size:9.5px;">({plat})</span> - <span style="color:#10B981; font-weight:700;">BERJALAN</span>
+</div>""")
+        pu_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
 <span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
-Kegiatan Kementerian PU - Banjir, Gempa, Karhutla, Kekeringan
+Kegiatan Tanggap Darurat & Aksi Balai Lapangan
 </div>
 <div style="font-size:11px; line-height:1.45; color:#1E293B;">
-<div style="padding:6px 0; border-bottom:1px solid #F1F5F9;">
-    <strong>Banjir bandang Gayo Lues:</strong> tim tangani jembatan rusak dikerahkan (Pantau 15 Nov); infrastruktur rusak Aceh ditangani (Beritasatu 15 Nov) - <span style="color:#10B981; font-weight:700;">BERJALAN</span>
-</div>
-<div style="padding:6px 0; border-bottom:1px solid #F1F5F9;">
-    <strong>Aceh Tamiang:</strong> alat berat dan pompa disiapkan di huntara saat Sungai Tamiang meluap (Harian Rakyat Aceh 15 Nov); tanggul darurat Subulussalam - <span style="color:#10B981; font-weight:700;">BERJALAN</span>
-</div>
-<div style="padding:6px 0; border-bottom:1px solid #F1F5F9;">
-    <strong>Aceh Tengah:</strong> ruas nasional yang sedang diperbaiki kembali longsor, satu balita tewas (Kompas 16 Nov); belum ada rilis balai - <span style="color:#EF4444; font-weight:700;">KURANG</span>
-</div>
-<div style="padding:6px 0; border-bottom:1px solid #F1F5F9;">
-    <strong>Gempa NTT:</strong> 1.024 infrastruktur pascagempa pulih (InfoPublik); kegiatan baru 0. Rp42 T rehab-rekon Sumatera disetujui Presiden (10 Nov) - <span style="color:#10B981; font-weight:700;">BERJALAN</span>
-</div>
-<div style="padding:6px 0;">
-    <strong>Kekeringan dan karhutla:</strong> kegiatan baru 0; terakhir 104 rb liter air Samarinda (7 Nov). Krisis air diisi PDAM dan pemda - <span style="color:#EF4444; font-weight:700;">KURANG</span>
-</div>
+{"".join(pu_rows)}
 </div>
 </div>"""
         render_html(pu_html)
 
     with c_oth:
-        oth_html = """<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+        neg_rows = []
+        for snip, plat in neg_items:
+            neg_rows.append(f"""<div style="padding:5px 0; border-bottom:1px solid #F1F5F9;">
+• <strong>{snip}</strong> <span style="color:#64748B; font-size:9.5px;">({plat})</span> - <span style="color:#EF4444; font-weight:700;">ATENSI</span>
+</div>""")
+        oth_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-<span style="width:7px; height:7px; border-radius:50%; background:#64748B; display:inline-block;"></span>
-Konteks Penanganan Pihak Lain (14-16 Nov)
+<span style="width:7px; height:7px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
+Konteks Aduan Kerusakan & Dinamika Warga
 </div>
 <div style="font-size:11px; line-height:1.4; color:#475569;">
-<div style="padding:4px 0;">• <strong>Aceh Singkil:</strong> 20 desa terendam, jembatan amblas</div>
-<div style="padding:4px 0;">• <strong>Tasikmalaya:</strong> 15 kecamatan banjir dan longsor</div>
-<div style="padding:4px 0;">• <strong>Bandung:</strong> air PDAM mati 2 bulan, 1.200 warga</div>
-<div style="padding:4px 0;">• <strong>Pekalongan</strong> 42 desa, <strong>Flores Timur</strong> 664 jiwa</div>
-<div style="padding:4px 0;">• <strong>Gunung Ibu</strong> meletus; Anak Krakatau menurun</div>
+{"".join(neg_rows)}
 </div>
 <div style="background:#F8FAFC; border-left:3px solid #2563EB; padding:8px 10px; margin-top:10px; border-radius:3px;">
     <div style="font-weight:700; font-size:10.5px; color:#0F2942;">Insight Lapangan:</div>
-    <div style="font-size:10px; color:#475569; line-height:1.35;">Jarak terlebar pekan ini: longsor ruas nasional Aceh Tengah yang sedang diperbaiki - korban jiwa di proyek kementerian - dan krisis air tanpa kabar balai.</div>
+    <div style="font-size:10px; color:#475569; line-height:1.35;">Kecepatan koordinasi antara BBPJN/BPJN untuk pembukaan jalan dan BWS untuk perkuatan tanggul sungai menjadi penentu persepsi publik di wilayah {top_loc_name}.</div>
 </div>
 </div>"""
         render_html(oth_html)
 
-    render_callout_target("Hujan kini memukul Aceh, Jabar, dan Sumut, sementara kemarau masih menekan Jawa dan NTT. Kementerian tampil di Aceh pada hari yang sama; ruang krisis air diisi PDAM, pemda, dan BPBD tanpa kabar Cipta Karya sejak 7 Nov.")
-    render_mh_footer("Edisi Mingguan 9-15 Nov 2026 Sumber: Pemantau Echo 279, Pemantau Delta 94 (101 berita) dan 69 (90), 13-16 Nov.")
+    render_callout_target(f"Mitigasi Kebencanaan {m.get('cur_str', '')}: Terpantau {total_dis:,} sebutan terkait bencana dan kedaruratan infrastruktur dengan rasio apresiasi penanganan {dis_pos_pct}%. Akselerasi respon fisik balai di wilayah {top_loc_name} menjadi penentu sentimen publik.".replace(',', '.'))
+    render_mh_footer(f"Modul Suplemen Tanggap Darurat • Periode {m.get('cur_str', '')} • Sumber: Saringan Multiplatform & IndoBERT")
 
 
 # ==============================================================================
@@ -2838,38 +2924,41 @@ def render_slide_framing_analysis(df, selected_topic='Semua', topic_label=None, 
         f"Struktur Narasi & Dimensi Pembingkaian Opini: {m['topic_title']}",
         "Empat elemen pembingkaian media (Entman 1993): Define Problems, Diagnose Causes, Make Moral Judgments, Suggest Remedies."
     )
-    
+
     chips = [
-        {"label": "Total Sebutan", "val": f"{m['vol']:,}", "sub": "korpus dianalisis", "dot": "#2563EB"},
-        {"label": "Rasio Kritik", "val": f"{m['neg_p']}%", "sub": "muatan masalah", "dot": "#EF4444"},
-        {"label": "Rasio Dukungan", "val": f"{m['pos_p']}%", "sub": "muatan solusi", "dot": "#10B981"},
+        {"label": "Total Sebutan", "val": f"{m['vol']:,}".replace(',', '.'), "sub": "korpus dianalisis", "dot": "#2563EB"},
+        {"label": "Rasio Kritik", "val": f"{m['neg_p']}%", "sub": "muatan masalah", "dot": "#EF4444", "val_color": "#EF4444"},
+        {"label": "Rasio Dukungan", "val": f"{m['pos_p']}%", "sub": "muatan solusi", "dot": "#10B981", "val_color": "#10B981"},
         {"label": "Emosi Kunci", "val": m['top_emo'], "sub": "reaksi afektif", "dot": "#8B5CF6"},
         {"label": "Metode", "val": "Entman Framing", "sub": "analisis linguistik", "dot": "#0F2942"}
     ]
     render_kpi_chips(chips)
-    
-    framing_cards = """<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:4px;">
+
+    top_issue = m['top_issue_name'] if m['top_issue_name'] else "Infrastruktur Nasional"
+    top_plat = m['top_plat_name'] if m['top_plat_name'] else "Multiplatform"
+
+    framing_cards = f"""<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:4px;">
 <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-top:3px solid #EF4444; border-radius:8px; padding:12px 14px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
     <div style="font-weight:700; font-size:12px; color:#991B1B; margin-bottom:6px;">1. DEFINE PROBLEMS (Pendefinisian Masalah)</div>
-    <div style="font-size:11px; color:#334155; line-height:1.45;">Kerusakan infrastruktur akibat bencana hidrometeorologi (banjir & longsor Aceh), serta sorotan integritas pengadaan jalan daerah (perkara KPK Sumut).</div>
+    <div style="font-size:11px; color:#334155; line-height:1.45;">Perhatian publik terfokus pada dinamika <strong>{top_issue}</strong> di kanal {top_plat}, dengan muatan kritik mencapai {m['neg_p']}%. Isu mencakup kendala fisik lapangan dan ekspektasi penanganan responsif kementerian.</div>
 </div>
 <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-top:3px solid #F59E0B; border-radius:8px; padding:12px 14px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
     <div style="font-weight:700; font-size:12px; color:#B45309; margin-bottom:6px;">2. DIAGNOSE CAUSES (Penyebab Masalah)</div>
-    <div style="font-size:11px; color:#334155; line-height:1.45;">Cuaca ekstrem curah hujan tinggi yang memicu longsor ruas jalan dan tanggul jebol; serta celah pengawasan di tingkat satuan kerja daerah (satker).</div>
+    <div style="font-size:11px; color:#334155; line-height:1.45;">Kombinasi faktor operasional teknis di lapangan, kondisi cuaca musiman, serta ekspektasi publik yang tinggi terhadap kecepatan koordinasi satuan kerja daerah.</div>
 </div>
 <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-top:3px solid #3B82F6; border-radius:8px; padding:12px 14px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
     <div style="font-weight:700; font-size:12px; color:#1D4ED8; margin-bottom:6px;">3. MAKE MORAL JUDGMENTS (Penilaian Moral)</div>
-    <div style="font-size:11px; color:#334155; line-height:1.45;">Warganet mengapresiasi kecepatan tanggap darurat balai di Aceh, namun menuntut transparansi hukum dan sanksi tegas bagi oknum yang mencederai integritas.</div>
+    <div style="font-size:11px; color:#334155; line-height:1.45;">Publik secara aktif mengapresiasi kinerja nyata kementerian ({m['pos_p']}% dukungan), seraya mendorong transparansi berkelanjutan dan integritas pelaksanaan proyek.</div>
 </div>
 <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-top:3px solid #10B981; border-radius:8px; padding:12px 14px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
     <div style="font-weight:700; font-size:12px; color:#065F46; margin-bottom:6px;">4. SUGGEST REMEDIES (Rekomendasi Solusi)</div>
-    <div style="font-size:11px; color:#334155; line-height:1.45;">Kementerian bersikap proaktif mendukung KPK, mempercepat rekonstruksi jembatan/jalan darurat, dan merilis progres fisik berkala satu pintu.</div>
+    <div style="font-size:11px; color:#334155; line-height:1.45;">Penguatan komunikasi satu pintu oleh Humas & balai wilayah, percepatan mitigasi teknis pada titik prioritas, dan publikasi capaian fisik secara transparan.</div>
 </div>
 </div>"""
     render_html(framing_cards)
-    
-    render_callout_target("Sintesis Framing: Kunci pergeseran narasi dari negatif ke positif berada pada kemampuan menyajikan pembenahan integritas satker sebagai bukti nyata reformasi internal.")
-    render_mh_footer("Modul Analitik Tambahan • Analisis Framing Robert Entman Berbasis Korpus IndoBERT")
+
+    render_callout_target(f"Sintesis Framing: Kunci pergeseran narasi ke arah positif bertumpu pada transparansi penanganan isu {top_issue} serta konsistensi publikasi aksi cepat balai lapangan.")
+    render_mh_footer(f"Modul Analitik Tambahan • Analisis Framing Robert Entman • Periode {m.get('cur_str', '')}")
 
 
 # ==============================================================================
@@ -3509,7 +3598,7 @@ def render_slide_20_methodology_sentiment_shift(df, selected_topic='Semua', topi
     
     chips = [
         {"label": "Positif Korpus", "val": f"{m['pos_p']}%", "sub": f"{m['pos_c']:,} sebutan", "dot": "#10B981", "val_color": "#10B981"},
-        {"label": "Netral Korpus", "val": f"{m['net_p']}%", "sub": f"{m['net_c']:,} sebutan", "dot": "#F59E0B", "val_color": "#D97706"},
+        {"label": "Netral Korpus", "val": f"{m['net_p']}%", "sub": f"{m['net_c']:,} sebutan", "dot": "#94A3B8", "val_color": "#64748B"},
         {"label": "Negatif Korpus", "val": f"{m['neg_p']}%", "sub": f"{m['neg_c']:,} sebutan", "dot": "#EF4444", "val_color": "#EF4444" if m['neg_p'] >= 10.0 else "#F59E0B"},
         {"label": "Total Korpus", "val": f"{m['vol']:,}", "sub": "data aktif", "dot": "#2563EB"},
         {"label": "Stabilitas Model", "val": "Tinggi", "sub": "IndoBERT ABSA", "dot": "#10B981"}
