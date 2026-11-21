@@ -812,13 +812,8 @@ def render_login_page():
             type="password",
             placeholder="Password"
         )
-        remember_me = st.checkbox(
-            "Ingat sesi login (berlaku 3 jam)",
-            value=True,
-            help="Sesi akan aktif selama 3 jam dan bertahan saat halaman di-reload (F5). Setelah 3 jam, Anda akan diminta login kembali."
-        )
         
-        st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
         submitted = st.form_submit_button(
             "Masuk ke Sistem (Sign In)",
             use_container_width=True,
@@ -830,7 +825,7 @@ def render_login_page():
             user_match = verify_credentials(username_val, password_val)
             if user_match:
                 st.toast(f"Selamat datang, {user_match['name']}!")
-                login_user(username_val, user_match, remember=remember_me)
+                login_user(username_val, user_match, remember=True)
             else:
                 st.error("Nama pengguna atau kata sandi tidak sesuai. Silakan periksa kembali.")
 
