@@ -1276,7 +1276,7 @@ def _extract_dynamic_freqs(df_slice, top_n=37, is_negative=False):
     if not col:
         return KEMENPU_10_NEG if is_negative else KEMENPU_53_WORDS
 
-    noise = {'yg', 'dan', 'di', 'ini', 'ke', 'dari', 'untuk', 'pada', 'adalah', 'itu', 'atau', 'dengan', 'ada', 'bisa', 'akan', 'juga', 'sudah', 'oleh', 'dalam', 'karena', 'saat', 'para', 'agar', 'kita', 'kami', 'saya', 'dia', 'mereka', 'bukan', 'tidak', 'tak', 'bila', 'jika', 'tahun', 'hari', 'bulan', 'rp', 'jt', 'miliar', 'triliun', 'indonesia', 'nya', 'saja', 'harus', 'lagi', 'masih', 'banyak', 'sangat', 'tersebut', 'bisa', 'dapat', 'yang', 'kompas', 'detik', 'tribun', 'antara', 'liputan'}
+    noise = {'yg', 'dan', 'di', 'ini', 'ke', 'dari', 'untuk', 'pada', 'adalah', 'itu', 'atau', 'dengan', 'ada', 'bisa', 'akan', 'juga', 'sudah', 'oleh', 'dalam', 'karena', 'saat', 'para', 'agar', 'kita', 'kami', 'saya', 'dia', 'mereka', 'bukan', 'tidak', 'tak', 'bila', 'jika', 'tahun', 'hari', 'bulan', 'rp', 'jt', 'miliar', 'triliun', 'indonesia', 'nya', 'saja', 'harus', 'lagi', 'masih', 'banyak', 'sangat', 'tersebut', 'bisa', 'dapat', 'yang', 'kompas', 'detik', 'tribun', 'antara', 'liputan', 'menjadi', 'melalui', 'salah', 'lebih', 'tentang', 'seperti', 'secara', 'terhadap', 'hingga', 'sebagai', 'dilakukan', 'merupakan', 'adanya', 'setiap', 'bagian', 'seluruh', 'terkait', 'namun', 'tetapi', 'tetap', 'kembali', 'hanya', 'atas', 'bagi', 'kini', 'terus', 'selain', 'serta', 'dibuat', 'diberikan', 'sama', 'selalu', 'satu', 'langsung', 'kementerianpu', 'sigapmembangunnegeriuntukrakyat', 'menteri'}
     
     words = []
     for t in df_slice[col].dropna().head(3000):
@@ -1287,7 +1287,7 @@ def _extract_dynamic_freqs(df_slice, top_n=37, is_negative=False):
                 words.append(w.capitalize())
                 
     counted = Counter(words).most_common(top_n)
-    if not counted or len(counted) < 5:
+    if not counted or len(counted) < 3:
         return KEMENPU_10_NEG if is_negative else KEMENPU_53_WORDS
     return dict(counted)
 
@@ -1295,24 +1295,59 @@ def _extract_dynamic_freqs(df_slice, top_n=37, is_negative=False):
 def render_slide_6_two_wordclouds(df, selected_topic='Semua', topic_label=None, **kwargs):
     m = _get_slide_metrics(df, selected_topic, topic_label)
     render_mh_top_bar(slide_num=6)
-    render_mh_title(
-        "Suara Teratas & Dua Awan Kata",
-        "Kosakata Aceh dan air; negatif mengerucut ke KPK",
-        "Dua awan dari unggahan lembaga (279) setelah saringan, 9-15 Nov. Kiri: frekuensi, warna = nada. Kanan: muatan negatif."
-    )
     
     # Dynamic word frequency extraction (Penyaring: Tanpa Media Daring)
     df_sosmed = df[df['platform'] != 'News'] if 'platform' in df.columns and (df['platform'] != 'News').any() else df
+    col = 'cleaned_content' if 'cleaned_content' in df_sosmed.columns else 'raw_content'
+    
     freq_left = _extract_dynamic_freqs(df_sosmed, top_n=37, is_negative=False)
     neg_slice = df_sosmed[df_sosmed['sentiment_name'] == 'Negatif'] if 'sentiment_name' in df_sosmed.columns else df_sosmed
     freq_right = _extract_dynamic_freqs(neg_slice, top_n=15, is_negative=True)
+    
+    pos_slice = df_sosmed[df_sosmed['sentiment_name'] == 'Positif'] if 'sentiment_name' in df_sosmed.columns else df_sosmed
+    freq_pos = _extract_dynamic_freqs(pos_slice, top_n=15, is_negative=False)
 
+    # Hitung frekuensi riil kata di df_sosmed
+    def _calc_word_counts(w):
+        if not w or len(df_sosmed) == 0 or col not in df_sosmed.columns:
+            return 0, 0
+        pat = r'\b' + re.escape(w.lower()) + r'\b'
+        mask_w = df_sosmed[col].str.contains(pat, case=False, na=False)
+        total_w = int(mask_w.sum())
+        neg_w = int((mask_w & (df_sosmed['sentiment_name'] == 'Negatif')).sum()) if 'sentiment_name' in df_sosmed.columns else 0
+        return total_w, neg_w
+
+    # Kata Positif Teratas (Hijau Teratas)
+    top_pos_candidates = list(freq_pos.keys())
+    top_pos_word = top_pos_candidates[0] if len(top_pos_candidates) > 0 else "Pembangunan"
+    top_pos_vol, top_pos_neg = _calc_word_counts(top_pos_word)
+    
+    # Kata Positif / Kebijakan ke-2 (Air Bersih / Irigasi / Infrastruktur)
+    second_pos_word = top_pos_candidates[1] if len(top_pos_candidates) > 1 else "Infrastruktur"
+    second_pos_vol, second_pos_neg = _calc_word_counts(second_pos_word)
+
+    # Kata Negatif Teratas (Merah Teratas)
+    top_neg_candidates = list(freq_right.keys())
+    top_neg_word = top_neg_candidates[0] if len(top_neg_candidates) > 0 else "Penanganan"
+    top_neg_vol, top_neg_neg = _calc_word_counts(top_neg_word)
+
+    # Subjudul Dinamis
+    if top_neg_vol > 0:
+        sub_title = f"Kosakata {top_pos_word} dan {second_pos_word}; muatan kritik publik pada {top_neg_word}"
+    else:
+        sub_title = f"Kosakata dominan {top_pos_word} dan {second_pos_word}; sentimen publik terpantau kondusif"
+
+    guide_text = f"Dua awan dari unggahan {m.get('topic_short', 'lembaga')} setelah saringan, periode {m.get('cur_str', '')}. Kiri: frekuensi, warna = nada. Kanan: muatan negatif."
+    
+    render_mh_title("Suara Teratas & Dua Awan Kata", sub_title, guide_text)
+
+    # 5 KPI Chips Dinamis
     chips = [
-        {"label": "Hijau Teratas", "val": "Aceh", "sub": "519 sebutan; 5 negatif", "dot": "#10B981", "val_color": "#10B981"},
-        {"label": "Merah Teratas", "val": "KPK", "sub": "212; 183 negatif", "dot": "#EF4444", "val_color": "#EF4444"},
-        {"label": "Kata Dianalisis", "val": "200", "sub": "term teratas sistem", "dot": "#2563EB"},
-        {"label": "Kata Negatif", "val": f"{len(freq_right)}", "sub": "≥5 sebutan negatif", "dot": "#EF4444"},
-        {"label": "Air Bersih", "val": "203", "sub": "sebutan; 8 negatif", "dot": "#10B981"}
+        {"label": "Hijau Teratas", "val": top_pos_word, "sub": f"{top_pos_vol:,} sebutan; {top_pos_neg} negatif", "dot": "#10B981", "val_color": "#10B981"},
+        {"label": "Merah Teratas", "val": top_neg_word, "sub": f"{top_neg_vol:,}; {top_neg_neg} negatif", "dot": "#EF4444", "val_color": "#EF4444"},
+        {"label": "Kata Dianalisis", "val": f"{len(freq_left)}", "sub": "term dominan korpus", "dot": "#2563EB"},
+        {"label": "Kata Negatif", "val": f"{len(freq_right)}", "sub": "muatan kritik publik", "dot": "#EF4444"},
+        {"label": second_pos_word[:14], "val": f"{second_pos_vol:,}", "sub": f"sebutan; {second_pos_neg} negatif", "dot": "#10B981", "val_color": "#10B981"}
     ]
     render_kpi_chips(chips)
     
@@ -1353,9 +1388,9 @@ def render_slide_6_two_wordclouds(df, selected_topic='Semua', topic_label=None, 
 
     render_callout_target(
         "Saringan dan Cara Membaca",
-        "Dikeluarkan: nama lembaga dan unit, nama orang (pejabat, menteri lain, tersangka), partai, perusahaan, portal berita, dan derau umum. Hijau = kerja fisik & pemulihan; Merah = perkara hukum. KPK dan geledah mendominasi peta negatif; Aceh dan air mendominasi frekuensi umum."
+        f"Dikeluarkan: nama lembaga, menteri, portal berita, dan derau umum. Hijau = apresiasi fisik & kemanfaatan warga; Merah = sorotan kritis. Kata '{top_neg_word}' memimpin peta muatan negatif; sedangkan '{top_pos_word}' dan '{second_pos_word}' mendominasi frekuensi umum pada periode {m.get('cur_str', '')}."
     )
-    render_mh_footer("Edisi Mingguan 9-15 Nov 2026 Sumber: Pemantau Echo proyek 279, 9-15 Nov (topTerms 200 term sistem). Derau fandom di bawah ambang batas.")
+    render_mh_footer(f"Edisi Evaluasi Multiplatform • Periode {m.get('cur_str', '')} • Sumber: Pemantauan Opini Multiplatform IndoBERT • Kementerian Pekerjaan Umum")
 
 
 # ==============================================================================
