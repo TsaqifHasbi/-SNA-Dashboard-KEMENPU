@@ -96,8 +96,8 @@ EXPANDED_EXTRAS = [
 ]
 
 WIB = timezone(timedelta(hours=7))
-DEFAULT_SINCE = "2026-11-05"
-DEFAULT_UNTIL = "2026-11-20"
+DEFAULT_SINCE = "2026-11-15"
+DEFAULT_UNTIL = "2026-11-21"
 CSV_PATH = os.path.join(SCRAPE_DIR, "scraped_Threads_Only.csv")
 
 # Default adalah 12 Keyword Resmi Persis dari cell_02_config.py

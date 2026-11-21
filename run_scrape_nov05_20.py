@@ -44,9 +44,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CELLS_DIR = os.path.join(BASE_DIR, 'colab_cells')
 SCRAPE_DIR = os.path.join(BASE_DIR, 'ScrapeData')
 
-# Rentang Tanggal Default: 5 s.d. 20 November 2026
-DEFAULT_SINCE = "2026-11-05"
-DEFAULT_UNTIL = "2026-11-20"
+# Rentang Tanggal Default: 15 s.d. 21 November 2026
+DEFAULT_SINCE = "2026-11-15"
+DEFAULT_UNTIL = "2026-11-21"
 
 PLATFORM_MAP = {
     'news':      ('scraped_News_Only.csv',      'run_news_only.py',      'Berita Online (Google/Bing)'),

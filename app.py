@@ -469,9 +469,9 @@ with st.sidebar:
     min_date = df_raw['date'].min().date()
     max_date = df_raw['date'].max().date()
     
-    # Default: 5 November 2026 s/d 18 November 2026
-    default_start = max(min_date, datetime.date(2026, 11, 5))
-    target_end = datetime.date(2026, 11, 18)
+    # Default: 15 November 2026 s/d 21 November 2026
+    default_start = max(min_date, datetime.date(2026, 11, 15))
+    target_end = datetime.date(2026, 11, 21)
     max_date_boundary = max(max_date, target_end)
     default_end = min(max_date_boundary, target_end)
     
@@ -480,7 +480,7 @@ with st.sidebar:
         value=(default_start, default_end),
         min_value=min_date,
         max_value=max_date_boundary,
-        help="Rentang waktu analisis data (default: 5 November 2026 s/d 18 November 2026)"
+        help="Rentang waktu analisis data (default: 15 November 2026 s/d 21 November 2026)"
     )
     
     start_d, end_d = None, None
