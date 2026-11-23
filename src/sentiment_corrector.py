@@ -246,7 +246,7 @@ NEUTRAL_INFORMATIONAL_PREFIXES = [
     # Arahan protokoler kepresidenan & pernyataan dinas pemerintah (informasi faktual)
     r'(?:presiden\s+prabowo(?:\s+subianto)?|pemerintah|kementerian|badan\s+gizi\s+nasional|kepala\s+bgn)\s+(?:menegaskan|memberi\s+arahan|menginstruksikan|menyampaikan|menggelar|resmikan|melantik)',
     # Kegiatan kedinasan formal, sosialisasi, & bimtek
-    r'(?:bimbingan\s+teknis|bimtek|sosialisasi|rapat\s+konsolidasi|rapat\s+koordinasi|rakor|lokakarya|penjamah\s+makanan)',
+    r'(?:bimbingan\s+teknis|bimtek|sosialisasi|rapat\s+konsolidasi|rapat\s+koordinasi|rakor|lokakarya|penjamah\s+makanan|bedah\s+buku|webinar|seminar|pelatihan|narasumber\s*:|e-sertifikat|daftar\s+kement(?:e)?rian)',
     # Klarifikasi publik warga (berterima kasih ke rakyat / anggaran uang rakyat bukan uang pribadi)
     r'(?:terima\s+kasih\s+itu\s+rakyat|bukan\s+duit(?:nya)?\s+pak\s+prabowo|bukan\s+uang\s+pribadi|duitnya\s+rakyat)',
     # Analisis elektoral & pemetaan kekuatan politik objektif
@@ -286,13 +286,65 @@ def _count_caps_words(text):
     words = text.split()
     return sum(1 for w in words if len(w) >= 3 and w.isupper() and w.isalpha())
 
+def classify_caps_intent(raw_text, text_lower):
+    """
+    Mengklasifikasikan intensi penggunaan huruf besar (ALL CAPS):
+    Membedakan secara akurat antara:
+    1. 'SARCASM_ANGER'       : Kemarahan, sindiran tajam, atau cemoohan sarkas.
+    2. 'ENTHUSIASTIC_PRAISE' : Pujian tulus, antusiasme tinggi, atau dukungan nyata.
+    3. 'HEADLINE_NEUTRAL'    : Judul rilis resmi, akronim birokrasi, atau format berita.
+    4. 'NORMAL'              : Teks biasa tanpa dominasi huruf kapital.
+    """
+    caps_count = _count_caps_words(raw_text)
+    if caps_count < 3:
+        return 'NORMAL', 'huruf_biasa'
+
+    # A. Cek Judul Berita / Rilis Resmi Kedinasan (Informatif Netral)
+    is_headline = bool(
+        re.search(r'\b(?:breaking\s+news|siaran\s+pers|kemen[\s-]*pu|kementerian|ditjen|bbws|bpjn|bbpjn|bws|apbn|ikn|dpr|ri)\b', text_lower)
+        and len(raw_text.split()) < 15
+        and not re.search(r'[!?]{2,}', raw_text)
+        and not re.search(r'\b(?:rusak|ancur|hancur|parah|bohong|suka|keren|mantap)\b', text_lower)
+    )
+    if is_headline:
+        return 'HEADLINE_NEUTRAL', 'caps_headline_resmi'
+
+    # B. Cek Sinyal Sarkasme & Kemarahan dalam Huruf Besar
+    has_sarc_anger = bool(
+        re.search(r'\b(?:katanya|giliran|padahal|malah|baru\s+viral|nunggu\s+viral|gitu\s+aja|gitu\s+doang)\b.*?\b(?:tapi|kok|lama|lelet|lambat|rusak|ancur|hancur|parah|bobrok|bohong|mangkrak)\b', text_lower) or
+        re.search(r'\b(?:hebat|keren|mantap|top|bagus|juara)\s+(?:banget+|bgt+|sekali|bet|bener|betul)\b.*?\b(?:rusak|ancur|hancur|parah|bolong|ambruk|mangkrak|lelet|lambat|bobrok|kacau|jelek)\b', text_lower) or
+        re.search(r'\b(?:rusak\s+parah|hancur\s+lebur|jalan\s+rusak|jalan\s+bolong|jembatan\s+ambruk|tanggul\s+jebol|proyek\s+mangkrak|ga\s+becus|gak\s+becus|korupsi|maling|pemborosan)\b', text_lower) or
+        re.search(r'\b(?:bohong|penipuan|pencitraan|ngibul|banci|sampah|tai|ancur|bobrok)\b', text_lower)
+    )
+    if has_sarc_anger:
+        return 'SARCASM_ANGER', 'caps_sarkas_marah'
+
+    # C. Cek Sinyal Pujian Antusias / Dukungan Nyata dalam Huruf Besar
+    has_praise_keywords = bool(
+        re.search(r'\b(?:suka\s+banget|suka\s+bgt|cinta\s+banget|keren\s+banget|keren\s+bgt|mantap\s+banget|mantap\s+bgt|enak\s+banget|enak\s+bgt|asli\s+cozy|cozy\s+banget|nyaman\s+banget|adem\s+banget|terima\s+kasih\s+banyak|makasih\s+banyak|alhamdulillah|juara\s+banget|top\s+banget|free\s+coffee|gratis\s+kopi|sukses\s+selalu|maju\s+terus|bangga\s+banget)\b', text_lower)
+    )
+    has_complaint_context = bool(
+        re.search(r'\b(?:tapi|namun|sayang|sayangnya|kecewa|sayang\s+sekali|mati|kotor|panas|bau|galak|rusak|payah|bobrok|lelet|lambat|bocor)\b', text_lower)
+    )
+    if has_praise_keywords and not has_complaint_context:
+        return 'ENTHUSIASTIC_PRAISE', 'caps_pujian_antusias'
+
+    # D. Jika ada tanda baca repetitif kemarahan (!!, ???) tanpa indikator positif -> Kemarahan
+    if re.search(r'[!?]{2,}', raw_text) and not has_praise_keywords:
+        return 'SARCASM_ANGER', 'caps_kemarahan'
+
+    return 'NORMAL', 'huruf_biasa'
+
 def _has_profanity(text_lower):
     words = set(re.findall(r'\b\w+\b', text_lower))
     return bool(words & PROFANITY)
 
 def _has_strong_negative(text_lower):
+    # Masking nama institusi resmi agar tidak memicu false positive korupsi
+    clean_text = text_lower.replace('komisi pemberantasan korupsi', 'kpk_institusi')
+    clean_text = clean_text.replace('pencegahan korupsi', 'anti_korupsi_positif')
     for phrase in STRONG_NEGATIVE_PHRASES:
-        if phrase in text_lower:
+        if phrase in clean_text:
             return True, phrase
     return False, None
 
@@ -366,49 +418,91 @@ def correct_sentiment(text, current_sentiment, current_score=0.0):
     if is_demand and not _has_profanity(text_lower) and not has_neg_early and not has_disaster_casualty:
         return 'Netral', 1, 0.0, 'aspirasi_dan_tuntutan_warga'
 
+    # 0d. CEK ISU LINTAS KEMENTERIAN (ESDM / TAMBANG / BAHLIL / NON-PU FOCUS)
+    # Contoh: "Bahlil vs Dody: Ketika Publik Menilai Kepemimpinan... Bahlil bukan berarti bebas dari kritik... pertambangan, energi..."
+    # Kritik ditujukan pada tata kelola tambang/energi ESDM, sedangkan PU/Dody hanya perbandingan/pihak pasif.
+    CROSS_MINISTRY_PATTERNS = [
+        r'\b(?:esdm|bahlil|lahadalia|pertambangan|izin\s+tambang|nikel|batu\s*bara|hilirisasi\s+tambang|subsidi\s+bbm)\b'
+    ]
+    is_cross_ministry = any(re.search(pat, text_lower) for pat in CROSS_MINISTRY_PATTERNS)
+    if is_cross_ministry:
+        criticism_towards_other = bool(
+            re.search(r'(?:bahlil|esdm|tambang|energi|nikel).*?(?:kritik|kontra|masalah|kasus|sorotan|dinilai|rendah|skandal)', text_lower) or
+            re.search(r'(?:kritik|kontra|masalah|kasus|sorotan|dinilai|rendah|skandal).*?(?:bahlil|esdm|tambang|energi|nikel)', text_lower)
+        )
+        pu_criticism = bool(
+            re.search(r'(?:dody|hanggodo|kemen[\s-]*pu|pekerjaan[\s-]+umum|jalan|jembatan|tanggul|bendungan|proyek\s+pu).*?(?:gagal|rusak|ambrol|korupsi|hancur|mangkrak|lambat|buruk|kecewa)', text_lower)
+        )
+        if criticism_towards_other and not pu_criticism:
+            return 'Netral', 1, 0.0, 'netralisasi_kritik_lintas_kementerian_esdm'
+
     neg_signals = 0
     pos_signals = 0
     reasons = []
 
-    # 0c. CEK PEMBELAAN KEBIJAKAN / KECAMAN KEPADA PENENTANG (PRO-POLICY DEFENSE)
-    # Contoh: "bangsat ,udah baik dikasih makan gratis dari mbg", "yang nolak mbg tolol"
+    # 1. CEK INTENSI PENGGUNAAN HURUF BESAR (ALL CAPS INTENT CLASSIFICATION)
+    # Membedakan apakah HURUF BESAR adalah Kemarahan/Sarkasme vs Dukungan/Pujian Antusias vs Headline Resmi
+    caps_intent, caps_reason = classify_caps_intent(raw_text, text_lower)
+    if caps_intent == 'SARCASM_ANGER':
+        neg_signals += 3
+        reasons.append(caps_reason)
+    elif caps_intent == 'ENTHUSIASTIC_PRAISE':
+        pos_signals += 3
+        reasons.append(caps_reason)
+
+    # 2. CEK APRESIASI FASILITAS, PERPUSTAKAAN & RUANG PUBLIK (KONTEKSTUAL & ANTI-SARKASME)
+    FACILITY_PRAISE_PATTERNS = [
+        r'\b(?:perpus|perpustakaan|ruang\s+baca|wfc|fasilitas|kantor\s+pu)\b.*?\b(?:suka\s+banget|suka\s+bgt|nyaman|cozy|adem|dingin|kenceng|bersih|luas|bagus|keren|lengkap|gratis|free|enak|betah|rekomendasi|surganya)\b',
+        r'\b(?:suka\s+banget|suka\s+bgt|nyaman|cozy|adem|dingin|kenceng|bersih|luas|bagus|keren|lengkap|gratis|free|enak|betah|rekomendasi|surganya)\b.*?\b(?:perpus|perpustakaan|ruang\s+baca|wfc|fasilitas|kantor\s+pu)\b'
+    ]
+    FACILITY_COMPLAINT_PATTERNS = [
+        r'\b(?:mati|panas|gerah|bau\s+apek|apek|kotor|jorok|sempit|bising|antri|antre|rusak|bocor|galak|judes|tidak\s+ramah|pelayanan\s+buruk|mengecewakan|kecewa|sayang\s+sekali|bobrok)\b'
+    ]
+    has_facility_praise = any(re.search(pat, text_lower) for pat in FACILITY_PRAISE_PATTERNS)
+    has_facility_complaint = any(re.search(pat, text_lower) for pat in FACILITY_COMPLAINT_PATTERNS)
+
+    if has_facility_praise:
+        if has_facility_complaint:
+            # Jika ada kata fasilitas positif tapi diikuti komplain nyata (misal: "perpus cozy tapi AC mati kotor")
+            neg_signals += 2
+            reasons.append('komplain_fasilitas')
+        else:
+            # Pujian fasilitas tulus tanpa komplain
+            pos_signals += 3
+            reasons.append('fasilitas_perpus_positif')
+
+    # 3. CEK PEMBELAAN KEBIJAKAN / KECAMAN KEPADA PENENTANG (PRO-POLICY DEFENSE)
     is_defense = any(re.search(pat, text_lower) for pat in PRO_POLICY_DEFENSE_PATTERNS)
     if is_defense:
         pos_signals += 3
         reasons.append('pembelaan_kebijakan_dari_penentang')
         
-    # Cek frasa positif kuat lebih awal agar tidak salah divonis sebagai kemarahan saat HURUF BESAR (ALL CAPS)
+    # Cek frasa positif kuat
     has_pos, pos_p = _has_strong_positive(text_lower)
     if has_pos:
         pos_signals += 2
         reasons.append(f'positif_kuat({pos_p})')
     
-    # 1. Umpatan (bobot 3 - mutlak negatif jika bukan pembelaan kebijakan)
+    # 4. Umpatan (bobot 3 - mutlak negatif jika bukan pembelaan kebijakan)
     if _has_profanity(text_lower):
         if not is_defense:
             neg_signals += 3
             reasons.append('umpatan')
     
-    # 2. Frasa negatif kuat
+    # 5. Frasa negatif kuat
     has_neg, neg_p = _has_strong_negative(text_lower)
     if has_neg:
         neg_signals += 2
         reasons.append(f'negatif_kuat({neg_p})')
     
-    # 3. Sarkasme
+    # 6. Sarkasme (bobot 4 - otomatis batalkan seluruh sinyal positif semu)
     has_sarc, sarc_p = _has_sarcasm(text_lower)
     if has_sarc:
         neg_signals += 4
         pos_signals = 0  # Batal seluruh sinyal positif semu karena pujian bersifat ironis/sarkas
         reasons.append(f'sarkasme({sarc_p})')
-    
-    # 4. Caps lock kemarahan (>= 4 kata huruf kapital tanpa indikator positif/pembelaan)
-    caps_count = _count_caps_words(raw_text)
-    if caps_count >= 4 and not is_pure_info and not has_pos and not is_defense:
-        neg_signals += 1
-        reasons.append('caps_kemarahan')
         
-    # 5. Emoji negatif
+    # 7. Emoji negatif
     neg_emoji_count = _count_emojis(text, NEGATIVE_EMOJIS)
     if neg_emoji_count >= 1:
         neg_signals += 1

@@ -55,6 +55,68 @@ def render_tab_issues(df_filtered):
             st.plotly_chart(diff_fig, use_container_width=True)
             st.caption("Angka menunjukkan frekuensi kemunculan kata kunci isu di masing-masing platform.")
 
+    # -------------------------------------------------------------
+    # SOLUSI & REKOMENDASI TINDAKAN STRATEGIS TERKAIT ISU YANG NAIK
+    # -------------------------------------------------------------
+    st.markdown("<div style='margin-top:14px;'></div>", unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown("""
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+            <span style="background:#EF4444; color:#FFFFFF; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:4px; letter-spacing:0.5px;">SOLUSI & MITIGASI</span>
+            <span style="font-size:14px; font-weight:700; color:#0F2942;">Rekomendasi Tindakan Strategis Terkait Isu yang Sedang Naik</span>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Analisis isu yang paling banyak menimbulkan sentimen negatif
+        col_sent = 'sentiment_name' if 'sentiment_name' in df_filtered.columns else 'predicted_sentiment'
+        df_neg_issues = df_filtered[df_filtered[col_sent] == 'Negatif'] if col_sent in df_filtered.columns else df_filtered
+
+        # Ekstraksi kategori isu dominan
+        from src.tab_sentiment_drilldown import extract_issue_category, get_issue_solution
+        if 'issue_category' not in df_neg_issues.columns:
+            df_neg_issues = df_neg_issues.copy()
+            df_neg_issues['issue_category'] = df_neg_issues['cleaned_content'].fillna(df_neg_issues.get('raw_content', '')).apply(extract_issue_category)
+
+        top_neg_issues = df_neg_issues['issue_category'].value_counts()
+        if not top_neg_issues.empty:
+            rising_issue_1 = top_neg_issues.index[0]
+            count_1 = top_neg_issues.iloc[0]
+            sol_1 = get_issue_solution(rising_issue_1)
+
+            rising_issue_2 = top_neg_issues.index[1] if len(top_neg_issues) > 1 else None
+            sol_2 = get_issue_solution(rising_issue_2) if rising_issue_2 else None
+
+            c_sol1, c_sol2 = st.columns(2)
+            with c_sol1:
+                st.markdown(f"""
+                <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-left:4px solid #EF4444; border-radius:8px; padding:12px 14px; height:100%; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <span style="font-size:11px; font-weight:800; color:#EF4444; background:#FEF2F2; padding:2px 8px; border-radius:4px;">PRIORITAS 1: {rising_issue_1.upper()} ({count_1:,} komplain)</span>
+                        <span style="font-size:10px; font-weight:700; color:#64748B;">SLA: {sol_1['sla']}</span>
+                    </div>
+                    <div style="font-size:11.5px; font-weight:700; color:#0F2942; margin-bottom:4px;">Penanggung Jawab: {sol_1['unit']}</div>
+                    <div style="font-size:11.5px; color:#334155; line-height:1.5; margin-bottom:6px;"><strong>Solusi:</strong> {sol_1['tindakan']}</div>
+                    <div style="font-size:10.5px; color:#64748B;"><strong>Locus Utama:</strong> {sol_1['target']}</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            with c_sol2:
+                if sol_2:
+                    count_2 = top_neg_issues.iloc[1]
+                    st.markdown(f"""
+                    <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-left:4px solid #D97706; border-radius:8px; padding:12px 14px; height:100%; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <span style="font-size:11px; font-weight:800; color:#D97706; background:#FFFBEB; padding:2px 8px; border-radius:4px;">PRIORITAS 2: {rising_issue_2.upper()} ({count_2:,} komplain)</span>
+                            <span style="font-size:10px; font-weight:700; color:#64748B;">SLA: {sol_2['sla']}</span>
+                        </div>
+                        <div style="font-size:11.5px; font-weight:700; color:#0F2942; margin-bottom:4px;">Penanggung Jawab: {sol_2['unit']}</div>
+                        <div style="font-size:11.5px; color:#334155; line-height:1.5; margin-bottom:6px;"><strong>Solusi:</strong> {sol_2['tindakan']}</div>
+                        <div style="font-size:10.5px; color:#64748B;"><strong>Locus Utama:</strong> {sol_2['target']}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.info("Isu negatif lain berada pada level ambang batas normal.")
+
     st.markdown("---")
     st.subheader("🏷️ Tagar dan Term Populer Lintas Platform")
     

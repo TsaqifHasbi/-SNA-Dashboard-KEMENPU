@@ -188,6 +188,76 @@ def render_slide_mentions_trend_sentiment(df, selected_topic='Kementerian_PU', t
     with st.container(border=True):
         st.plotly_chart(fig, use_container_width=True)
     
+    # Drill-down Interaktif: Pilih Tanggal & Sentimen -> Tampilkan Postingan
+    valid_dates = df['date_str'].dropna().unique().tolist() if 'date_str' in df.columns else []
+    valid_dates = sorted([d for d in valid_dates if str(d).strip() != '' and str(d) != 'nan'])
+    if valid_dates:
+        st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
+        with st.expander("🔍 **Eksplorasi Postingan per Tanggal & Sentimen (Klik untuk Buka/Tutup)**", expanded=True):
+            c_d1, c_d2 = st.columns([1.5, 2.5])
+            with c_d1:
+                sel_date = st.selectbox("📅 Pilih Tanggal:", valid_dates, index=len(valid_dates)-1, key="slide_trend_sel_date")
+            with c_d2:
+                sel_sent = st.radio("🏷️ Filter Sentimen:", ["🔴 Negatif", "⚪ Netral", "🟢 Positif", "Semua"], index=0, horizontal=True, key="slide_trend_sel_sent")
+            
+            s_map = {"🔴 Negatif": "Negatif", "⚪ Netral": "Netral", "🟢 Positif": "Positif"}
+            target_sent = s_map.get(sel_sent, None)
+            
+            df_show = df[df['date_str'] == sel_date]
+            if target_sent:
+                df_show = df_show[df_show['sentiment_name'] == target_sent]
+            
+            s_theme = "#EF4444" if target_sent == "Negatif" else ("#10B981" if target_sent == "Positif" else "#0F2942")
+            s_bg = "#FEF2F2" if target_sent == "Negatif" else ("#ECFDF5" if target_sent == "Positif" else "#F8FAFC")
+            s_lbl = target_sent if target_sent else "Semua Sentimen"
+            
+            st.markdown(f"""
+            <div style="background:{s_bg}; border-left:3px solid {s_theme}; padding:7px 12px; border-radius:4px; font-size:11.5px; margin:8px 0 14px 0;">
+                <span style="font-weight:700; color:{s_theme};">Hasil Filter Tanggal {sel_date} &bull; {s_lbl}:</span>
+                <span style="color:#475569; margin-left:6px;">Ditemukan {len(df_show):,} postingan.</span>
+            </div>
+            """, unsafe_allow_html=True)
+
+            if df_show.empty:
+                st.info(f"Tidak ada postingan dengan sentimen {s_lbl} pada tanggal {sel_date}.")
+            else:
+                sort_col = 'total_engagement' if 'total_engagement' in df_show.columns else 'likes'
+                top_posts = df_show.sort_values(by=sort_col, ascending=False).head(9)
+
+                cols_grid = st.columns(3)
+                for idx, (_, r) in enumerate(top_posts.iterrows()):
+                    col_target = cols_grid[idx % 3]
+                    with col_target:
+                        author = str(r.get('author', 'Anonim')).strip()[:20]
+                        platform = str(r.get('platform', 'Web'))
+                        txt = str(r.get('raw_content', r.get('cleaned_content', ''))).strip().replace('\n', ' ')
+                        snip = (txt[:150] + "...") if len(txt) > 150 else txt
+                        sent_name = str(r.get('sentiment_name', 'Netral'))
+                        sc = "#10B981" if sent_name == "Positif" else ("#EF4444" if sent_name == "Negatif" else "#64748B")
+                        sbg = "#ECFDF5" if sent_name == "Positif" else ("#FEF2F2" if sent_name == "Negatif" else "#F8FAFC")
+                        likes = int(r.get('likes', 0) if pd.notna(r.get('likes')) else 0)
+                        shares = int(r.get('shares', 0) if pd.notna(r.get('shares')) else 0)
+                        url = str(r.get('url', '')).strip()
+                        url_btn = f"<a href='{url}' target='_blank' style='color:#2563EB; font-weight:700; text-decoration:none; font-size:10px; background:#EFF6FF; padding:2px 6px; border-radius:4px;'>Buka ↗</a>" if url and url.startswith("http") else ""
+
+                        st.markdown(f"""
+                        <div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:12px; margin-bottom:12px; min-height:190px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 1px 2px rgba(0,0,0,0.02);">
+                            <div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                    <div style="font-size:11px; font-weight:700; color:#0F2942;">{author} <span style="color:#94A3B8; font-weight:400; font-size:9.5px;">({platform})</span></div>
+                                    <span style="font-size:9.5px; font-weight:800; color:{sc}; background:{sbg}; padding:1.5px 6px; border-radius:4px; border:1px solid {sc}30;">{sent_name}</span>
+                                </div>
+                                <div style="font-size:11px; color:#334155; line-height:1.45; margin-bottom:8px;">
+                                    "{snip}"
+                                </div>
+                            </div>
+                            <div style="border-top:1px solid #F1F5F9; padding-top:6px; display:flex; justify-content:space-between; align-items:center; font-size:9.5px; color:#64748B;">
+                                <span>❤️ {likes:,} &bull; 🔁 {shares:,}</span>
+                                {url_btn}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+    
     s_counts = df['sentiment_name'].value_counts()
     dominant_sent = s_counts.index[0] if not s_counts.empty else "Positif"
     render_html(f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:16px 22px; margin-top:14px;">

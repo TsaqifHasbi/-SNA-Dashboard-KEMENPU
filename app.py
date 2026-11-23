@@ -1,4 +1,4 @@
-# Build: 2026.11.20-align-pdf-report-v1 (Trigger Streamlit Cloud auto-redeploy)
+# Build: 2026.11.22-instant-login-speedup (Lazy load heavy analytics after auth)
 import os
 import sys
 import json
@@ -10,6 +10,42 @@ sys.path.insert(0, str(current_dir))
 
 # pyrefly: ignore[missing-import]
 import streamlit as st
+
+# -------------------------------------------------------------
+# PAGE CONFIGURATION (INSTANT TOP LOAD)
+# -------------------------------------------------------------
+_logo_icon = os.path.join(current_dir, "static", "logo.svg")
+
+st.set_page_config(
+    page_title="Public Policy Intelligence Platform | IndoBERT & SNA",
+    page_icon=_logo_icon if os.path.exists(_logo_icon) else "📊",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Intersep cepat halaman legal via query params (misal: /?page=terms atau /?page=privacy)
+_qp_page = (st.query_params.get("page") or "").lower().strip()
+if _qp_page in ["terms", "tos", "terms_of_service", "terms-of-service"]:
+    from src.legal_pages import render_terms_of_service
+    render_terms_of_service()
+    st.stop()
+elif _qp_page in ["privacy", "privacy_policy", "privacy-policy"]:
+    from src.legal_pages import render_privacy_policy
+    render_privacy_policy()
+    st.stop()
+
+# -------------------------------------------------------------
+# AUTHENTICATION GUARDIAN (PORTAL AKSES KEMENTERIAN PU)
+# Tampil instan (0.1 detik) tanpa diblokir oleh import berat
+# -------------------------------------------------------------
+from src.auth import check_authentication, render_user_sidebar_profile, render_user_management_panel
+
+if not check_authentication():
+    st.stop()
+
+# =============================================================
+# MODUL ANALITIK BERAT (HANYA DIMUAT SETELAH USER LOGIN SUKSES)
+# =============================================================
 import pandas as pd
 
 # Internal modules
@@ -100,6 +136,7 @@ from src.mh_weekly_report import (
 
 # Deep Analytical Tab Renderers
 from src.tab_executive import render_tab_executive
+from src.tab_sentiment_drilldown import render_tab_sentiment_drilldown
 from src.tab_sna import render_tab_sna
 from src.tab_platforms import render_tab_platforms
 from src.tab_emotions import render_tab_emotions
@@ -107,38 +144,6 @@ from src.tab_issues import render_tab_issues
 from src.tab_wordcloud import render_tab_wordcloud
 from src.tab_evaluation import render_tab_evaluation
 from src.clean_header_footer import render_html
-
-# -------------------------------------------------------------
-# PAGE CONFIGURATION & EXECUTIVE THEME (EXECUTIVE THEME)
-# -------------------------------------------------------------
-_logo_icon = os.path.join(current_dir, "static", "logo.svg")
-
-st.set_page_config(
-    page_title="Public Policy Intelligence Platform | IndoBERT & SNA",
-    page_icon=_logo_icon if os.path.exists(_logo_icon) else "📊",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-# Intersep cepat halaman legal via query params (misal: /?page=terms atau /?page=privacy)
-# Berjalan instan tanpa memuat dataset 197k baris untuk performa bot review
-_qp_page = (st.query_params.get("page") or "").lower().strip()
-if _qp_page in ["terms", "tos", "terms_of_service", "terms-of-service"]:
-    from src.legal_pages import render_terms_of_service
-    render_terms_of_service()
-    st.stop()
-elif _qp_page in ["privacy", "privacy_policy", "privacy-policy"]:
-    from src.legal_pages import render_privacy_policy
-    render_privacy_policy()
-    st.stop()
-
-# -------------------------------------------------------------
-# AUTHENTICATION GUARDIAN (PORTAL AKSES KEMENTERIAN PU)
-# -------------------------------------------------------------
-from src.auth import check_authentication, render_user_sidebar_profile, render_user_management_panel
-
-if not check_authentication():
-    st.stop()
 
 # Standalone st.logo removed per user preference; logo is integrated into the header bar and cards.
 
@@ -786,6 +791,7 @@ elif "Dashboard Analisis Multi Platform" in view_mode or "Katalog Analisis Multi
         },
         "3. Sentimen 7 Platform Media & Sosial": {
             "Sentimen Keseluruhan & Komparasi 7 Platform": render_slide_overall_sentiment,
+            "Detail Sentimen, Isu, Akun & Wilayah Terdampak": render_tab_sentiment_drilldown,
             "Sentimen Portal Berita Daring": render_slide_sentiment_online_news,
             "Sentimen Platform Twitter / X": render_slide_sentiment_twitter,
             "Sentimen Platform Facebook": render_slide_sentiment_facebook,
@@ -966,6 +972,7 @@ elif "Cockpit Analisis" in view_mode or "Evaluasi Model" in view_mode:
     # ---------------------------------------------------------
     tabs = st.tabs([
         "Ringkasan Eksekutif",
+        "Analisis Sentimen & Daerah",
         "Analisis SNA",
         "Analisis Platform Media & Sosial",
         "Analisis Emosi",
@@ -977,16 +984,18 @@ elif "Cockpit Analisis" in view_mode or "Evaluasi Model" in view_mode:
     with tabs[0]:
         render_tab_executive(df_filtered, df_raw, kpis)
     with tabs[1]:
-        render_tab_sna(df_filtered, selected_topic, selected_platform, 100, current_dir)
+        render_tab_sentiment_drilldown(df_filtered)
     with tabs[2]:
-        render_tab_platforms(df_filtered)
+        render_tab_sna(df_filtered, selected_topic, selected_platform, 100, current_dir)
     with tabs[3]:
-        render_tab_emotions(df_filtered)
+        render_tab_platforms(df_filtered)
     with tabs[4]:
-        render_tab_issues(df_filtered)
+        render_tab_emotions(df_filtered)
     with tabs[5]:
-        render_tab_wordcloud(df_filtered)
+        render_tab_issues(df_filtered)
     with tabs[6]:
+        render_tab_wordcloud(df_filtered)
+    with tabs[7]:
         render_tab_evaluation(current_dir)
 
 elif "Manajemen Pengguna" in view_mode:
