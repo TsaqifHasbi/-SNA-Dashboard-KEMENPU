@@ -25,32 +25,35 @@ def render_slide_sna_by_emotions(df, selected_topic='Kementerian_PU', topic_labe
     G = build_sna_network(df, max_nodes=70, topic_filter=topic_label, mode='emotion')
     
     with col_graph:
-        top_lower = str(topic_label).lower()
-        if 'pu' in top_lower or 'menteri' in top_lower or 'kementerian' in top_lower or 'pekerjaan' in top_lower:
-            emo_c1_desc = "Kritik tajam atas jalan rusak berlubang, keterlambatan penanganan genangan banjir, serta keluhan kualitas pengerjaan kontraktor infrastruktur."
-            emo_c2_desc = "Kekhawatiran publik atas kerawanan longsor jalur nasional, ketahanan tanggul sungai saat musim hujan ekstrem, dan keselamatan pengguna jalan."
-            emo_c3_desc = f"Apresiasi kepuasan publik atas perbaikan cepat jalan tol/nasional, peresmian bendungan baru, dan komitmen pelayanan infrastruktur {topic_label}."
-            emo_c4_desc = "Dukungan penuh terhadap arahan Menteri PU, sinergi pengawasan DPR RI, dan transparansi lelang proyek Ditjen Bina Marga & SDA."
-        elif 'sekolah' in top_lower or 'rakyat' in top_lower:
-            emo_c1_desc = "Kritik tajam atas ketimpangan fasilitas pendidikan antardaerah, biaya siluman, dan lambatnya renovasi gedung sekolah."
-            emo_c2_desc = "Kekhawatiran orang tua terkait daya tampung sistem zonasi, kualitas tenaga pengajar honorer, dan kepastian ijazah."
-            emo_c3_desc = f"Apresiasi program bantuan seragam/buku gratis, beasiswa siswa berprestasi, dan antusiasme kegiatan belajar {topic_label}."
-            emo_c4_desc = "Dukungan dewan pendidikan, pengawasan komite sekolah independen, dan komitmen anggaran afirmasi daerah 3T."
-        elif 'kdmp' in top_lower or 'koperasi' in top_lower:
-            emo_c1_desc = "Kritik atas dugaan monopoli pengurus lama, kendala pencairan dana usaha tani, dan transparansi SHU tahunan."
-            emo_c2_desc = "Kecemasan risiko gagal bayar kredit mikro anggota, fluktuasi harga komoditas panen, dan akuntabilitas buku kas."
-            emo_c3_desc = f"Apresiasi peningkatan permodalan usaha desa, kemudahan akses pupuk bersubsidi, dan semangat gotong royong {topic_label}."
-            emo_c4_desc = "Kepercayaan terhadap pendampingan dinas koperasi, audit akuntan publik bersertifikasi, dan penguatan lembaga ekonomi desa."
-        elif 'listrik' in top_lower or 'ev' in top_lower or 'elektrifikasi' in top_lower:
-            emo_c1_desc = "Kekesalan atas antrean panjang charging station (SPKLU), kenaikan tarif dasar listrik, dan biaya penggantian paket baterai."
-            emo_c2_desc = "Kekhawatiran isu keselamatan baterai saat banjir, jarak tempuh riil saat macet, dan ketersediaan bengkel resmi terdekat."
-            emo_c3_desc = f"Kepuasan atas efisiensi biaya bahan bakar, kenyamanan kabin hening tanpa getaran, dan teknologi mutakhir kendaraan {topic_label}."
-            emo_c4_desc = "Keyakinan terhadap jaminan garansi pabrikan 8 tahun, komitmen transisi energi bersih, dan ekspansi infrastruktur PLN."
-        else:
-            emo_c1_desc = "Kritik tajam tata kelola anggaran, dugaan monopoli vendor lokal, dan transparansi distribusi menu harian."
-            emo_c2_desc = "Kecemasan orang tua terkait kualitas gizi, potensi keracunan makanan, serta kesiapan fasilitas dapur 3T."
-            emo_c3_desc = f"Apresiasi menu sehat sekolah, senyum siswa penerima manfaat, dan antusiasme orang tua murid mendukung program {topic_label}."
-            emo_c4_desc = "Dukungan akademisi gizi, monitoring ketat Badan Gizi Nasional, dan pelibatan koperasi serta petani desa."
+        import re as _re
+        from collections import Counter as _Counter
+        from src.data_loader import ALL_STOPWORDS as _ALL_SW, clean_pu_entities as _clean_pu
+
+        def _describe_emo_cluster(emo_key, label_id):
+            if 'emotion' not in df.columns or df.empty:
+                return f"Tidak ada data emosi {label_id} pada rentang filter aktif."
+            sub = df[df['emotion'].astype(str).str.lower() == emo_key.lower()]
+            if sub.empty:
+                return f"Tidak terdeteksi unggahan dominan emosi {label_id} pada rentang filter aktif."
+            col_txt = 'cleaned_content' if 'cleaned_content' in sub.columns else ('raw_content' if 'raw_content' in sub.columns else None)
+            noise_w = {'yang', 'dan', 'di', 'ini', 'ke', 'dari', 'untuk', 'pada', 'adalah', 'itu', 'dengan', 'ada', 'akan', 'juga', 'sudah', 'oleh', 'dalam', 'karena', 'saat', 'para', 'agar', 'kita', 'kami', 'saya', 'tidak', 'tahun', 'hari', 'bulan', 'indonesia', 'lebih', 'tentang', 'seperti', 'secara', 'terhadap', 'hingga', 'sebagai', 'dilakukan', 'merupakan', 'terkait', 'kementerian', 'menteri', 'pekerjaan', 'umum', 'kemenpu', 'kementerianpu'}
+            cnt = _Counter()
+            if col_txt:
+                for t in sub[col_txt].dropna().head(1000):
+                    tc = _clean_pu(str(t).lower())
+                    for w in _re.findall(r'[a-z]{4,}', tc):
+                        if w not in _ALL_SW and w not in noise_w:
+                            cnt[w] += 1
+            kws = ", ".join(f"<strong>{w}</strong>" for w, _ in cnt.most_common(4))
+            top_p = sub['platform'].value_counts().index[0] if 'platform' in sub.columns and not sub.empty else "-"
+            pct = round(len(sub) / max(1, len(df)) * 100, 1)
+            kw_part = f" dengan kata kunci utama: {kws}" if kws else ""
+            return f"Tercatat <strong>{len(sub):,}</strong> sebutan ({pct}% korpus, terbanyak di <strong>{top_p}</strong>){kw_part}."
+
+        emo_c1_desc = _describe_emo_cluster('Anger', 'Marah')
+        emo_c2_desc = _describe_emo_cluster('Fear', 'Khawatir')
+        emo_c3_desc = _describe_emo_cluster('Joy', 'Gembira')
+        emo_c4_desc = _describe_emo_cluster('Trust', 'Percaya')
 
         render_html(f"""<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
 <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:12px 14px;">

@@ -330,9 +330,9 @@ def _get_slide_metrics(df, selected_topic='Semua', topic_label=None, df_full=Non
         ('Konektivitas Jalan', r'\b(?:jalan\s+tol|ruas\s+jalan|bbpjn|jalan\s+nasional|preservasi|jembatan)\b'),
         ('Jaringan Irigasi', r'\b(?:irigasi|lumbung\s+air|swasembada|saluran\s+primer|petani)\b'),
         ('Air Bersih', r'\b(?:air\s+bersih|krisis\s+air|kekeringan|tandon|pipanisasi|spam)\b'),
-        ('Isu Pengadaan & Hukum', r'\b(?:kpk|korupsi|geledah|ott|sidang)\b')
+        ('Isu Pengadaan & Hukum', r'\b(?:kpk|korupsi|geledah|ott|suap|tersangka)\b')
     ]
-    top_issue_name = "Bencana & Balai"
+    top_issue_name = top_kw_1.title() if top_kw_1 and top_kw_1 != '-' else "Infrastruktur Publik"
     top_issue_vol = 0
     if len(content_series_eval) > 0:
         for iname, ipat in issue_patterns:
@@ -610,7 +610,7 @@ def _extract_top_6_issue_findings(df_sub=None, m=None):
             'key': 'isu_tata_kelola',
             'title': 'Tata Kelola Pengadaan & Isu Hukum',
             'short': 'Tata Kelola & Hukum',
-            'pattern': r'\b(?:kpk|korupsi|ott|sidang|nepotisme|klarifikasi|tender|transparansi|lelang|geledah)\b',
+            'pattern': r'\b(?:kpk|korupsi|ott|nepotisme|tender|transparansi|lelang|geledah|suap|tersangka)\b',
             'action_title': 'Transparansi Pengadaan & Hukum',
             'action_desc': 'Itjen & Humas: Rilis fakta integritas pengadaan barang/jasa dan dukung penegakan hukum.'
         },
@@ -673,29 +673,8 @@ def _extract_top_6_issue_findings(df_sub=None, m=None):
                     'action_desc': c['action_desc']
                 })
 
-    # Urutkan murni berdasarkan volume sebutan terbesar (isu paling ramai)
+    # Urutkan murni berdasarkan volume sebutan terbesar (hanya isu dengan vol > 0)
     findings.sort(key=lambda x: x['vol'], reverse=True)
-
-    # Fallback dinamis jika kandidat kurang dari 6
-    if len(findings) < 6:
-        for c in topic_candidates:
-            if not any(f['short'] == c['short'] for f in findings):
-                findings.append({
-                    'title': c['title'],
-                    'short': c['short'],
-                    'vol': 0,
-                    'pos_c': 0,
-                    'neg_c': 0,
-                    'neg_p': 0.0,
-                    'pos_p': 0.0,
-                    'top_plat': 'Multiplatform',
-                    'plat_vol': 0,
-                    'statement': 'Belum terpantau lonjakan isu signifikan pada periode aktif.',
-                    'action_title': c['action_title'],
-                    'action_desc': c['action_desc']
-                })
-            if len(findings) >= 6:
-                break
 
     top6 = findings[:6]
     for i, f in enumerate(top6, 1):
@@ -712,19 +691,53 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
     df_full = kwargs.get('df_full', None)
     m = _get_slide_metrics(df, selected_topic, topic_label, df_full=df_full)
 
-    # ── Ekstraksi 6 temuan intelijen strategis (murni dinamis dari 6 isu teratas)
+    # ── Ekstraksi temuan intelijen strategis murni dari isu aktif (vol > 0)
     findings = _extract_top_6_issue_findings(df, m)
-    f0, f1, f2, f3, f4, f5 = findings[0], findings[1], findings[2], findings[3], findings[4], findings[5]
+    top_actions = sorted(findings, key=lambda x: (x.get('neg_c', 0), x.get('vol', 0)), reverse=True)
 
-    # Prioritas Tindakan dipilih dari 3 isu dengan dampak/sentimen kritis tertinggi di antara 6 temuan
-    top_actions = sorted(findings[:6], key=lambda x: x.get('neg_c', 0), reverse=True)
-    act0 = top_actions[0] if len(top_actions) > 0 else f0
-    act1 = top_actions[1] if len(top_actions) > 1 else f1
-    act2 = top_actions[2] if len(top_actions) > 2 else f2
+    if findings:
+        f0 = findings[0]
+        act0 = top_actions[0]
+        headline_text = f"Isu {f0['short']} Mendominasi Perhatian; {act0['short']} Menjadi Titik Kritis"
+        red_banner_text = f"Penentu ke depan: percepatan mitigasi teknis pada isu {act0['short']} ({act0['neg_p']}% kritik), serta konsistensi komunikasi lapangan pada isu {f0['short']} ({f0['vol']:,} sebutan)."
+    else:
+        headline_text = f"Ringkasan Eksekutif • {m['vol']:,} Sebutan Terpantau"
+        red_banner_text = "Belum terdeteksi klaster isu dominan pada rentang filter aktif."
 
-    # Judul sub-headline dan pita merah dinamis
-    headline_text = f"Isu {f0['short']} Mendominasi Perhatian; {act0['short']} Menjadi Titik Kritis"
-    red_banner_text = f"Penentu ke depan: percepatan mitigasi teknis pada isu {act0['short']} ({act0['neg_p']}% kritik), serta konsistensi komunikasi lapangan balai pada isu {f0['short']}."
+    # Bangun kartu temuan hanya untuk isu yang benar-benar ada (vol > 0)
+    left_findings = [f for i, f in enumerate(findings) if i % 2 == 0]
+    right_findings = [f for i, f in enumerate(findings) if i % 2 == 1]
+
+    def _render_finding_items(items):
+        return "".join(
+            f"""<div style="margin-bottom:15px;">
+                <div style="font-weight:700; font-size:12.5px; color:#0F172A; margin-bottom:4px;">{it['title']}</div>
+                <div style="font-size:11.5px; color:#475569; line-height:1.45;">{it['statement']}</div>
+            </div>"""
+            for it in items
+        )
+
+    findings_grid_html = (
+        f"""<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 30px;">
+            <div>{_render_finding_items(left_findings)}</div>
+            <div>{_render_finding_items(right_findings)}</div>
+        </div>"""
+        if findings else
+        """<div style="font-size:12px; color:#64748B; padding:12px 0;">Tidak ada klaster isu aktif dengan volume > 0 pada rentang filter saat ini.</div>"""
+    )
+
+    active_acts = top_actions[:3]
+    if active_acts:
+        cols_tpl = " ".join(["1fr"] * len(active_acts))
+        actions_grid_html = f'<div style="display:grid; grid-template-columns:{cols_tpl}; gap:16px; flex-grow:1;">' + "".join(
+            f"""<div>
+                <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">{a['action_title']} ({a['vol']:,} sebutan)</div>
+                <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">{a['action_desc']}</div>
+            </div>"""
+            for a in active_acts
+        ) + "</div>"
+    else:
+        actions_grid_html = '<div style="color:#94A3B8; font-size:11px;">Belum ada prioritas tindakan khusus karena tidak ada klaster isu aktif pada filter ini.</div>'
 
     chips_html = f"""
         <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
@@ -797,44 +810,13 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
             <span style="font-size:11.5px; color:#78350F; font-weight:500;">{m['guide_text']}</span>
         </div>
 
-        <!-- Enam Temuan Utama Sepekan Card -->
+        <!-- Temuan Utama Card (Dinamis hanya isu vol > 0) -->
         <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:18px 22px; margin-bottom:14px;">
             <div style="font-size:13.5px; font-weight:700; color:#0F2942; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
                 <span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
-                <span>Enam Temuan Utama Sepekan</span>
+                <span>Temuan Utama Terdeteksi ({len(findings)} Isu Aktif)</span>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 30px;">
-                <!-- Kolom Kiri: Poin 1, 3, 5 -->
-                <div>
-                    <div style="margin-bottom:15px;">
-                        <div style="font-weight:700; font-size:12.5px; color:#0F172A; margin-bottom:4px;">{f0['title']}</div>
-                        <div style="font-size:11.5px; color:#475569; line-height:1.45;">{f0['statement']}</div>
-                    </div>
-                    <div style="margin-bottom:15px;">
-                        <div style="font-weight:700; font-size:12.5px; color:#0F172A; margin-bottom:4px;">{f2['title']}</div>
-                        <div style="font-size:11.5px; color:#475569; line-height:1.45;">{f2['statement']}</div>
-                    </div>
-                    <div>
-                        <div style="font-weight:700; font-size:12.5px; color:#0F172A; margin-bottom:4px;">{f4['title']}</div>
-                        <div style="font-size:11.5px; color:#475569; line-height:1.45;">{f4['statement']}</div>
-                    </div>
-                </div>
-                <!-- Kolom Kanan: Poin 2, 4, 6 -->
-                <div>
-                    <div style="margin-bottom:15px;">
-                        <div style="font-weight:700; font-size:12.5px; color:#0F172A; margin-bottom:4px;">{f1['title']}</div>
-                        <div style="font-size:11.5px; color:#475569; line-height:1.45;">{f1['statement']}</div>
-                    </div>
-                    <div style="margin-bottom:15px;">
-                        <div style="font-weight:700; font-size:12.5px; color:#0F172A; margin-bottom:4px;">{f3['title']}</div>
-                        <div style="font-size:11.5px; color:#475569; line-height:1.45;">{f3['statement']}</div>
-                    </div>
-                    <div>
-                        <div style="font-weight:700; font-size:12.5px; color:#0F172A; margin-bottom:4px;">{f5['title']}</div>
-                        <div style="font-size:11.5px; color:#475569; line-height:1.45;">{f5['statement']}</div>
-                    </div>
-                </div>
-            </div>
+            {findings_grid_html}
         </div>
 
         <!-- Dark Navy PRIORITAS Banner -->
@@ -843,20 +825,7 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
                 <span style="width:12px; height:12px; border-radius:50%; background:#2563EB; display:inline-block; margin-bottom:4px;"></span>
                 <span style="color:#FFFFFF; font-weight:800; font-size:10px; letter-spacing:0.8px; text-transform:uppercase;">PRIORITAS</span>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; flex-grow:1;">
-                <div>
-                    <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">{act0['action_title']}</div>
-                    <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">{act0['action_desc']}</div>
-                </div>
-                <div>
-                    <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">{act1['action_title']}</div>
-                    <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">{act1['action_desc']}</div>
-                </div>
-                <div>
-                    <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">{act2['action_title']}</div>
-                    <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">{act2['action_desc']}</div>
-                </div>
-            </div>
+            {actions_grid_html}
         </div>
 
         <!-- Bottom Red Alert Banner: Penentu Pekan Depan -->
@@ -1208,30 +1177,8 @@ Tujuh Saluran - Urut dari Keterlibatan
 
 
 # ==============================================================================
-# SLIDE 6: SUARA TERATAS & DUA AWAN KATA (WORDCLOUD EXECUTIVE)
+# SLIDE 6: SUARA TERATAS & DUA AWAN KATA (WORDCLOUD EXECUTIVE - 100% REAL DATA)
 # ==============================================================================
-
-KEMENPU_53_WORDS = {
-    'Aceh': 519, 'Air Bersih': 203, 'Jalan': 195, 'KPK': 244, 'Geledah': 60,
-    'Sekolah Rakyat': 212, 'Gayo Lues': 178, 'Banjir': 165, 'Pidie Jaya': 77,
-    'Jembatan': 95, 'Normalisasi': 72, 'Preservasi': 78, 'Rehab Rekon': 115,
-    'Bendungan': 85, 'Irigasi': 65, 'Jalan Tol': 60, 'Tanggul Jebol': 58,
-    'Cipta Karya': 55, 'Pemeliharaan': 52, 'Swasembada': 50, 'Lumbung Air': 48,
-    'Jembatan Gantung': 46, 'Pemberdayaan': 45, 'Konektivitas': 42, 'SPAM': 40,
-    'Drainase': 38, 'Logistik': 36, 'Mitigasi': 35, 'Rob Pantura': 34,
-    'Sertifikasi': 33, 'Longsor': 32, 'Kekeringan': 30, 'Padat Karya': 28,
-    'Revitalisasi': 27, 'IKN': 24, 'Sumber Daya Air': 23, 'Erosi Pantai': 22,
-    'Keselamatan': 21, 'Mutu Aspal': 20, 'Kapasitas Tampung': 19, 'Berkelanjutan': 18,
-    'Tanggul Kritis': 16, 'Tebing Rawan': 15, 'Tanggap Darurat': 13, 'Konstruksi Beton': 12,
-    'Infrastruktur Hijau': 11, 'Pemulihan Ekonomi': 10, 'Akses Desa': 9, 'Tender Publik': 9,
-    'Pengawasan Mutu': 8, 'Inspeksi Teknis': 7, 'Sinergi Balai': 7, 'Pelayanan Rakyat': 5
-}
-
-KEMENPU_10_NEG = {
-    'KPK': 196, 'Geledah': 56, 'Satker': 96, 'BBPJN': 122, 'Jalan Rusak': 85,
-    'Tanggul Jebol': 75, 'Banjir Bandang': 70, 'Jembatan Putus': 60,
-    'Kekeringan Air': 55, 'Longsor': 50, 'Dugaan Korupsi': 45, 'Ruas Sipiongot': 40
-}
 
 def _get_wordcloud_font():
     candidates = [
@@ -1296,11 +1243,11 @@ def _generate_wordcloud_image_base64(freq_items, palette_mode='general', width=9
 def _extract_dynamic_freqs(df_slice, top_n=37, is_negative=False):
     from src.data_loader import ALL_STOPWORDS, clean_pu_entities
     if df_slice is None or len(df_slice) == 0:
-        return KEMENPU_10_NEG if is_negative else KEMENPU_53_WORDS
+        return {}
 
     col = 'cleaned_content' if 'cleaned_content' in df_slice.columns else ('raw_content' if 'raw_content' in df_slice.columns else None)
     if not col:
-        return KEMENPU_10_NEG if is_negative else KEMENPU_53_WORDS
+        return {}
 
     noise = {'yg', 'dan', 'di', 'ini', 'ke', 'dari', 'untuk', 'pada', 'adalah', 'itu', 'atau', 'dengan', 'ada', 'bisa', 'akan', 'juga', 'sudah', 'oleh', 'dalam', 'karena', 'saat', 'para', 'agar', 'kita', 'kami', 'saya', 'dia', 'mereka', 'bukan', 'tidak', 'tak', 'bila', 'jika', 'tahun', 'hari', 'bulan', 'rp', 'jt', 'miliar', 'triliun', 'indonesia', 'nya', 'saja', 'harus', 'lagi', 'masih', 'banyak', 'sangat', 'tersebut', 'bisa', 'dapat', 'yang', 'kompas', 'detik', 'tribun', 'antara', 'liputan', 'menjadi', 'melalui', 'salah', 'lebih', 'tentang', 'seperti', 'secara', 'terhadap', 'hingga', 'sebagai', 'dilakukan', 'merupakan', 'adanya', 'setiap', 'bagian', 'seluruh', 'terkait', 'namun', 'tetapi', 'tetap', 'kembali', 'hanya', 'atas', 'bagi', 'kini', 'terus', 'selain', 'serta', 'dibuat', 'diberikan', 'sama', 'selalu', 'satu', 'langsung', 'kementerianpu', 'sigapmembangunnegeriuntukrakyat', 'menteri'}
     
@@ -1313,8 +1260,8 @@ def _extract_dynamic_freqs(df_slice, top_n=37, is_negative=False):
                 words.append(w.capitalize())
                 
     counted = Counter(words).most_common(top_n)
-    if not counted or len(counted) < 3:
-        return KEMENPU_10_NEG if is_negative else KEMENPU_53_WORDS
+    if not counted:
+        return {}
     return dict(counted)
 
 
@@ -1327,15 +1274,15 @@ def render_slide_6_two_wordclouds(df, selected_topic='Semua', topic_label=None, 
     col = 'cleaned_content' if 'cleaned_content' in df_sosmed.columns else 'raw_content'
     
     freq_left = _extract_dynamic_freqs(df_sosmed, top_n=37, is_negative=False)
-    neg_slice = df_sosmed[df_sosmed['sentiment_name'] == 'Negatif'] if 'sentiment_name' in df_sosmed.columns else df_sosmed
+    neg_slice = df_sosmed[df_sosmed['sentiment_name'] == 'Negatif'] if 'sentiment_name' in df_sosmed.columns else df_sosmed.head(0)
     freq_right = _extract_dynamic_freqs(neg_slice, top_n=15, is_negative=True)
     
-    pos_slice = df_sosmed[df_sosmed['sentiment_name'] == 'Positif'] if 'sentiment_name' in df_sosmed.columns else df_sosmed
+    pos_slice = df_sosmed[df_sosmed['sentiment_name'] == 'Positif'] if 'sentiment_name' in df_sosmed.columns else df_sosmed.head(0)
     freq_pos = _extract_dynamic_freqs(pos_slice, top_n=15, is_negative=False)
 
     # Hitung frekuensi riil kata di df_sosmed
     def _calc_word_counts(w):
-        if not w or len(df_sosmed) == 0 or col not in df_sosmed.columns:
+        if not w or w == '-' or len(df_sosmed) == 0 or col not in df_sosmed.columns:
             return 0, 0
         pat = r'\b' + re.escape(w.lower()) + r'\b'
         mask_w = df_sosmed[col].str.contains(pat, case=False, na=False)
@@ -1343,25 +1290,26 @@ def render_slide_6_two_wordclouds(df, selected_topic='Semua', topic_label=None, 
         neg_w = int((mask_w & (df_sosmed['sentiment_name'] == 'Negatif')).sum()) if 'sentiment_name' in df_sosmed.columns else 0
         return total_w, neg_w
 
-    # Kata Positif Teratas (Hijau Teratas)
+    # Kata Positif Teratas (Hijau Teratas) - 100% dari data real
     top_pos_candidates = list(freq_pos.keys())
-    top_pos_word = top_pos_candidates[0] if len(top_pos_candidates) > 0 else "Pembangunan"
+    top_pos_word = top_pos_candidates[0] if len(top_pos_candidates) > 0 else "-"
     top_pos_vol, top_pos_neg = _calc_word_counts(top_pos_word)
     
-    # Kata Positif / Kebijakan ke-2 (Air Bersih / Irigasi / Infrastruktur)
-    second_pos_word = top_pos_candidates[1] if len(top_pos_candidates) > 1 else "Infrastruktur"
+    second_pos_word = top_pos_candidates[1] if len(top_pos_candidates) > 1 else "-"
     second_pos_vol, second_pos_neg = _calc_word_counts(second_pos_word)
 
-    # Kata Negatif Teratas (Merah Teratas)
+    # Kata Negatif Teratas (Merah Teratas) - 100% dari data real
     top_neg_candidates = list(freq_right.keys())
-    top_neg_word = top_neg_candidates[0] if len(top_neg_candidates) > 0 else "Penanganan"
+    top_neg_word = top_neg_candidates[0] if len(top_neg_candidates) > 0 else "-"
     top_neg_vol, top_neg_neg = _calc_word_counts(top_neg_word)
 
     # Subjudul Dinamis
-    if top_neg_vol > 0:
+    if top_pos_word != "-" and top_neg_vol > 0:
         sub_title = f"Kosakata {top_pos_word} dan {second_pos_word}; muatan kritik publik pada {top_neg_word}"
+    elif top_pos_word != "-":
+        sub_title = f"Kosakata dominan {top_pos_word}; tidak ada klaster kata negatif dominan pada filter ini"
     else:
-        sub_title = f"Kosakata dominan {top_pos_word} dan {second_pos_word}; sentimen publik terpantau kondusif"
+        sub_title = "Belum ada kata kunci dominan pada rentang filter aktif"
 
     guide_text = f"Dua awan dari unggahan {m.get('topic_short', 'lembaga')} setelah saringan, periode {m.get('cur_str', '')}. Kiri: frekuensi, warna = nada. Kanan: muatan negatif."
     
@@ -1373,16 +1321,21 @@ def render_slide_6_two_wordclouds(df, selected_topic='Semua', topic_label=None, 
         {"label": "Merah Teratas", "val": top_neg_word, "sub": f"{top_neg_vol:,}; {top_neg_neg} negatif", "dot": "#EF4444", "val_color": "#EF4444"},
         {"label": "Kata Dianalisis", "val": f"{len(freq_left)}", "sub": "term dominan korpus", "dot": "#2563EB"},
         {"label": "Kata Negatif", "val": f"{len(freq_right)}", "sub": "muatan kritik publik", "dot": "#EF4444"},
-        {"label": second_pos_word[:14], "val": f"{second_pos_vol:,}", "sub": f"sebutan; {second_pos_neg} negatif", "dot": "#10B981", "val_color": "#10B981"}
+        {"label": second_pos_word[:14] if second_pos_word != "-" else "Kata Positif #2", "val": f"{second_pos_vol:,}", "sub": f"sebutan; {second_pos_neg} negatif", "dot": "#10B981", "val_color": "#10B981"}
     ]
     render_kpi_chips(chips)
     
-    b64_left = _generate_wordcloud_image_base64(tuple(freq_left.items()), palette_mode='general', width=940, height=370)
-    b64_right = _generate_wordcloud_image_base64(tuple(freq_right.items()), palette_mode='negative', width=940, height=370)
+    b64_left = _generate_wordcloud_image_base64(tuple(freq_left.items()), palette_mode='general', width=940, height=370) if freq_left else None
+    b64_right = _generate_wordcloud_image_base64(tuple(freq_right.items()), palette_mode='negative', width=940, height=370) if freq_right else None
 
     c_cloud1, c_cloud2 = st.columns(2, gap="medium")
     
     with c_cloud1:
+        body_c1 = (
+            f'<img src="data:image/png;base64,{b64_left}" style="width:100%; height:auto; display:block; border-radius:4px;" alt="Awan Kata Umum" />'
+            if b64_left else
+            '<div style="padding:48px 16px; color:#64748B; font-size:12px; text-align:center;">Tidak ada data kata kunci pada rentang filter aktif.</div>'
+        )
         html_c1 = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:12px 18px 10px 18px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-family:'Plus Jakarta Sans',sans-serif; font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">
     <div style="display:flex; align-items:center; gap:6px;">
@@ -1392,12 +1345,17 @@ def render_slide_6_two_wordclouds(df, selected_topic='Semua', topic_label=None, 
     <span style="font-size:10px; color:#64748B; font-weight:500;">Ukuran = Frekuensi Sebutan</span>
 </div>
 <div style="width:100%; display:flex; align-items:center; justify-content:center; overflow:hidden;">
-    <img src="data:image/png;base64,{b64_left}" style="width:100%; height:auto; display:block; border-radius:4px;" alt="Awan Kata Umum" />
+    {body_c1}
 </div>
 </div>"""
         render_html(html_c1)
 
     with c_cloud2:
+        body_c2 = (
+            f'<img src="data:image/png;base64,{b64_right}" style="width:100%; height:auto; display:block; border-radius:4px;" alt="Awan Kata Negatif" />'
+            if b64_right else
+            '<div style="padding:48px 16px; color:#64748B; font-size:12px; text-align:center;">Tidak ada kata kunci bermuatan negatif pada rentang filter aktif.</div>'
+        )
         html_c2 = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:12px 18px 10px 18px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-family:'Plus Jakarta Sans',sans-serif; font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">
     <div style="display:flex; align-items:center; gap:6px;">
@@ -1407,14 +1365,14 @@ def render_slide_6_two_wordclouds(df, selected_topic='Semua', topic_label=None, 
     <span style="font-size:10px; color:#64748B; font-weight:500;">Ukuran = Volume Sentimen Negatif</span>
 </div>
 <div style="width:100%; display:flex; align-items:center; justify-content:center; overflow:hidden;">
-    <img src="data:image/png;base64,{b64_right}" style="width:100%; height:auto; display:block; border-radius:4px;" alt="Awan Kata Negatif" />
+    {body_c2}
 </div>
 </div>"""
         render_html(html_c2)
 
     render_callout_target(
         "Saringan dan Cara Membaca",
-        f"Dikeluarkan: nama lembaga, menteri, portal berita, dan derau umum. Hijau = apresiasi fisik & kemanfaatan warga; Merah = sorotan kritis. Kata '{top_neg_word}' memimpin peta muatan negatif; sedangkan '{top_pos_word}' dan '{second_pos_word}' mendominasi frekuensi umum pada periode {m.get('cur_str', '')}."
+        f"Dikeluarkan: nama lembaga, menteri, portal berita, dan derau umum. Hijau = apresiasi fisik & kemanfaatan warga; Merah = sorotan kritis. Kata '{top_neg_word}' memimpin peta muatan negatif ({top_neg_neg} negatif); sedangkan '{top_pos_word}' mendominasi frekuensi positif pada periode {m.get('cur_str', '')}."
     )
     render_mh_footer(f"Edisi Evaluasi Multiplatform • Periode {m.get('cur_str', '')} • Sumber: Pemantauan Opini Multiplatform IndoBERT • Kementerian Pekerjaan Umum")
 
@@ -1454,54 +1412,52 @@ def render_slide_7_issues_minister(df, selected_topic='Semua', topic_label=None,
         top_neg_plat = "Medsos"
         top_neg_count = 0
 
-    # 2. Pemetaan Dinamis 5 Tema Pengangkat (Positif)
+    # 2. Pemetaan Dinamis Tema Pengangkat (Positif) - HANYA tampil jika count > 0
     POS_THEMES = [
-        ("Tanggap darurat bencana & tinjauan lapangan", r'\b(?:banjir|longsor|bencana|darurat|tinjau|posko|aceh|gayo|tamiang|nagan)\b', "Berita, IG"),
-        ("Peresmian Sekolah Rakyat & sarana vokasi", r'\b(?:sekolah|rakyat|vokasi|pendidikan|peresmian|sarana)\b', "TikTok, IG"),
-        ("Preservasi jalan nasional, tol & konektivitas", r'\b(?:preservasi|jalan|nasional|tol|jalur|aspal|mulus|jembatan)\b', "YouTube, Berita"),
-        ("Ketahanan pangan, rehabilitasi irigasi & bendungan", r'\b(?:irigasi|bendungan|pangan|swasembada|tanggul|air|waduk)\b', "Berita Daring"),
-        ("Sinergi lintas instansi & program prioritas", r'\b(?:sinergi|asta\s+cita|kementerian|rapat|kerja\s+sama|kebijakan|pemerintah)\b', "Threads, Berita"),
+        ("Tanggap darurat bencana & tinjauan lapangan", r'\b(?:banjir|longsor|bencana|darurat|tinjau|posko|tanggul)\b'),
+        ("Pembangunan Sekolah Rakyat & fasilitas publik", r'\b(?:sekolah|rakyat|vokasi|pendidikan|peresmian|sarana|gedung|pasar|perpus)\b'),
+        ("Preservasi jalan nasional, tol & konektivitas", r'\b(?:preservasi|jalan|nasional|tol|jalur|aspal|mulus|jembatan)\b'),
+        ("Ketahanan pangan, rehabilitasi irigasi & bendungan", r'\b(?:irigasi|bendungan|pangan|swasembada|air|waduk|spam)\b'),
+        ("Sinergi lintas instansi & program prioritas", r'\b(?:sinergi|asta\s+cita|kementerian|rapat|kerja\s+sama|kebijakan|pemerintah)\b'),
     ]
     
-    df_m_pos = df_m[df_m['sentiment_name'] == 'Positif'] if 'sentiment_name' in df_m.columns else df_m
+    df_m_pos = df_m[df_m['sentiment_name'] == 'Positif'] if 'sentiment_name' in df_m.columns else df_m.head(0)
     pos_rows_data = []
-    for t_title, t_pat, default_plat in POS_THEMES:
+    for t_title, t_pat in POS_THEMES:
         m_t = df_m_pos['raw_content'].str.contains(t_pat, case=False, na=False) if 'raw_content' in df_m_pos.columns else pd.Series(False, index=df_m_pos.index)
         t_cnt = int(m_t.sum())
-        if t_cnt > 0 and 'platform' in df_m_pos.columns:
-            top_plats = df_m_pos[m_t]['platform'].value_counts().head(2).index.tolist()
-            plat_str = ", ".join(top_plats) if top_plats else default_plat
-        else:
-            plat_str = default_plat
-        pos_rows_data.append({'title': t_title, 'count': t_cnt, 'plat': plat_str})
+        if t_cnt > 0:
+            top_plats = df_m_pos[m_t]['platform'].value_counts().head(2).index.tolist() if 'platform' in df_m_pos.columns else []
+            plat_str = ", ".join(top_plats) if top_plats else "-"
+            pos_rows_data.append({'title': t_title, 'count': t_cnt, 'plat': plat_str})
         
     pos_rows_data.sort(key=lambda x: x['count'], reverse=True)
-    top_pos_theme_name = pos_rows_data[0]['title'].split('&')[0].strip() if pos_rows_data else "Kerja Lapangan"
+    top_pos_theme_name = pos_rows_data[0]['title'].split('&')[0].strip() if pos_rows_data else "Aktivitas Lapangan"
 
-    # 3. Pemetaan Dinamis 3 Tema Penekan (Negatif)
+    # 3. Pemetaan Dinamis Tema Penekan (Negatif) - HANYA tampil jika count > 0 (TIDAK pernah memaksa KPK muncul jika 0!)
     NEG_THEMES = [
-        ("Dinamika tata kelola, etika & keluarga di medsos", r'\b(?:nepotisme|wamen|keluarga|etika|jabatan|threads)\b', "Threads"),
-        ("Residu perkara penegakan hukum KPK & proyek daerah", r'\b(?:kpk|korupsi|geledah|sidang|suap|sumut)\b', "X, Berita"),
-        ("Keluhan jalan rusak, berlubang & infrastruktur daerah", r'\b(?:rusak|lubang|hancur|bergelombang|lambat|anggaran|daerah)\b', "Medsos"),
+        ("Keluhan jalan rusak, berlubang & infrastruktur daerah", r'\b(?:rusak|lubang|hancur|bergelombang|macet|aspal|jalan|jembatan)\b'),
+        ("Dampak banjir, longsor, tanggul & krisis air", r'\b(?:banjir|longsor|tanggul|jebol|kekeringan|krisis\s+air|bencana)\b'),
+        ("Dinamika anggaran, tender & tata kelola birokrasi", r'\b(?:anggaran|apbn|tender|lelang|efisiensi|pejabat|nepotisme|wamen)\b'),
+        ("Sorotan penegakan hukum & pengawasan proyek", r'\b(?:kpk|korupsi|geledah|sidang|suap|tersangka|ott)\b'),
+        ("Keluhan keterlambatan proyek & mutu pengerjaan", r'\b(?:lambat|mangkrak|gagal|ambruk|ambrol|molor|kecewa|kontraktor)\b'),
     ]
     neg_rows_data = []
-    for t_title, t_pat, default_plat in NEG_THEMES:
+    for t_title, t_pat in NEG_THEMES:
         m_t = df_m_neg['raw_content'].str.contains(t_pat, case=False, na=False) if 'raw_content' in df_m_neg.columns else pd.Series(False, index=df_m_neg.index)
         t_cnt = int(m_t.sum())
-        if t_cnt > 0 and 'platform' in df_m_neg.columns:
-            top_plats = df_m_neg[m_t]['platform'].value_counts().head(2).index.tolist()
-            plat_str = ", ".join(top_plats) if top_plats else default_plat
-        else:
-            plat_str = default_plat
-        neg_rows_data.append({'title': t_title, 'count': t_cnt, 'plat': plat_str})
+        if t_cnt > 0:
+            top_plats = df_m_neg[m_t]['platform'].value_counts().head(2).index.tolist() if 'platform' in df_m_neg.columns else []
+            plat_str = ", ".join(top_plats) if top_plats else "-"
+            neg_rows_data.append({'title': t_title, 'count': t_cnt, 'plat': plat_str})
         
     neg_rows_data.sort(key=lambda x: x['count'], reverse=True)
 
     # Header & Judul Dinamis
     render_mh_title(
         "Isu Positif dan Negatif - Menteri PU",
-        f"{top_pos_theme_name} mengangkat; kritik terisolir di {top_neg_plat}",
-        f"Pemantauan persepsi Menteri PU ({start_str} - {end_str}). Kiri: lima klaster pengangkat. Kanan: tiga isu penekan sentimen."
+        f"{top_pos_theme_name} mengangkat; kritik terpusat di {top_neg_plat}" if top_neg_count > 0 else f"{top_pos_theme_name} mengangkat; belum ada kritik signifikan",
+        f"Pemantauan persepsi Menteri PU ({start_str} - {end_str}). Kiri: klaster pengangkat aktif. Kanan: klaster penekan aktif (hanya isu dengan volume > 0)."
     )
 
     # 5 KPI Chips Dinamis
@@ -1509,7 +1465,7 @@ def render_slide_7_issues_minister(df, selected_topic='Semua', topic_label=None,
         {"label": "Penyebutan", "val": f"{m_vol:,}".replace(',', '.'), "sub": f"rentang {start_str} - {end_str}", "dot": "#10B981"},
         {"label": "Positif", "val": f"{m_pos_p}%", "sub": f"{m_pos_c:,} dari {m_vol:,} sebutan".replace(',', '.'), "dot": "#10B981", "val_color": "#10B981"},
         {"label": "Netral", "val": f"{m_neu_p}%", "sub": f"{m_neu_c:,} sebutan".replace(',', '.'), "dot": "#94A3B8", "val_color": "#64748B"},
-        {"label": "Negatif", "val": f"{m_neg_p}%", "sub": f"{m_neg_c:,} kritik; terjaga rendah".replace(',', '.'), "dot": "#EF4444", "val_color": "#EF4444"},
+        {"label": "Negatif", "val": f"{m_neg_p}%", "sub": f"{m_neg_c:,} kritik terdeteksi".replace(',', '.'), "dot": "#EF4444", "val_color": "#EF4444"},
         {"label": top_neg_plat, "val": f"{top_neg_count}", "sub": f"dari {m_neg_c:,} negatif menteri".replace(',', '.'), "dot": "#EF4444" if top_neg_count > 0 else "#10B981"}
     ]
     render_kpi_chips(chips)
@@ -1524,11 +1480,13 @@ def render_slide_7_issues_minister(df, selected_topic='Semua', topic_label=None,
 <td style="color:#10B981; font-weight:700;">{item['count']:,}</td>
 <td style="color:#64748B;">{item['plat']}</td>
 </tr>""".replace(',', '.'))
+        if not pos_rows_html:
+            pos_rows_html.append('<tr><td colspan="3" style="padding:10px; color:#64748B;">Tidak ada tema positif terdeteksi pada rentang filter aktif.</td></tr>')
 
         pos_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
 <span style="width:7px; height:7px; border-radius:50%; background:#10B981; display:inline-block;"></span>
-Lima Isu Pengangkat (Positif)
+Isu Pengangkat Aktif (Positif)
 </div>
 <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
 <thead>
@@ -1547,18 +1505,20 @@ Lima Isu Pengangkat (Positif)
 
     with col_neg:
         neg_rows_html = []
-        for idx, item in enumerate(neg_rows_data[:3], 1):
-            cnt_disp = f"{item['count']:,}".replace(',', '.') if item['count'] > 0 else "0"
+        for idx, item in enumerate(neg_rows_data[:5], 1):
+            cnt_disp = f"{item['count']:,}".replace(',', '.')
             neg_rows_html.append(f"""<tr style="border-bottom:1px solid #F1F5F9;">
 <td style="font-weight:600; padding:6px 4px; color:#991B1B;">{idx}. {item['title']}</td>
 <td style="color:#EF4444; font-weight:700;">{cnt_disp}</td>
 <td style="color:#64748B;">{item['plat']}</td>
 </tr>""")
+        if not neg_rows_html:
+            neg_rows_html.append('<tr><td colspan="3" style="padding:10px; color:#64748B;">Tidak ada tema kritik terdeteksi pada rentang filter aktif.</td></tr>')
 
         neg_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
 <span style="width:7px; height:7px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
-Tiga Isu Penekan (Negatif)
+Isu Penekan Aktif (Negatif)
 </div>
 <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
 <thead>
@@ -1574,7 +1534,7 @@ Tiga Isu Penekan (Negatif)
 </table>
 <div style="background:#FEF2F2; border-left:3px solid #EF4444; padding:8px 10px; margin-top:12px; border-radius:3px;">
     <div style="font-weight:700; font-size:10.5px; color:#991B1B;">Catatan Filter Negatif Menteri:</div>
-    <div style="font-size:10px; color:#7F1D1D; line-height:1.35;">Dari total {m_neg_c:,} sebutan kritik menteri ({m_neg_p}%), porsi terbesar terpusat di saluran {top_neg_plat} ({top_neg_count} sebutan). Sentimen negatif Menteri tetap berada di batas aman berkat intensitas komunikasi kerja lapangan dan kehadiran langsung saat tanggap bencana.</div>
+    <div style="font-size:10px; color:#7F1D1D; line-height:1.35;">Dari total {m_neg_c:,} sebutan kritik menteri ({m_neg_p}%), porsi terbesar terpusat di saluran {top_neg_plat} ({top_neg_count} sebutan). Seluruh daftar tema di atas ditarik 100% dari unggahan nyata pada periode terpilih.</div>
 </div>
 </div>""".replace(',', '.')
         render_html(neg_html)
@@ -1585,7 +1545,7 @@ Tiga Isu Penekan (Negatif)
 
 
 # ==============================================================================
-# DEFINISI & EKSTRAKSI DINAMIS 3 TEMUAN UTAMA (SOROTAN KHUSUS) KEMENTERIAN PU
+# DEFINISI KLASTER DETEKSI ISU KEMENTERIAN PU (KONTEN & NARASI 100% DINAMIS DARI DATA REAL)
 # ==============================================================================
 ISSUE_DEFINITIONS = [
     {
@@ -1593,80 +1553,35 @@ ISSUE_DEFINITIONS = [
         'name': 'Tanggap Bencana & Pemulihan Infrastruktur',
         'short_name': 'Bencana & Pemulihan',
         'pattern': r'\b(?:banjir|longsor|gempa|bencana|tanggul|darurat|jembatan putus|posko|aceh|gayo|pidie)\b',
-        'sub_headline': 'Penanganan darurat bencana alam, jembatan putus, dan pemulihan infrastruktur wilayah terdampak',
         'color': '#2563EB',
-        'counter_narrative': 'Kementerian PU bergerak cepat memobilisasi alat berat, memasang jembatan bailey, dan memastikan konektivitas logistik serta tanggul darurat pulih.',
-        'layers': [
-            ("L1 Tanggap Darurat & Jembatan Bailey", "Positif", "#10B981", "Apresiasi respon cepat penanganan jembatan putus & pemulihan akses jalan."),
-            ("L2 Penanganan Banjir & Normalisasi Sungai", "Netral", "#94A3B8", "Laporan debit air sungai, kondisi tanggul, dan posko siaga banjir balai."),
-            ("L3 Korban & Dampak Terisolir", "Negatif", "#EF4444", "Kekhawatiran warga terkait ruas jalan putus dan desa yang sempat terisolir."),
-            ("L4 Kesiapsiagaan Alat Berat di Lapangan", "Positif", "#10B981", "Pengerahan excavator dan dump truck balai di titik-titik rawan longsor."),
-            ("L5 Kebutuhan Bantuan Logistik & Air Bersih", "Netral", "#94A3B8", "Distribusi mobil tangki air bersih kementerian ke posko pengungsian.")
-        ]
     },
     {
         'id': 'air',
         'name': 'Air Bersih, Irigasi & Bendungan',
         'short_name': 'Air Bersih & Irigasi',
         'pattern': r'\b(?:air bersih|irigasi|bendungan|spam|kekeringan|krisis air|bws|sda|lumbung air)\b',
-        'sub_headline': 'Penyediaan akses air minum SPAM, ketahanan irigasi sawah rakyat, dan pengelolaan bendungan nasional',
         'color': '#10B981',
-        'counter_narrative': 'Kementerian PU memastikan keandalan pasokan SPAM air bersih dan revitalisasi saluran irigasi guna menopang swasembada pangan rakyat.',
-        'layers': [
-            ("L1 Pasokan Air Minum & Jaringan SPAM", "Positif", "#10B981", "Apresiasi peresmian dan perluasan pipa sambungan rumah air bersih SPAM."),
-            ("L2 Irigasi Sawah & Ketahanan Pangan", "Positif", "#10B981", "Dukungan petani terhadap normalisasi saluran primer/sekunder penunjang panen."),
-            ("L3 Keluhan Debit Air Musim Kemarau", "Netral", "#94A3B8", "Aspirasi kelompok tani agar pembagian air bendungan proporsional dan merata."),
-            ("L4 Pemeliharaan Fisik Bendungan & Waduk", "Netral", "#94A3B8", "Monitoring kapasitas tampung waduk dan pengerukan sedimentasi berkala."),
-            ("L5 Aduan Pipa Bocor & Tekanan Rendah", "Negatif", "#EF4444", "Aduan warga terkait keterlambatan perbaikan pipa distribusi di pemukiman.")
-        ]
     },
     {
         'id': 'sekolah',
         'name': 'Sekolah Rakyat & Fasilitas Publik',
-        'short_name': 'Sekolah Rakyat & Fasilitas',
-        'pattern': r'\b(?:sekolah rakyat|madrasah|sekolah|vokasi|pasar|fasilitas|nagan raya|gedung)\b',
-        'sub_headline': 'Pembangunan gedung Sekolah Rakyat, renovasi madrasah, dan penyediaan fasilitas sosial bagi masyarakat',
+        'short_name': 'Sekolah & Fasilitas',
+        'pattern': r'\b(?:sekolah rakyat|madrasah|sekolah|vokasi|pasar|fasilitas|gedung|perpus|perpustakaan)\b',
         'color': '#8B5CF6',
-        'counter_narrative': 'Pembangunan prasarana pendidikan Sekolah Rakyat difokuskan untuk memfasilitasi anak-anak kurang mampu dengan standar mutu terbaik.',
-        'layers': [
-            ("L1 Apresiasi Gedung Sekolah Rakyat Baru", "Positif", "#10B981", "Pujian atas fasilitas belajar modern, asrama, dan ruang kelas yang representatif."),
-            ("L2 Revitalisasi Madrasah & Sekolah Daerah", "Positif", "#10B981", "Dukungan terhadap program rehabilitasi ruang belajar rusak di daerah 3T."),
-            ("L3 Kebutuhan Sarana Penunjang & Akses Jalan", "Netral", "#94A3B8", "Permintaan penataan trotoar dan akses jalan lingkungan menuju sekolah."),
-            ("L4 Harapan Pemerataan Fasilitas ke Pelosok", "Netral", "#94A3B8", "Aspirasi agar pembangunan sekolah rakyat menjangkau lebih banyak kabupaten."),
-            ("L5 Pengawasan Kualitas Konstruksi Bangunan", "Netral", "#94A3B8", "Desakan agar pengawasan mutu beton dan atap bangunan sekolah diperketat.")
-        ]
     },
     {
         'id': 'jalan',
         'name': 'Preservasi Jalan & Jembatan Nasional',
         'short_name': 'Jalan & Jembatan Nasional',
         'pattern': r'\b(?:jalan tol|jalan nasional|aspal|jembatan|lubang|bolong|jalan rusak|trans sumatera|nataru|preservasi|bbpjn)\b',
-        'sub_headline': 'Kesiapan jalan tol libur Nataru, penanganan aduan jalan berlubang, dan kemantapan jalan nasional',
         'color': '#F59E0B',
-        'counter_narrative': 'Tim Reaksi Cepat Bina Marga gencar melakukan patroli sapu lubang dan percepatan perbaikan aspal ruas arteri.',
-        'layers': [
-            ("L1 Kesiapan Tol Fungsional Libur Nataru", "Positif", "#10B981", "Antusiasme masyarakat terhadap pembukaan ruas tol baru pengurai macet."),
-            ("L2 Patroli Sapu Lubang & Perbaikan Aspal", "Positif", "#10B981", "Respon tanggap tim balai jalan atas aduan lubang jalan di media sosial."),
-            ("L3 Aduan Kerusakan Jalan Daerah & Aspal Buruk", "Negatif", "#EF4444", "Keluhan warganet atas jalan berlubang dan ruas jalan yang belum diperbaiki."),
-            ("L4 Pembangunan Jembatan Gantung Perintis", "Positif", "#10B981", "Konektivitas antardesa terisolir melalui jembatan gantung pejalan kaki."),
-            ("L5 Sorotan Pengawasan Mutu Proyek Daerah", "Negatif", "#EF4444", "Tuntutan transparansi pelaksanaan lelang dan mutu preservasi berkala.")
-        ]
     },
     {
         'id': 'kpk',
-        'name': 'Akuntabilitas & Perkara KPK',
-        'short_name': 'Perkara KPK & Integritas',
-        'pattern': r'\b(?:kpk|korupsi|geledah|ott|sidang|perkara|satker|tersangka|penyidikan|jaksa|sidik)\b',
-        'sub_headline': 'Sorotan perkara hukum, penggeledahan proyek jalan daerah, dan desakan pengawasan akuntabilitas satker',
+        'name': 'Pengawasan Proyek & Isu Hukum',
+        'short_name': 'Pengawasan & Hukum',
+        'pattern': r'\b(?:kpk|korupsi|geledah|ott|suap|tersangka|penyidikan|tipikor)\b',
         'color': '#EF4444',
-        'counter_narrative': 'Kementerian PU mendukung penuh proses penegakan hukum KPK dan memperketat pengawasan pengadaan melalui Itjen.',
-        'layers': [
-            ("L1 Pemberitaan Penyidikan & Penggeledahan", "Negatif", "#EF4444", "Liputan media daring mengenai pemeriksaan saksi dan penggeledahan berkas."),
-            ("L2 Sorotan Integritas Pejabat Satker Daerah", "Negatif", "#EF4444", "Kritik publik atas dugaan penyimpangan pelaksanaan lelang proyek jalan."),
-            ("L3 Dukungan Pembenahan Pengawasan Internal", "Netral", "#94A3B8", "Aspirasi agar Inspektorat Jenderal Kementerian memperketat audit preventif."),
-            ("L4 Klarifikasi Pemisahan Ranah Proyek", "Netral", "#94A3B8", "Penjelasan pemisahan antara kewenangan jalan provinsi dengan jalan nasional."),
-            ("L5 Komitmen Dukungan Penuh Penegakan Hukum", "Positif", "#10B981", "Pernyataan resmi komitmen pimpinan kementerian kooperatif membantu KPK.")
-        ]
     }
 ]
 
@@ -1714,14 +1629,17 @@ def extract_top_3_issues(df_active):
             top_plat = 'Multiplatform'
             top_plat_count = vol
             
-        # Daily timeline
+        # Daily timeline dengan rincian sentimen real per hari
         daily_series = []
         if 'date' in sub_df.columns and not sub_df['date'].dropna().empty:
-            date_grp = sub_df.groupby(sub_df['date'].dt.date).size()
-            for d_val, c_val in date_grp.items():
-                daily_series.append((d_val, c_val))
+            for d_val, grp in sub_df.groupby(sub_df['date'].dt.date):
+                c_val = len(grp)
+                d_pos = int((grp['sentiment_name'] == 'Positif').sum()) if 'sentiment_name' in grp.columns else 0
+                d_neu = int((grp['sentiment_name'] == 'Netral').sum()) if 'sentiment_name' in grp.columns else 0
+                d_neg = int((grp['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in grp.columns else 0
+                daily_series.append((d_val, c_val, d_pos, d_neu, d_neg))
             daily_series.sort(key=lambda x: x[0])
-            peak_entry = max(daily_series, key=lambda x: x[1]) if daily_series else (None, 0)
+            peak_entry = max(daily_series, key=lambda x: x[1]) if daily_series else (None, 0, 0, 0, 0)
             id_m = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'Mei', 6: 'Jun', 7: 'Jul', 8: 'Agu', 9: 'Sep', 10: 'Okt', 11: 'Nov', 12: 'Des'}
             if peak_entry[0]:
                 peak_str = f"{peak_entry[0].day:02d} {id_m.get(peak_entry[0].month, peak_entry[0].strftime('%b'))}"
@@ -1731,14 +1649,47 @@ def extract_top_3_issues(df_active):
         else:
             peak_str = '-'
             peak_vol = 0
-            
+
+        # Ekstraksi dinamis kata kunci nyata & lapis narasi dari unggahan asli di sub_df
+        top_kws_issue = [w for w, _ in _get_frequent_words(sub_df, max_words=5)]
+        kw_str = ", ".join(top_kws_issue[:4]) if top_kws_issue else defn['short_name']
+        dyn_sub_headline = f"Dominan di {top_plat} ({top_plat_count:,} sebutan) • Kata kunci nyata: {kw_str}".replace(',', '.')
+
+        # Bangun 5 Lapis Narasi murni dari post riil berinteraksi tertinggi (dedup snippet)
+        dyn_layers = []
+        cand_df = sub_df.sort_values(by='total_engagement', ascending=False) if 'total_engagement' in sub_df.columns else sub_df
+        seen_snips = set()
+        for _, r in cand_df.iterrows():
+            raw_t = re.sub(r'\s+', ' ', str(r.get('raw_content', r.get('cleaned_content', ''))).strip())
+            if len(raw_t) < 15:
+                continue
+            key_s = raw_t[:32].lower()
+            if key_s in seen_snips:
+                continue
+            seen_snips.add(key_s)
+            s_nm = str(r.get('sentiment_name', 'Netral'))
+            s_col = '#10B981' if s_nm == 'Positif' else ('#EF4444' if s_nm == 'Negatif' else '#64748B')
+            r_plat = str(r.get('platform', 'Web'))
+            r_auth = str(r.get('author', 'Anonim')).strip()[:20]
+            r_dt = str(r.get('date_str', ''))
+            r_title = f"{r_plat} • {r_auth}" + (f" ({r_dt})" if r_dt else "")
+            r_snip = raw_t[:115] + ("..." if len(raw_t) > 115 else "")
+            dyn_layers.append((r_title, s_nm, s_col, r_snip))
+            if len(dyn_layers) >= 5:
+                break
+
+        dyn_counter = (
+            f"Fokus respon pada {top_plat} ({top_plat_count:,} sebutan, kritik {neg_pct}%, positif {pos_pct}%). "
+            f"Prioritaskan klarifikasi faktual & dokumentasi lapangan terkait istilah kunci: {kw_str}."
+        ).replace(',', '.')
+
         scored_issues.append({
             'id': defn['id'],
             'name': defn['name'],
             'short_name': defn['short_name'],
-            'sub_headline': defn['sub_headline'],
-            'counter_narrative': defn['counter_narrative'],
-            'layers': defn['layers'],
+            'sub_headline': dyn_sub_headline,
+            'counter_narrative': dyn_counter,
+            'layers': dyn_layers,
             'vol': vol,
             'vol_pct': round(vol / total_len * 100, 1),
             'pos': pos, 'pos_pct': pos_pct,
@@ -1805,43 +1756,37 @@ def render_slide_9_main_topics(df, selected_topic='Semua', topic_label=None, **k
     total_k_neg = int((df_k['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in df_k.columns else 0
     k_neg_p = round((total_k_neg / total_k_vol) * 100, 1)
 
-    # 2. Definisi 6 Klaster Isu Utama Kementerian PU
+    # 2. Definisi 6 Klaster Isu Utama Kementerian PU (HANYA tampil jika cnt > 0; bukti kata kunci 100% dinamis dari data real!)
     CLUSTER_DEFINITIONS = [
         {
-            'name': 'Banjir Aceh dan pemulihan fisik',
-            'short_name': 'Bencana Aceh',
+            'name': 'Penanganan bencana dan pemulihan fisik',
+            'short_name': 'Bencana & Pemulihan',
             'pattern': r'\b(?:banjir|longsor|gempa|bencana|tanggul|darurat|jembatan|aceh|gayo|pidie)\b',
-            'key_terms': ['aceh', 'banjir', 'longsor', 'tanggul', 'gayo']
         },
         {
-            'name': 'Perkara KPK dan pengawasan proyek',
-            'short_name': 'Perkara KPK',
-            'pattern': r'\b(?:kpk|korupsi|geledah|sidang|ott|penyelidikan|sumut|bbpjn)\b',
-            'key_terms': ['kpk', 'geledah', 'sidang', 'korupsi', 'sumut']
+            'name': 'Pengawasan proyek dan isu hukum',
+            'short_name': 'Pengawasan & Hukum',
+            'pattern': r'\b(?:kpk|korupsi|geledah|ott|penyelidikan|tersangka|suap|tipikor)\b',
         },
         {
-            'name': 'Sekolah Rakyat dan sarana vokasi',
-            'short_name': 'Sekolah Rakyat',
-            'pattern': r'\b(?:sekolah|rakyat|vokasi|pendidikan|pelatihan|inpres)\b',
-            'key_terms': ['sekolah', 'rakyat', 'vokasi', 'sarana']
+            'name': 'Sekolah Rakyat dan sarana fasilitas publik',
+            'short_name': 'Sekolah & Fasilitas',
+            'pattern': r'\b(?:sekolah|rakyat|vokasi|pendidikan|pelatihan|inpres|perpus|perpustakaan|gedung)\b',
         },
         {
-            'name': 'Air bersih dan kekeringan irigasi',
+            'name': 'Air bersih, irigasi dan bendungan',
             'short_name': 'Air Bersih & SDA',
             'pattern': r'\b(?:air\s+bersih|krisis\s+air|kekeringan|irigasi|bendungan|waduk|pipa|spam)\b',
-            'key_terms': ['air', 'irigasi', 'kekeringan', 'bendungan', 'waduk']
         },
         {
-            'name': 'Tol fungsional dan konektivitas Nataru',
-            'short_name': 'Tol & Jalur Nataru',
-            'pattern': r'\b(?:jalan\s+tol|nataru|fungsional|jalan\s+nasional|preservasi|aspal|trans)\b',
-            'key_terms': ['tol', 'nataru', 'fungsional', 'jalan', 'preservasi']
+            'name': 'Jalan tol, jalan nasional dan konektivitas',
+            'short_name': 'Jalan & Konektivitas',
+            'pattern': r'\b(?:jalan\s+tol|nataru|fungsional|jalan\s+nasional|preservasi|aspal|jalan\s+rusak|lubang)\b',
         },
         {
-            'name': 'Isu tata kelola, pejabat & birokrasi',
+            'name': 'Tata kelola, anggaran dan birokrasi',
             'short_name': 'Tata Kelola',
-            'pattern': r'\b(?:wamen|nepotisme|pejabat|itjen|humas|anggaran|birokrasi)\b',
-            'key_terms': ['wamen', 'nepotisme', 'pejabat', 'itjen', 'anggaran']
+            'pattern': r'\b(?:wamen|nepotisme|pejabat|itjen|humas|anggaran|apbn|birokrasi|tender|lelang)\b',
         }
     ]
 
@@ -1850,6 +1795,8 @@ def render_slide_9_main_topics(df, selected_topic='Semua', topic_label=None, **k
         mask = df_k['raw_content'].str.contains(c['pattern'], case=False, na=False) if 'raw_content' in df_k.columns else pd.Series(False, index=df_k.index)
         sub = df_k[mask]
         cnt = len(sub)
+        if cnt == 0:
+            continue
         pos_cnt = int((sub['sentiment_name'] == 'Positif').sum()) if 'sentiment_name' in sub.columns else 0
         neu_cnt = int((sub['sentiment_name'] == 'Netral').sum()) if 'sentiment_name' in sub.columns else 0
         neg_cnt = int((sub['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in sub.columns else 0
@@ -1864,13 +1811,8 @@ def render_slide_9_main_topics(df, selected_topic='Semua', topic_label=None, **k
         else:
             status_html = '<span style="color:#F59E0B; font-weight:700;">campur</span>'
             
-        ev_counts = []
-        if 'raw_content' in sub.columns and cnt > 0:
-            for term in c['key_terms']:
-                tc = int(sub['raw_content'].str.contains(r'\b' + term + r'\b', case=False, na=False).sum())
-                if tc > 0:
-                    ev_counts.append(f"{term} {tc}")
-        ev_str = ", ".join(ev_counts[:3]) if ev_counts else f"{cnt:,} sebutan"
+        top_real_terms = _get_frequent_words(sub, max_words=3)
+        ev_str = ", ".join(f"{w} ({n:,})" for w, n in top_real_terms) if top_real_terms else f"{cnt:,} sebutan"
         
         clusters_data.append({
             'name': c['name'],
@@ -1887,15 +1829,20 @@ def render_slide_9_main_topics(df, selected_topic='Semua', topic_label=None, **k
 
     # Urutkan klaster berdasarkan volume sebutan terbanyak
     clusters_data.sort(key=lambda x: x['cnt'], reverse=True)
-    top_vol_cl = clusters_data[0] if clusters_data else {'name': 'Bencana & Pemulihan', 'short_name': 'Bencana', 'cnt': 0, 'neg_cnt': 0, 'neg_p': 0.0}
-    
-    # Cari klaster penekan negatif utama
+    if not clusters_data:
+        render_mh_title(
+            "Topik & Narasi - Kementerian PU",
+            "Belum ada klaster topik terdeteksi pada rentang filter aktif",
+            f"Periode {start_str} - {end_str}."
+        )
+        st.info("Tidak ada data topik yang cocok pada filter aktif saat ini.")
+        return
+
+    top_vol_cl = clusters_data[0]
     neg_sorted_cl = sorted(clusters_data, key=lambda x: x['neg_cnt'], reverse=True)
-    top_neg_cl = neg_sorted_cl[0] if neg_sorted_cl else top_vol_cl
-    
-    # Cari klaster pengangkat positif utama
+    top_neg_cl = neg_sorted_cl[0]
     pos_sorted_cl = sorted(clusters_data, key=lambda x: x['pos_cnt'], reverse=True)
-    top_pos_cl = pos_sorted_cl[0] if pos_sorted_cl else top_vol_cl
+    top_pos_cl = pos_sorted_cl[0]
 
     render_mh_title(
         "Topik & Narasi - Kementerian PU",
@@ -1980,31 +1927,16 @@ def render_dynamic_special_issue_slide(df, rank=1, slide_num=10, selected_topic=
     render_mh_top_bar(slide_num=slide_num)
     
     top3 = extract_top_3_issues(df)
-    if rank <= len(top3):
-        issue = top3[rank - 1]
-    else:
-        fallback_defn = ISSUE_DEFINITIONS[(rank - 1) % len(ISSUE_DEFINITIONS)]
-        issue = {
-            'id': fallback_defn['id'],
-            'name': fallback_defn['name'],
-            'short_name': fallback_defn['short_name'],
-            'sub_headline': fallback_defn['sub_headline'],
-            'counter_narrative': fallback_defn['counter_narrative'],
-            'layers': fallback_defn['layers'],
-            'vol': 0,
-            'vol_pct': 0.0,
-            'pos': 0, 'pos_pct': 0.0,
-            'neu': 0, 'neu_pct': 0.0,
-            'neg': 0, 'neg_pct': 0.0,
-            'primary_sentiment': 'Netral',
-            'primary_color': '#F59E0B',
-            'top_platform': 'Multiplatform',
-            'top_platform_count': 0,
-            'peak_str': '-',
-            'peak_vol': 0,
-            'daily_series': [],
-            'sub_df': pd.DataFrame()
-        }
+    if rank > len(top3):
+        render_mh_title(
+            f"Sorotan Khusus #{rank}",
+            f"Tidak ada isu peringkat #{rank} pada rentang filter aktif",
+            f"Hanya ditemukan {len(top3)} klaster isu dengan volume > 0 pada periode {m.get('cur_str', '')}."
+        )
+        st.info(f"Tidak ada data isu peringkat #{rank} pada rentang filter saat ini (hanya {len(top3)} isu aktif terdeteksi).")
+        render_mh_footer(f"Analisis Dinamis Korpus • Periode {m.get('cur_str', '')} • Kementerian Pekerjaan Umum")
+        return
+    issue = top3[rank - 1]
 
     id_m = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'Mei', 6: 'Jun', 7: 'Jul', 8: 'Agu', 9: 'Sep', 10: 'Okt', 11: 'Nov', 12: 'Des'}
     rank_labels = {1: "Utama #1", 2: "Utama #2", 3: "Utama #3"}
@@ -2040,7 +1972,11 @@ def render_dynamic_special_issue_slide(df, rank=1, slide_num=10, selected_topic=
             
         rows_chrono = []
         max_v = max([x[1] for x in d_series]) if d_series else 1
-        for d_date, d_vol in d_series:
+        for d_entry in d_series:
+            d_date, d_vol = d_entry[0], d_entry[1]
+            d_pos = d_entry[2] if len(d_entry) > 2 else 0
+            d_neu = d_entry[3] if len(d_entry) > 3 else 0
+            d_neg = d_entry[4] if len(d_entry) > 4 else 0
             d_str = f"{d_date.day:02d} {id_m.get(d_date.month, d_date.strftime('%b'))}"
             d_pct = round(d_vol / max(1, issue['vol']) * 100, 1)
             
@@ -2062,7 +1998,7 @@ def render_dynamic_special_issue_slide(df, rank=1, slide_num=10, selected_topic=
             rows_chrono.append(f"""<tr style="border-bottom:1px solid #F1F5F9;">
 <td style="font-weight:700; padding:6px 4px; width:75px;">{d_str}</td>
 <td style="padding:6px 4px; font-weight:600; color:#0F2942; width:85px;">{d_vol:,} <span style="font-size:10px; color:#64748B; font-weight:400;">({d_pct}%)</span></td>
-<td style="padding:6px 4px; font-size:10.5px; color:#475569;">Penyebutan isu & dinamika respon publik</td>
+<td style="padding:6px 4px; font-size:10.5px; color:#475569;"><span style="color:#10B981; font-weight:600;">{d_pos} pos</span> &bull; {d_neu} net &bull; <span style="color:#EF4444; font-weight:600;">{d_neg} neg</span></td>
 <td style="width:80px; text-align:right;">{badge}</td>
 </tr>""".replace(',', '.'))
 
@@ -2238,14 +2174,6 @@ def render_slide_12_disaster_response_kemenpu(df, selected_topic='Semua', topic_
             if len(pos_items) >= 5:
                 break
 
-    if not pos_items:
-        pos_items = [
-            ("Tim tanggap darurat balai siaga di posko infrastruktur dan ruas rawan bencana.", "Balai Wilayah"),
-            ("Pengerahan alat berat dan pompa darurat untuk percepatan pembukaan akses jalan.", "Bina Marga"),
-            ("Pemantauan kapasitas tampung bendungan dan tanggul sungai oleh balai SDA.", "Ditjen SDA"),
-            ("Distribusi sarana air bersih tangki darurat untuk wilayah terdampak kekeringan.", "Cipta Karya"),
-        ]
-
     neg_items = []
     if len(df_dis_neg) > 0:
         seen = set()
@@ -2261,19 +2189,14 @@ def render_slide_12_disaster_response_kemenpu(df, selected_topic='Semua', topic_
             if len(neg_items) >= 5:
                 break
 
-    if not neg_items:
-        neg_items = [
-            ("Aduan jalan ambles dan material tebing menutup sebagian badan jalan raya.", "Warganet"),
-            ("Keluhan genangan air lambat surut di kawasan permukiman bantaran sungai.", "Warga"),
-            ("Permintaan penambahan tangki air bersih pada daerah rawan kekeringan.", "Komunitas"),
-        ]
-
     with c_pu:
         pu_rows = []
         for snip, plat in pos_items:
             pu_rows.append(f"""<div style="padding:6px 0; border-bottom:1px solid #F1F5F9;">
-• <strong>{snip}</strong> <span style="color:#64748B; font-size:9.5px;">({plat})</span> - <span style="color:#10B981; font-weight:700;">BERJALAN</span>
+• <strong>{snip}</strong> <span style="color:#64748B; font-size:9.5px;">({plat})</span> - <span style="color:#10B981; font-weight:700;">POSITIF</span>
 </div>""")
+        if not pu_rows:
+            pu_rows.append('<div style="padding:10px 0; color:#64748B;">Tidak ada unggahan positif terkait bencana pada rentang filter aktif.</div>')
         pu_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
 <span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
@@ -2291,6 +2214,8 @@ Kegiatan Tanggap Darurat & Aksi Balai Lapangan
             neg_rows.append(f"""<div style="padding:5px 0; border-bottom:1px solid #F1F5F9;">
 • <strong>{snip}</strong> <span style="color:#64748B; font-size:9.5px;">({plat})</span> - <span style="color:#EF4444; font-weight:700;">ATENSI</span>
 </div>""")
+        if not neg_rows:
+            neg_rows.append('<div style="padding:10px 0; color:#64748B;">Tidak ada aduan negatif terkait bencana pada rentang filter aktif.</div>')
         oth_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
 <span style="width:7px; height:7px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
@@ -2690,6 +2615,9 @@ def render_slide_14_intelligence_projections(df, selected_topic='Semua', topic_l
         growth = cnt_l - cnt_p
         growth_pct = round(growth / max(1, cnt_p) * 100, 1) if cnt_p > 0 else (100.0 if cnt_l > 0 else 0.0)
         
+        if cnt_l == 0 and cnt_p == 0:
+            continue
+
         trends.append({
             'defn': defn,
             'id': defn['id'],
@@ -2703,16 +2631,21 @@ def render_slide_14_intelligence_projections(df, selected_topic='Semua', topic_l
             'growth': growth,
             'growth_pct': growth_pct
         })
+
+    if not trends:
+        render_mh_top_bar(slide_num=14)
+        render_mh_title(
+            "Rekomendasi Intelijen - Proyeksi 7 Hari",
+            "Belum ada lonjakan isu aktif pada rentang filter ini",
+            f"Periode {start_recent_str} - {end_str}."
+        )
+        st.info("Tidak ada isu aktif dengan volume > 0 pada rentang filter saat ini untuk diproyeksikan.")
+        return
         
-    # Klasifikasi 3 Skenario Intelijen Berdasarkan Pergerakan Nyata Data:
-    # 1. Paling Mungkin: isu dengan volume terbesar / traksi atensi tertinggi di 1-3 hari terakhir
+    # Klasifikasi 3 Skenario Intelijen Berdasarkan Pergerakan Nyata Data (Hanya isu aktif > 0):
     most_likely = max(trends, key=lambda x: (x['cnt_last'], x['growth']))
-    
-    # 2. Paling Berbahaya (Konvergensi): isu dengan sentimen negatif tertinggi atau lonjakan negatif
     worst_candidates = [t for t in trends if t['id'] != most_likely['id']]
-    worst_case = max(worst_candidates, key=lambda x: (x['neg_pct'], x['growth'])) if worst_candidates else max(trends, key=lambda x: x['neg_pct'])
-    
-    # 3. Terkendali: isu dengan sentimen negatif terendah dan dukungan positif stabil
+    worst_case = max(worst_candidates, key=lambda x: (x['neg_pct'], x['cnt_last'])) if worst_candidates else most_likely
     stable_candidates = [t for t in trends if t['id'] not in (most_likely['id'], worst_case['id'])]
     stable = min(stable_candidates, key=lambda x: x['neg_pct']) if stable_candidates else min(trends, key=lambda x: x['neg_pct'])
     
@@ -2763,66 +2696,44 @@ Tiga Skenario Intelijen (Proyeksi 7 Hari)
 </div>"""
         render_html(scen_html)
 
-    # Kalibrasi Tanda Bahaya Dini Sesuai Profil Isu Kritis
-    if worst_case['id'] == 'kpk':
-        tanda_1 = "Agenda penegakan hukum KPK (periksa saksi, geledah)"
-        ambang_1 = ">50 sebutan"
-        respons_1 = "Satu pernyataan resmi Itjen / Pimpinan"
-    elif worst_case['id'] == 'bencana':
-        tanda_1 = "Banjir meluas / longsor ruas nasional berulang"
-        ambang_1 = "1 kejadian"
-        respons_1 = "Rilis BPJN / BWS respon darurat 24 jam"
-    elif worst_case['id'] == 'jalan':
-        tanda_1 = "Video aduan jalan rusak parah / berlubang viral"
-        ambang_1 = ">50 sebutan"
-        respons_1 = "Tim Sapu Lubang BBPJN tanggapi di medsos"
-    elif worst_case['id'] == 'air':
-        tanda_1 = "Aduan kekeringan irigasi sawah / pipa SPAM bocor"
-        ambang_1 = ">30 sebutan"
-        respons_1 = "Mobilisasi tangki Cipta Karya & gilir air BWS"
-    else:
-        tanda_1 = f"Lonjakan kritik tajam {worst_case['short_name']}"
-        ambang_1 = ">30 sebutan"
-        respons_1 = "Klarifikasi teknis unit kerja terkait 24 jam"
-
-    if most_likely['id'] == 'bencana':
-        tanda_2 = "Longsor / banjir ruas arteri berulang berkorban"
-        ambang_2 = "1 kejadian"
-        respons_2 = "Pengerahan alat berat & jembatan bailey balai"
-    elif most_likely['id'] == 'jalan':
-        tanda_2 = "Aduan kemacetan parah / lubang jalan jalur logistik"
-        ambang_2 = ">40 sebutan"
-        respons_2 = "Patroli preservasi rutin BBPJN & perbaikan cepat"
-    elif most_likely['id'] == 'air':
-        tanda_2 = "Fluktuasi debit air waduk / tanggul kritis"
-        ambang_2 = "24 jam"
-        respons_2 = "Monitoring posko hidrologi BWS & rilis berkala"
-    else:
-        tanda_2 = f"Eskalasi atensi publik {most_likely['short_name']}"
-        ambang_2 = f">{max(30, int(most_likely['cnt_last'] * 0.25))} sebutan"
-        respons_2 = "Publikasi dokumentasi visual lapangan di kanal medsos"
+    # Kalibrasi Tanda Bahaya Dini 100% Dinamis dari Isu yang Benar-Benar Aktif (> 0)
+    warn_response_map = {
+        'kpk': ("Itjen & Biro Kompu: siapkan klarifikasi satu pintu & audit transparansi"),
+        'bencana': ("BPJN / BWS: rilis progres darurat & pengerahan alat berat 24 jam"),
+        'jalan': ("Ditjen Bina Marga / BBPJN: aktivasi tim sapu lubang & publikasi before-after"),
+        'air': ("Ditjen SDA / Cipta Karya: pantau debit bendungan & mobilisasi tangki air bersih"),
+        'sekolah': ("Ditjen Cipta Karya: publikasi progres fisik & kualitas fasilitas layanan publik"),
+    }
+    sorted_warn = sorted(trends, key=lambda x: (x['neg_pct'], x['cnt_last']), reverse=True)
+    warn_rows_html = []
+    for tr in sorted_warn:
+        thresh = max(10, int(round(tr['cnt_last'] * 1.25))) if tr['cnt_last'] > 0 else 10
+        col_w = "#EF4444" if tr['neg_pct'] >= 15 else ("#D97706" if tr['neg_pct'] >= 8 else "#10B981")
+        resp_txt = warn_response_map.get(tr['id'], "Klarifikasi teknis unit kerja terkait dalam 24 jam")
+        warn_rows_html.append(
+            f"""<tr style="border-bottom:1px solid #F1F5F9;">
+<td style="font-weight:600; padding:6px 4px;">Eskalasi {tr['name']} ({tr['cnt_last']:,} sebutan, {tr['neg_pct']}% neg)</td>
+<td style="color:{col_w}; font-weight:700;">&gt;{thresh:,} / 3 hr</td>
+<td>{resp_txt}</td>
+</tr>"""
+        )
 
     with c_warn:
         warn_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
 <span style="width:7px; height:7px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
-Tanda Bahaya dan Respons Cepat
+Tanda Bahaya dan Respons Cepat (Berdasarkan Isu Aktif)
 </div>
 <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
 <thead>
 <tr style="border-bottom:1.5px solid #CBD5E1; color:#64748B; font-size:10px; font-weight:700;">
-<th style="padding:6px 4px;">TANDA</th>
-<th style="padding:6px 4px; width:80px;">AMBANG ▼</th>
+<th style="padding:6px 4px;">TANDA (DATA REAL)</th>
+<th style="padding:6px 4px; width:85px;">AMBANG ▼</th>
 <th style="padding:6px 4px;">RESPONS</th>
 </tr>
 </thead>
 <tbody>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">{tanda_1}</td><td style="color:#EF4444; font-weight:700;">{ambang_1}</td><td>{respons_1}</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">{tanda_2}</td><td style="color:#EF4444; font-weight:700;">{ambang_2}</td><td>{respons_2}</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">Amplifikasi RT / tagar seragam menyasar PU</td><td style="color:#D97706; font-weight:700;">>30 akun</td><td>Fakta ranah pusat-daerah & klarifikasi</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">Banjir atau tanggul kritis meluas</td><td style="color:#EF4444; font-weight:700;">24 jam</td><td>Rilis update BWS & kesiapsiagaan posko</td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">Krisis pasokan air bersih tanpa progres</td><td style="color:#D97706; font-weight:700;">3 hari</td><td>Rilis Ditjen Cipta Karya & dropping tangki</td></tr>
-<tr><td style="font-weight:600; padding:6px 4px;">Video komplain jalan baru viral di medsos</td><td style="color:#D97706; font-weight:700;">>100 rb tayang</td><td>Jawab di kanal sama dalam kurun 6 jam</td></tr>
+{"".join(warn_rows_html)}
 </tbody>
 </table>
 </div>"""
@@ -2857,32 +2768,53 @@ def render_slide_stakeholder_mapping(df, selected_topic='Semua', topic_label=Non
     ]
     render_kpi_chips(chips)
     
+    # Klasifikasi Dinamis 4 Kuadran Power (Engagement) vs Interest (Frekuensi Sebutan) dari Akun Nyata
+    promoters, latents, defenders, apathetics = [], [], [], []
+    if 'author' in df.columns and len(df) > 0:
+        eng_col = 'total_engagement' if 'total_engagement' in df.columns else None
+        if eng_col:
+            auth_stats = df.groupby('author').agg(freq=('author', 'count'), power=(eng_col, 'sum')).reset_index()
+        else:
+            auth_stats = df.groupby('author').agg(freq=('author', 'count')).reset_index()
+            auth_stats['power'] = auth_stats['freq']
+        auth_stats = auth_stats[auth_stats['author'].astype(str).str.strip().str.lower().isin(['', 'nan', 'none']) == False]
+        if not auth_stats.empty:
+            med_freq = auth_stats['freq'].median()
+            med_pow = auth_stats['power'].median()
+            promoters = auth_stats[(auth_stats['power'] >= med_pow) & (auth_stats['freq'] >= med_freq)].sort_values('power', ascending=False)['author'].head(4).tolist()
+            latents = auth_stats[(auth_stats['power'] >= med_pow) & (auth_stats['freq'] < med_freq)].sort_values('power', ascending=False)['author'].head(4).tolist()
+            defenders = auth_stats[(auth_stats['power'] < med_pow) & (auth_stats['freq'] >= med_freq)].sort_values('freq', ascending=False)['author'].head(4).tolist()
+            apathetics = auth_stats[(auth_stats['power'] < med_pow) & (auth_stats['freq'] < med_freq)].sort_values('freq', ascending=False)['author'].head(4).tolist()
+
+    def _fmt_quad(lst):
+        return ", ".join(str(x)[:22] for x in lst) if lst else "Tidak ada akun terdeteksi di kuadran ini."
+
     c_m1, c_m2 = st.columns(2, gap="medium")
     with c_m1:
-        st.markdown("""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+        render_html(f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
 <span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
-Kuadran Pemangku Kepentingan (Power vs Interest)
+Kuadran Pemangku Kepentingan (Power vs Interest — Data Real)
 </div>
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:11px;">
 <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:6px; padding:10px;">
-    <div style="font-weight:700; color:#1D4ED8; margin-bottom:4px;">PROMOTERS (Tinggi / Tinggi)</div>
-    <div style="color:#1E3A8A; font-size:10px;">Biro Komunikasi Publik, Pimpinan Satker, Komisi V DPR, Mitra Balai Lapangan.</div>
+    <div style="font-weight:700; color:#1D4ED8; margin-bottom:4px;">PROMOTERS (Power Tinggi / Aktif)</div>
+    <div style="color:#1E3A8A; font-size:10px;">{_fmt_quad(promoters)}</div>
 </div>
 <div style="background:#FEF3C7; border:1px solid #FDE68A; border-radius:6px; padding:10px;">
-    <div style="font-weight:700; color:#D97706; margin-bottom:4px;">LATENTS (Tinggi / Rendah)</div>
-    <div style="color:#78350F; font-size:10px;">Lembaga Penegak Hukum (KPK/Kejaksaan), Kementerian Keuangan, BPK.</div>
+    <div style="font-weight:700; color:#D97706; margin-bottom:4px;">LATENTS (Power Tinggi / Sesekali)</div>
+    <div style="color:#78350F; font-size:10px;">{_fmt_quad(latents)}</div>
 </div>
 <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:6px; padding:10px;">
-    <div style="font-weight:700; color:#15803D; margin-bottom:4px;">DEFENDERS (Rendah / Tinggi)</div>
-    <div style="color:#14532D; font-size:10px;">Komunitas Warga Lokal, Asosiasi Petani Pemakai Air (P3A), Relawan Bencana.</div>
+    <div style="font-weight:700; color:#15803D; margin-bottom:4px;">DEFENDERS (Aktif / Power Sedang)</div>
+    <div style="color:#14532D; font-size:10px;">{_fmt_quad(defenders)}</div>
 </div>
 <div style="background:#F1F5F9; border:1px solid #CBD5E1; border-radius:6px; padding:10px;">
-    <div style="font-weight:700; color:#475569; margin-bottom:4px;">APATHETICS (Rendah / Rendah)</div>
-    <div style="color:#334155; font-size:10px;">Warganet Umum, Pengamat Sekilas di platform hiburan digital.</div>
+    <div style="font-weight:700; color:#475569; margin-bottom:4px;">APATHETICS (Power &amp; Frekuensi Rendah)</div>
+    <div style="color:#334155; font-size:10px;">{_fmt_quad(apathetics)}</div>
 </div>
 </div>
-</div>""", unsafe_allow_html=True)
+</div>""")
 
     with c_m2:
         top_kols = list(author_counts.items())[:5]
@@ -3198,29 +3130,48 @@ def render_slide_17_daily_nov16(df, selected_topic='Semua', topic_label=None, **
     vol_m = len(df_day_m)
     neg_m = int((df_day_m['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in df_day_m.columns else 0
     
-    # Track critical sensitive topics
-    kpk_cnt = int(df_day['raw_content'].astype(str).str.contains(r'kpk|korupsi|sidang|suap|tersangka', case=False, na=False).sum()) if 'raw_content' in df_day.columns else 0
-    disaster_cnt = int(df_day['raw_content'].astype(str).str.contains(r'longsor|banjir|tanggul|amblas|rusak', case=False, na=False).sum()) if 'raw_content' in df_day.columns else 0
-    water_cnt = int(df_day['raw_content'].astype(str).str.contains(r'sawah|irigasi|air|kekeringan|waduk', case=False, na=False).sum()) if 'raw_content' in df_day.columns else 0
-    
+    # Deteksi dinamis 3 kategori isu terbesar pada hari ini (TIDAK pernah memaksa KPK jika 0!)
+    from src.tab_sentiment_drilldown import extract_issue_category, get_issue_solution
+    if len(df_day) > 0:
+        day_cats = (
+            df_day['issue_category']
+            if 'issue_category' in df_day.columns
+            else df_day['cleaned_content'].fillna(df_day.get('raw_content', '')).apply(extract_issue_category)
+        )
+        cat_vc = day_cats.value_counts()
+        top_day_issues = [(cat_name, int(cnt)) for cat_name, cnt in cat_vc.items() if cnt > 0][:3]
+    else:
+        top_day_issues = []
+
     top_w_day = _get_frequent_words(df_day, max_words=10)
-    top_issue_label = top_w_day[0][0].title() if top_w_day else "Infrastruktur"
+    top_issue_label = top_w_day[0][0].title() if top_w_day else (top_day_issues[0][0] if top_day_issues else "Aktivitas Publik")
     
-    sub_title = f"Fokus Lapangan: {top_issue_label}; KPK & Bencana Terpantau"
+    if top_day_issues:
+        sub_title = f"Fokus Lapangan: {top_issue_label}; Isu Utama {top_day_issues[0][0]} ({top_day_issues[0][1]:,} sebutan)"
+    else:
+        sub_title = f"Pantauan Mutakhir ({d_str}) • {vol_day:,} sebutan masuk"
     render_mh_title(
         f"Laporan Harian Terkini ({d_str})",
         sub_title,
-        f"{full_d_str}, pantauan mutakhir. Digunakan untuk mendeteksi sinyal dini dan respon taktis hari ini."
+        f"{full_d_str}, pantauan mutakhir 100% dari unggahan nyata pada tanggal ini."
     )
     
     chips = [
         {"label": "Lembaga (Terkini)", "val": f"{vol_l:,}", "sub": f"masuk; {neg_l} negatif", "dot": "#2563EB"},
         {"label": "Menteri PU", "val": f"{vol_m:,}", "sub": f"masuk; {neg_m} negatif", "dot": "#10B981"},
-        {"label": "Isu Hukum / KPK", "val": f"{kpk_cnt:,}", "sub": "sebutan pada tanggal ini", "dot": "#F59E0B" if kpk_cnt > 0 else "#10B981"},
-        {"label": "Bencana & Cuaca", "val": f"{disaster_cnt:,}", "sub": "pantauan jalan & tanggul", "dot": "#EF4444" if disaster_cnt > 0 else "#2563EB"},
-        {"label": "Irigasi & Air", "val": f"{water_cnt:,}", "sub": "sebutan ketahanan pangan", "dot": "#10B981"}
     ]
-    render_kpi_chips(chips)
+    chip_dots = ["#EF4444", "#F59E0B", "#10B981"]
+    for idx_i, (iss_nm, iss_cnt) in enumerate(top_day_issues):
+        short_lbl = iss_nm.split('&')[0].split(',')[0].strip()[:18]
+        chips.append({"label": short_lbl, "val": f"{iss_cnt:,}", "sub": "sebutan pada tanggal ini", "dot": chip_dots[idx_i % len(chip_dots)]})
+    while len(chips) < 5:
+        if len(chips) == 2:
+            chips.append({"label": "Positif Harian", "val": f"{pos_day:,}", "sub": "opini positif masuk", "dot": "#10B981"})
+        elif len(chips) == 3:
+            chips.append({"label": "Negatif Harian", "val": f"{neg_day:,}", "sub": "opini kritik masuk", "dot": "#EF4444"})
+        else:
+            chips.append({"label": "Total Harian", "val": f"{vol_day:,}", "sub": f"rentang {d_str}", "dot": "#2563EB"})
+    render_kpi_chips(chips[:5])
     
     c_p2, c_l2 = st.columns([1.1, 0.9], gap="medium")
     
@@ -3287,31 +3238,35 @@ Kabar Masuk {d_str}
         render_html(p2_table)
 
     with c_l2:
-        act1_desc = f"BPJN Wilayah: koordinasi pembukaan jalur dan keselamatan kerja di titik penanganan {top_issue_label}." if disaster_cnt > 0 else "Ditjen Bina Marga: respon cepat verifikasi kondisi jalur logistik dan jalan arteri."
-        act2_desc = f"BWS / Ditjen SDA: monitoring berkala kesiapan tanggul dan pompa air di daerah rawan banjir." if water_cnt > 0 else "Ditjen Cipta Karya: pemantauan distribusi layanan air bersih dan fasilitas permukiman."
-        act3_desc = f"Itjen + Biro Kompu: siapkan satu narasi resmi bilamana eskalasi KPK bertambah." if kpk_cnt > 0 else "Biro Komunikasi Publik: rilis capaian berkala infrastruktur untuk menjaga sentimen positif."
+        card_styles = [
+            ("#FEF2F2", "#EF4444", "#991B1B", "#7F1D1D"),
+            ("#FEF3C7", "#F59E0B", "#B45309", "#78350F"),
+            ("#F0FDF4", "#10B981", "#065F46", "#064E3B"),
+        ]
+        action_cards_html = []
+        for idx_a, (iss_nm, iss_cnt) in enumerate(top_day_issues[:3]):
+            bg_c, br_c, t_c, d_c = card_styles[idx_a % len(card_styles)]
+            sol = get_issue_solution(iss_nm)
+            action_cards_html.append(
+                f"""<div style="background:{bg_c}; border-left:3px solid {br_c}; padding:8px 10px; margin-bottom:8px; border-radius:3px;">
+<div style="font-weight:700; font-size:11px; color:{t_c};">{iss_nm} ({iss_cnt:,} sebutan)</div>
+<div style="font-size:10px; color:{d_c}; line-height:1.4;"><strong>{sol['unit']}</strong>: {sol['tindakan']}</div>
+</div>"""
+            )
+        if not action_cards_html:
+            action_cards_html.append('<div style="padding:10px; color:#64748B; font-size:11px;">Belum ada isu dominan yang memerlukan eskalasi khusus pada tanggal ini.</div>')
 
         l2_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
 <span style="width:7px; height:7px; border-radius:50%; background:#2563EB; display:inline-block;"></span>
-Perlu Diikuti Hari Ini
+Perlu Diikuti Hari Ini (Murni Isu Aktif {d_str})
 </div>
-<div style="background:#FEF2F2; border-left:3px solid #EF4444; padding:8px 10px; margin-bottom:8px; border-radius:3px;">
-<div style="font-weight:700; font-size:11px; color:#991B1B;">Tanggap Darurat & Preservasi Jalan</div>
-<div style="font-size:10px; color:#7F1D1D; line-height:1.4;">{act1_desc}</div>
-</div>
-<div style="background:#FEF3C7; border-left:3px solid #F59E0B; padding:8px 10px; margin-bottom:8px; border-radius:3px;">
-<div style="font-weight:700; font-size:11px; color:#B45309;">Infrastruktur SDA & Ketahanan Air</div>
-<div style="font-size:10px; color:#78350F; line-height:1.4;">{act2_desc}</div>
-</div>
-<div style="background:#F0FDF4; border-left:3px solid #10B981; padding:8px 10px; border-radius:3px;">
-<div style="font-weight:700; font-size:11px; color:#065F46;">Akuntabilitas & Narasi Satu Pintu</div>
-<div style="font-size:10px; color:#064E3B; line-height:1.4;">{act3_desc}</div>
-</div>
+{"".join(action_cards_html)}
 </div>"""
         render_html(l2_html)
 
-    render_callout_target(f"Tarikan {d_str} mencatat {vol_day:,} opini (Lembaga {vol_l:,}, Menteri {vol_m:,}). Prioritas respon cepat tertuju pada preservasi fisik dan mitigasi isu hukum.")
+    top_focus_txt = top_day_issues[0][0] if top_day_issues else top_issue_label
+    render_callout_target(f"Tarikan {d_str} mencatat {vol_day:,} opini (Lembaga {vol_l:,}, Menteri {vol_m:,}). Fokus respon cepat hari ini tertuju pada isu aktif: {top_focus_txt}.")
     render_mh_footer(f"Edisi Pemantauan Harian {full_d_str} • Sumber: Saringan Dinamis Multiplatform & Pemantau Terintegrasi")
 
 
@@ -3326,64 +3281,64 @@ def render_slide_18_watch_list(df, selected_topic='Semua', topic_label=None, **k
     
     candidates = [
         {
-            "item": "Perkara KPK proyek jalan Sumut & satker daerah",
-            "regex": r'kpk|korupsi|sidik|suap|satker|geledah|tersangka|ott',
+            "item": "Sorotan penegakan hukum & pengawasan proyek",
+            "regex": r'\b(?:kpk|korupsi|tipikor|suap|geledah|tersangka|ott)\b',
             "unit": "Itjen + Humas",
             "act": "Satu pernyataan; transparansi proses",
             "default_col": "#EF4444"
         },
         {
             "item": "Longsor ruas jalan nasional & keselamatan kerja",
-            "regex": r'longsor|amblas|runtuh|tebing|tertutup',
+            "regex": r'\b(?:longsor|amblas|runtuh|tebing|jalan\s+tertutup)\b',
             "unit": "Ditjen Bina Marga",
             "act": "Kronologi 24 jam & buka akses",
             "default_col": "#EF4444"
         },
         {
             "item": "Banjir bandang, luapan sungai & tanggul darurat",
-            "regex": r'banjir|tanggul|sungai|luapan|pompa|huntara',
+            "regex": r'\b(?:banjir|tanggul|luapan\s+sungai|pompa\s+banjir|huntara)\b',
             "unit": "Ditjen SDA + Balai",
             "act": "Progres jembatan, perbaikan tanggul",
             "default_col": "#EF4444"
         },
         {
-            "item": "Kesiapan jalan tol fungsional libur Nataru / Lebaran",
-            "regex": r'tol|nataru|lebaran|fungsional|tarif|bpjt|rest area',
+            "item": "Kesiapan jalan tol fungsional & konektivitas",
+            "regex": r'\b(?:jalan\s+tol|nataru|fungsional|tarif\s+tol|bpjt|rest\s+area)\b',
             "unit": "BPJT + BUJT",
             "act": "Panduan & jadwal fungsional satu pintu",
             "default_col": "#10B981"
         },
         {
             "item": "Krisis air bersih, sumur bor & kekeringan daerah",
-            "regex": r'krisis air|air bersih|kekeringan|pdam|sumur bor|kemarau',
+            "regex": r'\b(?:krisis\s+air|air\s+bersih|kekeringan|pdam|sumur\s+bor|spam)\b',
             "unit": "Ditjen Cipta Karya + SDA",
             "act": "Rilis bantuan air & tangki darurat",
             "default_col": "#F59E0B"
         },
         {
-            "item": "Aduan jalan rusak, berlubang & preservasi jalan provinsi",
-            "regex": r'jalan rusak|berlubang|jeglongan|tambal|jalan nasional',
+            "item": "Aduan jalan rusak, berlubang & preservasi jalan",
+            "regex": r'\b(?:jalan\s+rusak|berlubang|jeglongan|tambal\s+jalan|preservasi\s+jalan)\b',
             "unit": "BBPJN / BPJN Wilayah",
             "act": "Jadwal tambal & verifikasi lapangan",
             "default_col": "#F59E0B"
         },
         {
-            "item": "Renovasi sarana pendidikan, Sekolah Rakyat & madrasah",
-            "regex": r'sekolah rakyat|madrasah|sekolah|inpres pasar|fasilitas umum',
+            "item": "Sarana pendidikan, Sekolah Rakyat & fasilitas publik",
+            "regex": r'\b(?:sekolah\s+rakyat|madrasah|perpus|perpustakaan|inpres\s+pasar|fasilitas\s+umum)\b',
             "unit": "Ditjen Cipta Karya",
             "act": "Publikasi kemanfaatan langsung warga",
             "default_col": "#10B981"
         },
         {
-            "item": "Klaim sewa jet, pergub, dan isu polemik di media sosial",
-            "regex": r'jet|pergub|klaim|viral|antrian kpk|skandal',
+            "item": "Isu polemik fasilitas & transparansi anggaran",
+            "regex": r'\b(?:sewa\s+jet|skandal|pungli|mark[\s-]*up|bancakan)\b',
             "unit": "Biro Kompu + Itjen",
-            "act": "Cek fakta; hindari amplifikasi liar",
+            "act": "Cek fakta & klarifikasi transparan",
             "default_col": "#D97706"
         },
         {
-            "item": "Isu keluarga menteri / wamen (nepotisme birokrasi)",
-            "regex": r'wamen|nepotisme|keluarga wamen|pejabat pu',
+            "item": "Sorotan etika & tata kelola birokrasi",
+            "regex": r'\b(?:nepotisme|kolusi|konflik\s+kepentingan|etika\s+pejabat)\b',
             "unit": "Biro Kepegawaian + Itjen",
             "act": "Hasil penelusuran; jaga etika instansi",
             "default_col": "#10B981"
@@ -3402,12 +3357,18 @@ def render_slide_18_watch_list(df, selected_topic='Semua', topic_label=None, **k
             mask = raw_texts.str.contains(c['regex'], case=False, na=False)
             sub = df[mask]
             cnt = len(sub)
-            neg_c = int((sub['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in sub.columns else 0
-            neg_p = round(neg_c / cnt * 100, 1) if cnt > 0 else 0.0
-            pos_c = int((sub['sentiment_name'] == 'Positif').sum()) if 'sentiment_name' in sub.columns else 0
-            pos_p = round(pos_c / cnt * 100, 1) if cnt > 0 else 0.0
         else:
-            cnt, neg_c, neg_p, pos_c, pos_p = 0, 0, 0.0, 0, 0.0
+            cnt = 0
+
+        # HANYA tampilkan butir pantau yang benar-benar ada di data real (cnt > 0)
+        if cnt == 0:
+            continue
+
+        neg_c = int((sub['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in sub.columns else 0
+        neg_p = round(neg_c / cnt * 100, 1)
+        pos_c = int((sub['sentiment_name'] == 'Positif').sum()) if 'sentiment_name' in sub.columns else 0
+        pos_p = round(pos_c / cnt * 100, 1)
+        top_pl = sub['platform'].value_counts().index[0] if 'platform' in sub.columns and len(sub) > 0 else "-"
             
         if cnt >= 30 and neg_p >= 25.0:
             stat = "TINGGI"
@@ -3425,14 +3386,10 @@ def render_slide_18_watch_list(df, selected_topic='Semua', topic_label=None, **k
             stat = "PANTAU"
             col = "#F59E0B"
             c_pantau += 1
-        elif cnt > 0:
+        else:
             stat = "KURANG"
             col = "#D97706"
             c_kurang += 1
-        else:
-            stat = "MEREDA"
-            col = "#10B981"
-            c_mereda += 1
             
         scored_items.append({
             'item': c['item'],
@@ -3441,7 +3398,8 @@ def render_slide_18_watch_list(df, selected_topic='Semua', topic_label=None, **k
             'act': c['act'],
             'col': col,
             'vol': cnt,
-            'neg_p': neg_p
+            'neg_p': neg_p,
+            'top_pl': top_pl,
         })
         
     priority_order = {"TINGGI": 0, "BARU": 1, "PANTAU": 2, "KURANG": 3, "STABIL": 4, "MEREDA": 5}
@@ -3449,11 +3407,11 @@ def render_slide_18_watch_list(df, selected_topic='Semua', topic_label=None, **k
     
     total_monitored = len(scored_items)
     chips = [
-        {"label": "Butir Pantau", "val": str(total_monitored), "sub": "diikuti unit", "dot": "#2563EB"},
+        {"label": "Butir Aktif", "val": str(total_monitored), "sub": "isu dengan sebutan > 0", "dot": "#2563EB"},
         {"label": "Tinggi / Baru", "val": str(c_tinggi + c_baru), "sub": "eskalasi atensi", "dot": "#EF4444", "val_color": "#EF4444" if (c_tinggi + c_baru) > 0 else "#10B981"},
         {"label": "Pantau", "val": str(c_pantau), "sub": "perlu verifikasi", "dot": "#F59E0B"},
-        {"label": "Kurang Informasi", "val": str(c_kurang), "sub": "belum ada rilis", "dot": "#D97706"},
-        {"label": "Mereda / Stabil", "val": str(c_mereda), "sub": "situasi kondusif", "dot": "#10B981"}
+        {"label": "Volume Rendah", "val": str(c_kurang), "sub": "< 5 sebutan", "dot": "#D97706"},
+        {"label": "Stabil", "val": str(c_mereda), "sub": "dominan positif", "dot": "#10B981"}
     ]
     render_kpi_chips(chips)
     
@@ -3461,13 +3419,15 @@ def render_slide_18_watch_list(df, selected_topic='Semua', topic_label=None, **k
     for it in scored_items:
         col = it['col']
         badge = f"""<span style="background:{col}15; color:{col}; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; border:1px solid {col}30;">{it['stat']}</span>"""
-        vol_info = f"<span style='color:#94A3B8; font-size:9.5px; font-weight:normal;'>({it['vol']:,} sebutan)</span>" if it['vol'] > 0 else ""
+        vol_info = f"<span style='color:#64748B; font-size:9.5px; font-weight:normal;'>({it['vol']:,} sebutan • {it['neg_p']}% neg • {it['top_pl']})</span>"
         rows.append(f"""<tr style="border-bottom:1px solid #F1F5F9;">
 <td style="font-weight:600; padding:6px 4px;">{it['item']} {vol_info}</td>
 <td style="color:#64748B; font-size:10.5px; padding:6px 4px;">{it['unit']}</td>
 <td style="padding:6px 4px; width:85px;">{badge}</td>
 <td style="font-weight:600; color:#0F2942; padding:6px 4px;">{it['act']}</td>
 </tr>""")
+    if not rows:
+        rows.append('<tr><td colspan="4" style="padding:12px; color:#64748B; text-align:center;">Tidak ada butir isu pantauan dengan volume > 0 pada rentang filter aktif.</td></tr>')
 
     render_mh_title(
         "Daftar Pantau Sepekan",
@@ -3526,34 +3486,54 @@ def render_slide_19_priorities_methodology(df, selected_topic='Semua', topic_lab
     c_act, c_src = st.columns([1, 1], gap="medium")
     
     with c_act:
-        top_neg_issue = m['top_issue_name'] if m['top_issue_name'] else "Preservasi Infrastruktur"
-        
-        act1 = f"1. Tangani segera aduan terkait {top_neg_issue} (24 Jam)"
-        act2 = "2. Satu pintu pernyataan resmi Itjen & Humas atas perkara hukum"
-        act3 = "3. Rilis progres fisik perbaikan jembatan dan ruas jalan daerah"
-        act4 = "4. Publikasi bantuan air bersih & kesiapan sarana hidrologi"
-        act5 = "5. Jawab video viral kondisi jalan di platform X dan TikTok"
-        act6 = "6. Koordinasi satu pintu kesiapan tol fungsional dan jalur logistik"
+        from src.tab_sentiment_drilldown import extract_issue_category, get_issue_solution
+        dyn_acts_rows = []
+        if len(df) > 0:
+            cat_series = (
+                df['issue_category']
+                if 'issue_category' in df.columns
+                else df['cleaned_content'].fillna(df.get('raw_content', '')).apply(extract_issue_category)
+            )
+            df_tmp_cat = df.assign(_cat=cat_series)
+            cat_stats = []
+            for cname, grp in df_tmp_cat.groupby('_cat'):
+                c_tot = len(grp)
+                if c_tot == 0:
+                    continue
+                c_neg = int((grp['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in grp.columns else 0
+                c_neg_p = round(c_neg / c_tot * 100, 1)
+                c_pl = grp['platform'].value_counts().index[0] if 'platform' in grp.columns else '-'
+                cat_stats.append((cname, c_tot, c_neg, c_neg_p, c_pl))
+            cat_stats.sort(key=lambda x: (x[2], x[1]), reverse=True)
+
+            for idx_a, (cname, c_tot, c_neg, c_neg_p, c_pl) in enumerate(cat_stats[:6], 1):
+                sol = get_issue_solution(cname)
+                is_urgent = (idx_a <= 3 and c_neg > 0) or c_neg_p >= 20.0
+                b_col = "#EF4444" if is_urgent else "#2563EB"
+                b_lbl = "SEGERA" if is_urgent else "PEKAN INI"
+                dyn_acts_rows.append(
+                    f"""<tr style="border-bottom:1px solid #F1F5F9;">
+<td style="font-weight:600; padding:6px 4px;">{idx_a}. <strong>{cname}</strong> ({c_neg:,} neg / {c_tot:,} total di {c_pl}) &mdash; <span style="font-weight:400; color:#475569;">{sol['unit']}: {sol['tindakan'][:115]}...</span></td>
+<td><span style="background:{b_col}15; color:{b_col}; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px;">{b_lbl}</span></td>
+</tr>"""
+                )
+        if not dyn_acts_rows:
+            dyn_acts_rows.append('<tr><td colspan="2" style="padding:10px; color:#64748B;">Belum ada rekomendasi tindakan karena tidak ada data aktif pada filter ini.</td></tr>')
 
         act_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
 <div style="font-size:12.5px; font-weight:700; color:#0F2942; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
 <span style="width:7px; height:7px; border-radius:50%; background:#EF4444; display:inline-block;"></span>
-Enam Tindakan Prioritas Pimpinan
+Tindakan Prioritas Pimpinan (Berdasarkan Isu Real Teratas)
 </div>
 <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
 <thead>
 <tr style="border-bottom:1.5px solid #CBD5E1; color:#64748B; font-size:10px; font-weight:700;">
-<th style="padding:6px 4px;">TINDAKAN</th>
+<th style="padding:6px 4px;">TINDAKAN BERBASIS DATA REAL</th>
 <th style="padding:6px 4px; width:85px;">WAKTU ▼</th>
 </tr>
 </thead>
 <tbody>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">{act1}</td><td><span style="background:#EF444415; color:#EF4444; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px;">SEGERA</span></td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">{act2}</td><td><span style="background:#EF444415; color:#EF4444; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px;">SEGERA</span></td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">{act3}</td><td><span style="background:#EF444415; color:#EF4444; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px;">SEGERA</span></td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">{act4}</td><td><span style="background:#2563EB15; color:#2563EB; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px;">PEKAN INI</span></td></tr>
-<tr style="border-bottom:1px solid #F1F5F9;"><td style="font-weight:600; padding:6px 4px;">{act5}</td><td><span style="background:#2563EB15; color:#2563EB; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px;">PEKAN INI</span></td></tr>
-<tr><td style="font-weight:600; padding:6px 4px;">{act6}</td><td><span style="background:#2563EB15; color:#2563EB; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px;">PEKAN INI</span></td></tr>
+{"".join(dyn_acts_rows)}
 </tbody>
 </table>
 </div>"""
@@ -3584,7 +3564,7 @@ Sumber Korpus & Metodologi AI
 </div>"""
         render_html(src_html)
 
-    render_callout_target("Tiga tindakan prioritas pertama (SEGERA) wajib dikoordinasikan langsung antara Itjen, Ditjen Bina Marga, dan Biro Komunikasi Publik dalam 24 jam.")
+    render_callout_target("Prioritas tindakan di atas disusun otomatis berdasarkan volume kritik tertinggi pada rentang filter aktif dan dipetakan langsung ke unit teknis terkait.")
     render_mh_footer(f"Edisi Mingguan • Periode {m.get('cur_str', '')} • Verifikasi Metodologis Berbasis AI IndoBERT & SNA KemenPU")
 
 
@@ -3592,6 +3572,7 @@ Sumber Korpus & Metodologi AI
 # SLIDE 20: CATATAN METODOLOGI: PERUBAHAN SKEMA SENTIMEN
 # ==============================================================================
 def render_slide_20_methodology_sentiment_shift(df, selected_topic='Semua', topic_label=None, **kwargs):
+    import json as _json
     m = _get_slide_metrics(df, selected_topic, topic_label)
     render_mh_top_bar(slide_num=20)
     render_mh_title(
@@ -3600,12 +3581,30 @@ def render_slide_20_methodology_sentiment_shift(df, selected_topic='Semua', topi
         f"Evaluasi stabilitas inferensi IndoBERT ABSA lintas kanal ({m.get('start_str', 'Awal')} - {m.get('end_str', 'Akhir')}). Pemetaan sebaran polaritas opini publik pada korpus aktif."
     )
 
+    # Baca metrik evaluasi model IndoBERT aktual dari evaluation_metrics.json (tanpa angka hardcoded)
+    model_f1_str = "N/A"
+    model_sub_str = "IndoBERT Fine-Tuned"
+    for _mp in [
+        os.path.join(os.path.dirname(__file__), '..', 'models', 'best_indobert_sentiment_v2', 'evaluation_metrics.json'),
+        os.path.join(os.path.dirname(__file__), '..', 'models', 'best_indobert_sentiment', 'evaluation_metrics.json'),
+    ]:
+        if os.path.exists(_mp):
+            try:
+                with open(_mp, 'r', encoding='utf-8') as _mf:
+                    _md = _json.load(_mf)
+                _f1 = float(_md.get('macro_f1', _md.get('accuracy', 0.0))) * 100
+                model_f1_str = f"{_f1:.2f}%"
+                model_sub_str = f"Macro-F1 ({_md.get('version', 'v2')})"
+                break
+            except Exception:
+                pass
+
     chips = [
         {"label": "Positif Korpus", "val": f"{m['pos_p']}%", "sub": f"{m['pos_c']:,} sebutan".replace(',', '.'), "dot": "#10B981", "val_color": "#10B981"},
         {"label": "Netral Korpus", "val": f"{m['net_p']}%", "sub": f"{m['net_c']:,} sebutan".replace(',', '.'), "dot": "#94A3B8", "val_color": "#64748B"},
         {"label": "Negatif Korpus", "val": f"{m['neg_p']}%", "sub": f"{m['neg_c']:,} sebutan".replace(',', '.'), "dot": "#EF4444", "val_color": "#EF4444" if m['neg_p'] >= 10.0 else "#F59E0B"},
         {"label": "Total Korpus", "val": f"{m['vol']:,}".replace(',', '.'), "sub": "data aktif dianalisis", "dot": "#2563EB"},
-        {"label": "Stabilitas Model", "val": "92.4%", "sub": "IndoBERT ABSA Fine-Tuned", "dot": "#10B981", "val_color": "#10B981"}
+        {"label": "Akurasi / F1 Model", "val": model_f1_str, "sub": model_sub_str, "dot": "#10B981", "val_color": "#10B981"}
     ]
     render_kpi_chips(chips)
 
@@ -3675,7 +3674,7 @@ Evaluasi Konsistensi Klasifikasi Sentimen per Kanal Platform
     render_html(tbl_html)
 
     render_callout_target(f"Evaluasi Metodologi {m.get('cur_str', '')}: Model IndoBERT ABSA memproses {m['vol']:,} sebutan secara konsisten lintas saluran. Pemisahan polaritas opini menghasilkan rasio positif {m['pos_p']}%, netral {m['net_p']}%, dan kritik {m['neg_p']}%, memastikan deteksi aduan publik akurat tanpa bias klasifikasi.".replace(',', '.'))
-    render_mh_footer(f"Audit Metodologi & Validasi Inferensi AI • Model IndoBERT ABSA (F1-Score 92.4%) • Periode {m.get('cur_str', '')}")
+    render_mh_footer(f"Audit Metodologi & Validasi Inferensi AI • Model IndoBERT ABSA (F1-Score {model_f1_str}) • Periode {m.get('cur_str', '')}")
 
 
 # ==============================================================================

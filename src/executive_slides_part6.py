@@ -92,7 +92,7 @@ def _render_viral_cards_grid(df, platform_name, title, breadcrumb, page_num=1, p
             
         likes_val = fmt_val(row.get('likes', 0))
         shares_val = fmt_val(max(row.get('shares', 0), row.get('reposts', 0)))
-        date_val = str(row.get('date_str', '14 Okt'))
+        date_val = str(row.get('date_str', '-'))
         
         with c:
             render_html(f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:10px; padding:15px; margin-bottom:14px; box-shadow:0 1px 3px rgba(0,0,0,0.03); min-height:225px; display:flex; flex-direction:column; justify-content:space-between; transition:all 0.2s ease;">

@@ -85,7 +85,7 @@ def _extract_top_hashtags(df, top_n=30):
                 
     top_items = ht_counter.most_common(top_n)
     if not top_items:
-        top_items = [('makanbergizigratis', 1200), ('mbg', 980), ('gizinasiona', 750), ('prabowogibran', 620)]
+        return []
         
     max_freq = top_items[0][1] if top_items else 1
     results = []
@@ -113,30 +113,36 @@ def render_slide_popular_tags_terms(df, selected_topic='Kementerian_PU', topic_l
     with col_tags:
         with st.container(border=True):
             render_html("""<div style="font-size:13px; font-weight:700; color:#1E293B; margin-bottom:8px;">Top 20 Tagar (Hashtags) Teraktif</div>""")
-            fig_tags = go.Figure(go.Bar(
-                y=[d['tag'] for d in tags_data][::-1],
-                x=[d['count'] for d in tags_data][::-1],
-                orientation='h',
-                marker=dict(color='#3B82F6'),
-                text=[f"{d['count']:,}" for d in tags_data][::-1],
-                textposition='inside'
-            ))
-            fig_tags.update_layout(**_chart_layout(height=480))
-            st.plotly_chart(fig_tags, use_container_width=True)
+            if tags_data:
+                fig_tags = go.Figure(go.Bar(
+                    y=[d['tag'] for d in tags_data][::-1],
+                    x=[d['count'] for d in tags_data][::-1],
+                    orientation='h',
+                    marker=dict(color='#3B82F6'),
+                    text=[f"{d['count']:,}" for d in tags_data][::-1],
+                    textposition='inside'
+                ))
+                fig_tags.update_layout(**_chart_layout(height=480))
+                st.plotly_chart(fig_tags, use_container_width=True)
+            else:
+                st.info("Tidak ada tagar (#) terdeteksi pada rentang filter aktif.")
         
     with col_terms:
         with st.container(border=True):
             render_html("""<div style="font-size:13px; font-weight:700; color:#1E293B; margin-bottom:8px;">Top 20 Kata Kunci (Keywords) Terbanyak</div>""")
-            fig_terms = go.Figure(go.Bar(
-                y=[d['word'] for d in terms_data][::-1],
-                x=[d['count'] for d in terms_data][::-1],
-                orientation='h',
-                marker=dict(color='#EA580C'),
-                text=[f"{d['count']:,}" for d in terms_data][::-1],
-                textposition='inside'
-            ))
-            fig_terms.update_layout(**_chart_layout(height=480))
-            st.plotly_chart(fig_terms, use_container_width=True)
+            if terms_data:
+                fig_terms = go.Figure(go.Bar(
+                    y=[d['word'] for d in terms_data][::-1],
+                    x=[d['count'] for d in terms_data][::-1],
+                    orientation='h',
+                    marker=dict(color='#EA580C'),
+                    text=[f"{d['count']:,}" for d in terms_data][::-1],
+                    textposition='inside'
+                ))
+                fig_terms.update_layout(**_chart_layout(height=480))
+                st.plotly_chart(fig_terms, use_container_width=True)
+            else:
+                st.info("Tidak ada kata kunci terdeteksi pada rentang filter aktif.")
         
     render_slide_footer()
 
@@ -182,53 +188,48 @@ def render_slide_wordcloud_terms(df, selected_topic='Kementerian_PU', topic_labe
         
     with col_narr:
         # Dynamic extraction of top positive & negative words
-        pos_words = [t['word'] for t in terms if t['sentiment'] == 'Positif'][:3]
-        neg_words = [t['word'] for t in terms if t['sentiment'] == 'Negatif'][:3]
+        pos_words = [t['word'] for t in terms if t['sentiment'] == 'Positif'][:4]
+        neg_words = [t['word'] for t in terms if t['sentiment'] == 'Negatif'][:4]
+        neu_words = [t['word'] for t in terms if t['sentiment'] == 'Netral'][:4]
         
-        pw_str = ", ".join([f"<em>{w}</em>" for w in pos_words]) if pos_words else "<em>gizi</em>, <em>anak</em>, <em>sehat</em>"
-        nw_str = ", ".join([f"<em>{w}</em>" for w in neg_words]) if neg_words else "<em>anggaran</em>, <em>defisit</em>, <em>pengawasan</em>"
+        pw_str = ", ".join([f"<em>{w}</em>" for w in pos_words])
+        nw_str = ", ".join([f"<em>{w}</em>" for w in neg_words])
         
         # Real top engaging post for quote
         sort_col = 'total_engagement' if 'total_engagement' in df.columns else ('likes' if 'likes' in df.columns else df.columns[0])
         top_row = df.sort_values(sort_col, ascending=False).iloc[0] if not df.empty else None
         
-        quote_text = ""
-        quote_author = "Netizen"
+        quote_text = "Belum ada unggahan pada rentang filter aktif."
+        quote_author = "-"
         quote_likes = "0"
         quote_shares = "0"
-        quote_date = "14 Okt"
+        quote_date = "-"
         
         if top_row is not None:
             raw_q = str(top_row.get('raw_content', top_row.get('cleaned_content', '')))
             quote_text = " ".join(raw_q.split())
             if len(quote_text) > 130:
                 quote_text = quote_text[:127] + "..."
-            quote_author = str(top_row.get('author', 'Netizen'))
+            quote_author = str(top_row.get('author', 'Anonim'))
             quote_likes = fmt_val(top_row.get('likes', 0))
             quote_shares = fmt_val(max(top_row.get('shares', 0), top_row.get('reposts', 0)))
-            quote_date = str(top_row.get('date_str', '14 Okt'))
+            quote_date = str(top_row.get('date_str', '-'))
             
-        top_lower = str(topic_label).lower()
-        if 'sekolah' in top_lower or 'rakyat' in top_lower:
-            pos_label = "1. Klaster Aksesibilitas & Mutu Pendidikan"
-            pos_text = f"Kata kunci {pw_str} berbobot signifikan dan berasosiasi positif dengan optimisme perluasan akses belajar dan afirmasi sekolah prasejahtera."
-            neg_label = "2. Klaster Akuntabilitas & Sarana Prasarana"
-            neg_text = f"Istilah {nw_str} mendominasi sentimen kritis publik, menuntut transparansi alokasi dana pendidikan dan pemerataan infrastruktur 3T."
-        elif 'kdmp' in top_lower or 'koperasi' in top_lower:
-            pos_label = "1. Klaster Pemberdayaan Ekonomi & UMKM Desa"
-            pos_text = f"Kata kunci {pw_str} berbobot signifikan dan berasosiasi positif dengan semangat kemandirian ekonomi pedesaan dan permodalan koperasi."
-            neg_label = "2. Klaster Tata Kelola & Pengawasan Fiskal"
-            neg_text = f"Istilah {nw_str} mendominasi sentimen kritis, menuntut audit independen pembagian SHU dan mitigasi risiko permodalan."
-        elif 'listrik' in top_lower or 'ev' in top_lower or 'elektrifikasi' in top_lower:
-            pos_label = "1. Klaster Efisiensi Energi & Masa Depan Hijau"
-            pos_text = f"Kata kunci {pw_str} berbobot signifikan dan berasosiasi positif dengan antusiasme pengurangan polusi dan hemat biaya operasional."
-            neg_label = "2. Klaster Infrastruktur & Keandalan Baterai"
-            neg_text = f"Istilah {nw_str} mendominasi sentimen kritis, menuntut percepatan persebaran SPKLU dan jaminan ketahanan baterai jangka panjang."
+        n_pos_df = int((df['sentiment_name'] == 'Positif').sum()) if 'sentiment_name' in df.columns else 0
+        n_neg_df = int((df['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in df.columns else 0
+        pos_label = "1. Klaster Semantik Positif (Real-Time)"
+        if pw_str:
+            pos_text = f"Kata kunci {pw_str} dominan berasosiasi positif pada korpus aktif ({n_pos_df:,} unggahan positif untuk topik {topic_label})."
+        elif neu_words:
+            pos_text = f"Percakapan positif ({n_pos_df:,} unggahan) menyebar pada istilah umum seperti {', '.join(f'<em>{w}</em>' for w in neu_words[:3])}."
         else:
-            pos_label = "1. Klaster Nutrisi & Kesejahteraan Anak"
-            pos_text = f"Kata kunci {pw_str} berbobot signifikan dan berasosiasi positif dengan optimisme peningkatan gizi anak sekolah serta dukungan petani/UMKM."
-            neg_label = "2. Klaster Akuntabilitas Fiskal & Standar Mutu"
-            neg_text = f"Istilah {nw_str} mendominasi sentimen kritis warganet, menuntut pengawasan mutu higienitas dapur dan transparansi alokasi anggaran."
+            pos_text = "Belum terdeteksi klaster kata kunci positif dominan pada rentang filter aktif."
+
+        neg_label = "2. Klaster Semantik Negatif / Kritis (Real-Time)"
+        if nw_str:
+            neg_text = f"Istilah {nw_str} paling sering muncul dalam unggahan kritis ({n_neg_df:,} unggahan negatif pada rentang filter aktif)."
+        else:
+            neg_text = f"Tidak ada istilah tunggal yang terkonsentrasi tajam pada sentimen negatif ({n_neg_df:,} unggahan negatif pada rentang ini)."
 
         render_html(f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:18px; box-shadow:0 1px 3px rgba(0,0,0,0.03); height:100%;">
 <div style="font-size:13px; font-weight:800; color:#1E293B; margin-bottom:14px; border-bottom:1px solid #F1F5F9; padding-bottom:6px;">
@@ -285,7 +286,7 @@ def render_slide_wordcloud_hashtags(df, selected_topic='Kementerian_PU', topic_l
 </span>""")
                 
             render_html(f"""<div style="font-size:13px; font-weight:700; color:#1E293B; margin-bottom:12px; border-bottom:1px solid #F1F5F9; padding-bottom:6px;">Awan Tagar Populer (Hashtags) Terdeteksi</div>
-<div style="line-height:2.4; text-align:center; padding:10px 0;">{"".join(tag_badges)}</div>""")
+<div style="line-height:2.4; text-align:center; padding:10px 0;">{"".join(tag_badges) if tag_badges else '<span style="color:#64748B; font-size:12px;">Tidak ada tagar (#) terdeteksi pada rentang filter aktif.</span>'}</div>""")
         
     with col_rank:
         with st.container(border=True):
@@ -301,6 +302,6 @@ PERINGKAT 10 TAGAR TERPOPULER
 </div>
 <span style="font-weight:800; color:#0F172A;">{t['count']:,}</span>
 </div>""")
-            render_html("".join(rank_rows))
+            render_html("".join(rank_rows) if rank_rows else '<div style="color:#64748B; font-size:11.5px; padding:10px 0;">Tidak ada tagar terdeteksi pada rentang filter aktif.</div>')
         
     render_slide_footer()

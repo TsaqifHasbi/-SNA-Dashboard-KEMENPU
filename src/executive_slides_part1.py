@@ -313,32 +313,58 @@ def render_slide_sna_by_sentiment(df, selected_topic='Kementerian_PU', topic_lab
     G = build_sna_network(df, max_nodes=70, topic_filter=topic_label, mode='sentiment')
     
     with col_graph:
-        top_lower = str(topic_label).lower()
-        if 'pu' in top_lower or 'menteri' in top_lower or 'kementerian' in top_lower or 'pekerjaan' in top_lower:
-            c1_desc = "Diskusi publik seputar preservasi jalan nasional, perbaikan jalan rusak, kemantapan infrastruktur, kesiapan jalur logistik, dan konektivitas antarwilayah."
-            c2_desc = f"Apresiasi terhadap percepatan pembangunan bendungan, penyelesaian tanggul pengendali banjir, revitalisasi irigasi, dan proyek infrastruktur {topic_label}."
-            c3_desc = "Pemberitaan media mengenai kebijakan dan sidak kepemimpinan Menteri PU, arahan jajaran Ditjen teknis, serta sinergi pengawasan Komisi V DPR."
-            c4_desc = "Sorotan kritis warganet dan aduan masyarakat terkait jalan rusak berlubang, genangan banjir daerah, keterlambatan proyek kontraktor, serta transparansi lelang PU."
-        elif 'sekolah' in top_lower or 'rakyat' in top_lower:
-            c1_desc = "Diskusi seputar pemerataan akses fasilitas belajar, pemutakhiran data siswa prasejahtera, dan sarana sekolah di daerah 3T."
-            c2_desc = f"Apresiasi terhadap perluasan beasiswa pendidikan vokasi, peningkatan kualifikasi guru, dan afirmasi program {topic_label}."
-            c3_desc = "Pemberitaan regulasi Kemendikbudristek, alokasi anggaran fungsi pendidikan 20%, dan evaluasi kurikulum inklusif."
-            c4_desc = "Sorotan kritis disparitas kualitas sekolah swasta vs negeri, pungutan liar, dan transparansi penyaluran bantuan operasional."
-        elif 'kdmp' in top_lower or 'koperasi' in top_lower:
-            c1_desc = "Diskusi seputar keanggotaan warga desa, penyertaan modal simpan-pinjam, dan adopsi pencatatan digital koperasi."
-            c2_desc = f"Dukungan terhadap hilirisasi produk pertanian lokal, kemitraan rantai pasok desa, dan penguatan permodalan {topic_label}."
-            c3_desc = "Pemberitaan regulasi Kementerian Koperasi, fasilitasi legalitas badan hukum, dan skema pembiayaan LPDB."
-            c4_desc = "Kekhawatiran potensi kredit macet (NPL), intervensi politik lokal, dan desakan audit independen tata kelola keuangan."
-        elif 'listrik' in top_lower or 'ev' in top_lower or 'elektrifikasi' in top_lower:
-            c1_desc = "Diskusi warganet seputar ketersediaan SPKLU, durasi pengisian daya baterai, dan perbandingan biaya operasional harian."
-            c2_desc = f"Antusiasme terhadap insentif subsidi kendaraan ramah lingkungan, pengurangan emisi karbon, dan hilirisasi nikel nasional."
-            c3_desc = "Pemberitaan kebijakan kementerian teknis, target bauran energi hijau, dan kesiapan rantai pasok industri otomotif."
-            c4_desc = "Keluhan depresiasi harga purna jual baterai, keandalan jaringan listrik daerah, dan transparansi distribusi kuota subsidi."
-        else:
-            c1_desc = "Diskusi seputar pemutakhiran data penerima manfaat dan dokumentasi pelaksanaan distribusi di lapangan."
-            c2_desc = f"Menyoroti investasi gizi generasi muda serta pemberdayaan petani, peternak, dan UMKM lokal pendukung program {topic_label}."
-            c3_desc = "Pemberitaan dinamika anggaran fiskal APBN, regulasi Badan Gizi Nasional, dan evaluasi berkala kementerian terkait."
-            c4_desc = "Tuntutan pengawasan standar higienitas dapur satelit, audit transparansi rekanan vendor, dan mitigasi risiko keracunan."
+        import re as _re
+        from collections import Counter as _Counter
+        from src.data_loader import ALL_STOPWORDS as _ALL_SW, clean_pu_entities as _clean_pu
+
+        def _top_kws_slice(sub_df, n=4):
+            if sub_df is None or sub_df.empty:
+                return []
+            col_txt = 'cleaned_content' if 'cleaned_content' in sub_df.columns else ('raw_content' if 'raw_content' in sub_df.columns else None)
+            if not col_txt:
+                return []
+            noise_w = {'yang', 'dan', 'di', 'ini', 'ke', 'dari', 'untuk', 'pada', 'adalah', 'itu', 'dengan', 'ada', 'akan', 'juga', 'sudah', 'oleh', 'dalam', 'karena', 'saat', 'para', 'agar', 'kita', 'kami', 'saya', 'tidak', 'tahun', 'hari', 'bulan', 'indonesia', 'lebih', 'tentang', 'seperti', 'secara', 'terhadap', 'hingga', 'sebagai', 'dilakukan', 'merupakan', 'terkait', 'kementerian', 'menteri', 'pekerjaan', 'umum', 'kemenpu', 'kementerianpu'}
+            cnt = _Counter()
+            for t in sub_df[col_txt].dropna().head(1500):
+                tc = _clean_pu(str(t).lower())
+                for w in _re.findall(r'[a-z]{4,}', tc):
+                    if w not in _ALL_SW and w not in noise_w:
+                        cnt[w] += 1
+            return [w for w, _ in cnt.most_common(n)]
+
+        def _fmt_kws(kws):
+            return ", ".join(f"<strong>{w}</strong>" for w in kws) if kws else "-"
+
+        all_kws = _top_kws_slice(df, 4)
+        top_all_plat = df['platform'].value_counts().index[0] if ('platform' in df.columns and not df.empty) else "-"
+        c1_desc = (
+            f"Menghimpun <strong>{len(df):,}</strong> percakapan lintas kanal (terbanyak di <strong>{top_all_plat}</strong>) dengan kata kunci paling sering dibahas: {_fmt_kws(all_kws)}."
+            if not df.empty else "Belum ada percakapan pada rentang filter aktif."
+        )
+
+        df_pos_cl = df[df['sentiment_name'] == 'Positif'] if 'sentiment_name' in df.columns else df.head(0)
+        pos_kws = _top_kws_slice(df_pos_cl, 4)
+        pos_top_plat = df_pos_cl['platform'].value_counts().index[0] if ('platform' in df_pos_cl.columns and not df_pos_cl.empty) else "-"
+        c2_desc = (
+            f"Tercatat <strong>{len(df_pos_cl):,}</strong> unggahan positif (terbanyak di <strong>{pos_top_plat}</strong>) yang mengangkat topik: {_fmt_kws(pos_kws)}."
+            if not df_pos_cl.empty else "Tidak ada unggahan bersentimen positif pada rentang filter aktif."
+        )
+
+        df_news_cl = df[df['platform'] == 'News'] if 'platform' in df.columns else df.head(0)
+        news_kws = _top_kws_slice(df_news_cl, 3)
+        top_media = ", ".join(df_news_cl['author'].dropna().astype(str).value_counts().head(3).index.tolist()) if ('author' in df_news_cl.columns and not df_news_cl.empty) else "-"
+        c3_desc = (
+            f"Terekam <strong>{len(df_news_cl):,}</strong> artikel media daring (teraktif: <strong>{top_media}</strong>) dengan fokus liputan: {_fmt_kws(news_kws)}."
+            if not df_news_cl.empty else "Tidak ada artikel media daring (News) pada rentang filter aktif."
+        )
+
+        df_neg_cl = df[df['sentiment_name'] == 'Negatif'] if 'sentiment_name' in df.columns else df.head(0)
+        neg_kws = _top_kws_slice(df_neg_cl, 4)
+        neg_top_plat = df_neg_cl['platform'].value_counts().index[0] if ('platform' in df_neg_cl.columns and not df_neg_cl.empty) else "-"
+        c4_desc = (
+            f"Terdeteksi <strong>{len(df_neg_cl):,}</strong> sorotan kritis (terbanyak di <strong>{neg_top_plat}</strong>) yang berpusat pada istilah: {_fmt_kws(neg_kws)}."
+            if not df_neg_cl.empty else "Tidak terdeteksi unggahan negatif pada rentang filter aktif."
+        )
 
         render_html(f"""<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
 <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:12px 14px;">
