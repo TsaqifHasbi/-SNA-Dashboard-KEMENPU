@@ -294,8 +294,9 @@ def render_tab_sentiment_drilldown(df_filtered, **kwargs):
         st.markdown(f"#### 👤 4. Top Akun Pemengaruh / Paling Vokal ({selected_sent})")
         
         # Kelompokkan per author
-        acc_grp = df_sent.groupby(['author', 'platform']).agg(
-            posts=('content', 'count'),
+        count_col = 'cleaned_content' if 'cleaned_content' in df_sent.columns else ('content' if 'content' in df_sent.columns else 'author')
+        acc_grp = df_sent.groupby(['author', 'platform'], observed=True).agg(
+            posts=(count_col, 'count'),
             total_eng=('total_engagement', 'sum')
         ).reset_index().sort_values(by='total_eng', ascending=False).head(5)
         
@@ -339,7 +340,7 @@ def render_tab_sentiment_drilldown(df_filtered, **kwargs):
         st.markdown(f"#### 📝 5. Daftar Postingan Nyata ({selected_sent})")
     with c_head2:
         # Filter tambahan: Pilih Daerah Terdampak Spesifik
-        reg_options = ["Semua Wilayah Terdampak"] + sorted(df_sent['detected_region'].unique().tolist())
+        reg_options = ["Semua Wilayah Terdampak"] + sorted([str(x) for x in df_sent['detected_region'].dropna().unique()])
         selected_reg_filter = st.selectbox(
             "Filter Wilayah Terdampak:",
             reg_options,
@@ -358,7 +359,7 @@ def render_tab_sentiment_drilldown(df_filtered, **kwargs):
         key=f"search_drill_{selected_sent}"
     )
     if search_q.strip():
-        df_display = df_display[df_display['cleaned_content'].str.contains(search_q.strip(), case=False, na=False)]
+        df_display = df_display[df_display['cleaned_content'].astype(str).str.contains(search_q.strip(), case=False, na=False, regex=False)]
 
     st.caption(f"Menampilkan {min(len(df_display), 12):,} dari {len(df_display):,} postingan {selected_sent} terurut berdasarkan interaksi.")
 
