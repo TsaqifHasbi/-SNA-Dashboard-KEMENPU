@@ -125,6 +125,7 @@ from src.mh_weekly_report import (
     render_slide_14_intelligence_projections,
     render_slide_stakeholder_mapping,
     render_slide_framing_analysis,
+    render_slide_sentiment_search,
     render_slide_15_chapter_3,
     render_slide_16_daily_nov15,
     render_slide_17_daily_nov16,
@@ -628,6 +629,7 @@ if "Format Laporan Harian" in view_mode or "Laporan Harian" in view_mode or "Sli
             "Suplemen 1: Pemetaan Pemangku Kepentingan (Stakeholder Matrix)": render_slide_stakeholder_mapping,
             "Suplemen 2: Analisis Pembingkaian Robert Entman (Framing Analysis)": render_slide_framing_analysis,
             "Suplemen 3: Rekap Khusus Penanganan Bencana": render_slide_12_disaster_response_kemenpu,
+            "Suplemen 4: Pencarian Sentimen & Eksplorasi Aspek": render_slide_sentiment_search,
         },
         "Bab 3: Tindakan Strategis (The Action)": {
             "Slide 15: Pembuka Bab 3 (The Action)": render_slide_15_chapter_3,

@@ -411,9 +411,307 @@ def _get_slide_metrics(df, selected_topic='Semua', topic_label=None, df_full=Non
         'prev_end_str': _fmt_id_date(prev_end, True)
     }
 
+_EXTRA_NOISE_WORDS = {
+    'kementerian', 'menteri', 'pekerjaan', 'umum', 'kemenpu', 'kementerianpu', 'pupr',
+    'masyarakat', 'terjemahkan', 'translate', 'repost', 'selengkapnya', 'lihat', 'balas',
+    'suka', 'komentar', 'share', 'video', 'foto', 'reels', 'berita', 'indonesia',
+    'pemerintah', 'republik', 'nasional', 'daerah', 'wilayah', 'proyek', 'program',
+    'tahun', 'bulan', 'hari', 'dody', 'hanggodo', 'infrastruktur', 'pembangunan',
+    'sigapmembangunnegeriuntukrakyat', 'tentang', 'terkait', 'seperti', 'melalui',
+    'dilakukan', 'merupakan', 'adanya', 'seluruh', 'tersebut', 'secara', 'terhadap',
+    'sebagai', 'menjadi', 'hingga', 'namun', 'tetapi', 'tetap', 'kembali', 'hanya',
+    'lebih', 'sangat', 'banyak', 'masih', 'harus', 'sudah', 'dapat', 'bisa', 'akan',
+    'untuk', 'dalam', 'dengan', 'adalah', 'karena', 'bahwa', 'antara', 'sehingga',
+    'kompas', 'detik', 'tribun', 'liputan', 'cnn', 'cnbc', 'antaranews', 'tempo',
+    'jalan', 'umumnya', 'warga', 'publik', 'negeri', 'rakyat', 'orang', 'kerja',
+    'bersama', 'semua', 'mulai', 'langsung', 'terus', 'agar', 'supaya', 'ketika',
+    'saat', 'waktu', 'siap', 'baik', 'baru', 'besar', 'tinggi', 'cepat', 'kuat'
+}
+
+_NON_ENTITY_TOKENS = {
+    'minimal', 'maksimal', 'belum', 'masih', 'sebesar', 'dibuka', 'gratis', 'fungsional',
+    'sepanjang', 'nasional', 'indonesia', 'tersebut', 'akan', 'saat', 'pada', 'untuk',
+    'tarif', 'diskon', 'baru', 'sudah', 'terus', 'hingga', 'dalam', 'mulai', 'jalan',
+    'ruas', 'gerbang', 'rest', 'area', 'persen', 'tahun', 'bulan', 'hari', 'masuki',
+    'tahap', 'lebih', 'dari', 'yang', 'dan', 'di', 'ke', 'nataru', 'lebaran', 'mudik',
+    'secara', 'kilat', 'rusak', 'akibat', 'darurat', 'putus', 'gantung', 'besar', 'kecil',
+    'langsung', 'bisa', 'dapat', 'harus', 'wajib', 'seluruh', 'semua', 'ini', 'itu',
+    'kami', 'kita', 'mereka', 'menteri', 'kementerian', 'pekerjaan', 'umum', 'pu',
+    'pemerintah', 'presiden', 'dody', 'hanggodo', 'segera', 'bakal', 'resmi', 'siap',
+    'gratis', 'berbayar', 'sementara', 'permanen', 'panjang', 'pendek', 'utama', 'umum',
+    'terpanjang', 'terbaru', 'pertama', 'kedua', 'ketiga', 'terputus', 'ambruk', 'ambrol',
+    'roboh', 'jebol', 'bocor', 'banjir', 'longsor', 'air', 'bersih', 'minum', 'hujan',
+    'dengan', 'oleh', 'atau', 'karena', 'agar', 'untuk', 'dalam', 'adalah', 'menjadi',
+    'melalui', 'menuju', 'lintas', 'sekitar', 'menjelang', 'libur', 'natal', 'akhir',
+    'ikuti', 'gelar', 'lakukan', 'dorong', 'pastikan', 'tinjau', 'pantau', 'bangun',
+    'perbaiki', 'ai', 'menggelar', 'melakukan', 'terus', 'sedang', 'sudah', 'telah',
+    'bersama', 'secara', 'resmi', 'kini', 'juga', 'dapat', 'bisa', 'akan', 'mulai'
+}
+
+_KNOWN_LOCI_PATTERNS = [
+    ("Aceh", r"\baceh\b"),
+    ("Gayo Lues", r"\bgayo\s+lues\b"),
+    ("Pidie Jaya", r"\bpidie\s+jaya\b"),
+    ("Aceh Tamiang", r"\b(?:aceh\s+)?tamiang\b"),
+    ("Nagan Raya", r"\bnagan\s+raya\b"),
+    ("Sumut", r"\b(?:sumut|sumatera\s+utara|medan|tapanuli|sibolga|nias|deli\s+serdang)\b"),
+    ("Sumbar", r"\b(?:sumbar|sumatera\s+barat|padang|tanah\s+datar|bukittinggi|agam)\b"),
+    ("Sumsel", r"\b(?:sumsel|sumatera\s+selatan|palembang)\b"),
+    ("Riau", r"\b(?:riau|pekanbaru|rengat)\b"),
+    ("Jambi", r"\bjambi\b"),
+    ("Bangka Belitung", r"\b(?:bangka\s+belitung|babel|pangkalpinang)\b"),
+    ("Lampung", r"\b(?:lampung|bakauheni)\b"),
+    ("Bengkulu", r"\bbengkulu\b"),
+    ("DKI Jakarta", r"\b(?:jakarta|jaksel|jaktim|jakbar|jakpus|jakut|ciliwung)\b"),
+    ("Bogor / Puncak", r"\b(?:bogor|puncak)\b"),
+    ("Bandung / Jabar", r"\b(?:bandung|gedebage|ciwidey|jabar|jawa\s+barat|bekasi|depok|sukabumi|cirebon|patimban|subang|karawang|citarum)\b"),
+    ("Banten", r"\b(?:banten|tangerang|serang|lebak|pandeglang|karian)\b"),
+    ("Semarang / Pantura", r"\b(?:semarang|demak|pantura|pekalongan|brebes|kudus|pati|pemali\s+juana)\b"),
+    ("Solo / Jateng", r"\b(?:solo|surakarta|jateng|jawa\s+tengah|magelang|banyumas|cilacap|kebumen|purworejo|bengawan\s+solo)\b"),
+    ("Yogyakarta", r"\b(?:yogyakarta|jogja|diy|kulon\s+progo|sleman|bantul|jjls)\b"),
+    ("Jawa Timur", r"\b(?:jatim|jawa\s+timur|surabaya|malang|sidoarjo|brantas|probolinggo|banyuwangi|kediri|madura|pasuruan)\b"),
+    ("IKN / Kalimantan", r"\b(?:ikn|nusantara|kalimantan|kaltim|kalsel|kalbar|kalteng|balikpapan|samarinda|banjarmasin|pontianak|sepaku|pulau\s+balang)\b"),
+    ("Sulawesi", r"\b(?:sulawesi|sulsel|sulut|sulteng|sultra|makassar|manado|palu|kendari|pelosika|gorontalo)\b"),
+    ("Bali & NTB/NTT", r"\b(?:bali|lombok|ntb|ntt|kupang|flores|mataram|labuan\s+bajo|sumbawa|gilimanuk)\b"),
+    ("Maluku & Papua", r"\b(?:maluku|papua|ambon|ternate|jayapura|sorong|merauke|timika|manokwari)\b"),
+]
+
+_SPECIFIC_SUBTHEME_PATTERNS = [
+    ("Diskon tarif tol Nataru", r"\b(?:diskon\s+(?:tarif\s+)?tol|potongan\s+tarif\s+tol|tarif\s+tol\s+(?:minimal|30|20))\b"),
+    ("Tol fungsional Nataru", r"\b(?:tol\s+fungsional|jalur\s+fungsional|fungsional\s+nataru|dibuka\s+fungsional)\b"),
+    ("Henti sementara konstruksi Nataru", r"\b(?:hentikan\s+konstruksi|henti\s+sementara|penghentian\s+konstruksi)\b"),
+    ("Penyesuaian tarif tol", r"\b(?:penyesuaian\s+tarif|kenaikan\s+tarif\s+tol|tarif\s+tol\s+naik)\b"),
+    ("Siaga bencana musim hujan", r"\b(?:siaga\s+(?:hadapi\s+)?bencana|musim\s+hujan|posko\s+(?:siaga|bencana)|tanggap\s+darurat)\b"),
+    ("Perbaikan tanggul & normalisasi sungai", r"\b(?:tanggul\s+(?:jebol|kritis|darurat)|normalisasi\s+sungai|pompa\s+(?:air|banjir)|pengendalian\s+banjir)\b"),
+    ("Jembatan bailey & buka akses longsor", r"\b(?:jembatan\s+bailey|jembatan\s+darurat|buka\s+akses|alat\s+berat|material\s+longsor)\b"),
+    ("Aduan jalan rusak & berlubang", r"\b(?:jalan\s+rusak|jalan\s+berlubang|jalan\s+bolong|sapu\s+lubang|tambal\s+jalan|inpres\s+jalan|iijd)\b"),
+    ("Rehabilitasi irigasi & ketahanan pangan", r"\b(?:saluran\s+irigasi|jaringan\s+irigasi|swasembada\s+pangan|lumbung\s+air|rehabilitasi\s+irigasi)\b"),
+    ("Pasokan air bersih & jaringan SPAM", r"\b(?:air\s+bersih|jaringan\s+spam|krisis\s+air|dropping\s+air|tangki\s+air|sumur\s+bor)\b"),
+    ("Pembangunan Sekolah Rakyat & madrasah", r"\b(?:sekolah\s+rakyat|renovasi\s+madrasah|gedung\s+sekolah|fasilitas\s+pendidikan)\b"),
+    ("Program PU Mengajar & literasi", r"\b(?:pu\s+mengajar|perpustakaan|perpus\s+pu|ruang\s+baca)\b"),
+    ("Pembangunan & operasional bendungan", r"\b(?:pembangunan\s+bendungan|peresmian\s+bendungan|impounding|kapasitas\s+tampung|bendungan)\b"),
+    ("Sanitasi, TPS3R & pengolahan limbah", r"\b(?:sanitasi|tps3r|ipal|air\s+limbah|pengolahan\s+sampah)\b"),
+    ("Pengawasan proyek & penegakan hukum", r"\b(?:kpk|korupsi|geledah|ott|suap|tersangka|audit\s+itjen|transparansi\s+lelang)\b"),
+]
+
+
+def _clean_captured_entity(raw_name):
+    """Bersihkan token non-entitas di ujung nama infrastruktur hasil regex."""
+    toks = [t.strip(".,;:!?()[]\"'") for t in str(raw_name).split()]
+    cleaned = []
+    for t in toks:
+        tl = t.lower()
+        if not t or tl in _NON_ENTITY_TOKENS or len(t) <= 1:
+            break
+        cleaned.append(t)
+    if not cleaned:
+        return None
+    val = " ".join(cleaned)
+    if val.lower() in _NON_ENTITY_TOKENS or len(val) < 3:
+        return None
+    return val
+
+
+def _extract_specific_topic_details(sub_df, topic_key=None):
+    """
+    Mengekstrak entitas infrastruktur spesifik (nama ruas tol, bendungan, sungai/BBWS, jembatan),
+    wilayah/daerah spesifik, dan sub-tema kontekstual 100% dari teks nyata di sub_df.
+    """
+    if sub_df is None or len(sub_df) == 0:
+        return [], [], []
+
+    raw_s = sub_df['raw_content'].fillna(sub_df.get('cleaned_content', '')).astype(str)
+    clean_s = sub_df['cleaned_content'].fillna(raw_s).astype(str)
+    sample_raw = raw_s.head(2000)
+
+    entities = collections.Counter()
+
+    # 1. Ruas Tol Spesifik
+    if topic_key in (None, 'jalan_tol', 'jalan_rusak_preservasi'):
+        known_tols = [
+            ("Tol Trans Sumatera", r"\btol\s+trans\s+sumat[er]+a\b|\bjtss\b|\bjt?ts\b"),
+            ("Tol Puncak", r"\btol\s+puncak(?:\s+bogor)?\b"),
+            ("Tol Gedebage KM 149", r"\b(?:tol\s+)?gedebage(?:\s+km\s*149)?\b"),
+            ("Tol Rengat-Pekanbaru", r"\btol\s+rengat[\s\-]+pekanbaru\b|\btol\s+pekanbaru[\s\-]+rengat\b"),
+            ("Tol Palembang-Betung", r"\btol\s+(?:palembang[\s\-]+betung|betung[\s\-]+jambi)\b"),
+            ("Tol Akses Patimban", r"\btol\s+(?:akses\s+)?patimban\b"),
+            ("Tol Jagoratu", r"\btol\s+jagoratu\b"),
+            ("Tol Jogja-Solo", r"\btol\s+(?:jogja|yogyakarta)[\s\-]+solo\b|\btol\s+solo[\s\-]+(?:jogja|yogyakarta)\b"),
+            ("Tol Jogja-Bawen", r"\btol\s+(?:jogja|yogyakarta)[\s\-]+bawen\b"),
+            ("Tol Semarang-Demak", r"\btol\s+semarang[\s\-]+demak\b"),
+            ("Tol Cisumdawu", r"\btol\s+cisumdawu\b"),
+            ("Tol Cipali", r"\btol\s+cipali\b"),
+            ("Tol Japek / Cikampek", r"\btol\s+(?:japek|jakarta[\s\-]+cikampek|cikampek)\b"),
+            ("Tol Bocimi", r"\btol\s+bocimi\b"),
+            ("Tol Getaci", r"\btol\s+getaci\b"),
+            ("Tol Probowangi", r"\btol\s+probowangi\b"),
+            ("Tol IKN", r"\btol\s+ikn\b"),
+            ("Tol Padang-Sicincin", r"\btol\s+padang[\s\-]+sicincin\b"),
+            ("Tol Binjai-Langsa", r"\btol\s+binjai[\s\-]+langsa\b"),
+            ("Tol Sigli-Banda Aceh", r"\btol\s+(?:sigli[\s\-]+banda\s+aceh|sibanceh)\b"),
+            ("Tol Gilimanuk-Mengwi", r"\btol\s+gilimanuk[\s\-]+mengwi\b"),
+            ("Tol Bali Mandara", r"\btol\s+bali\s+mandara\b"),
+            ("Tol Serpong-Balaraja", r"\btol\s+(?:serpong[\s\-]+balaraja|serbaraja)\b"),
+            ("Tol Pejagan-Cilacap", r"\btol\s+pejagan[\s\-]+cilacap\b"),
+            ("Jalur Pantura", r"\b(?:jalur|jalan)\s+pantura\b"),
+            ("Jalur Pansela / JJLS", r"\b(?:jalur\s+pansela|jjls)\b"),
+        ]
+        for lbl, pat in known_tols:
+            c = int(raw_s.str.contains(pat, case=False, na=False).sum())
+            if c > 0:
+                entities[lbl] += c
+
+        # Auto-discover nama tol baru selain daftar di atas
+        for t in sample_raw:
+            for m in re.findall(r'\bTol\s+([A-Z][a-zA-Z0-9\-]+(?:\s+[A-Z][a-zA-Z0-9\-]+)?)', t):
+                nm = _clean_captured_entity(m)
+                if nm:
+                    full_nm = f"Tol {nm}"
+                    if not any(full_nm.lower() in k.lower() or k.lower() in full_nm.lower() for k in entities):
+                        entities[full_nm] += 1
+
+    # 2. Bendungan / Waduk Spesifik
+    if topic_key in (None, 'bendungan_waduk', 'sumber_daya_air', 'irigasi_pertanian', 'air_bersih'):
+        for t in sample_raw:
+            for kind, m in re.findall(r'\b(Bendungan|Waduk)\s+([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)?)', t):
+                nm = _clean_captured_entity(m)
+                if nm:
+                    entities[f"{kind} {nm}"] += 1
+
+    # 3. BBWS / BWS / Sungai Spesifik
+    if topic_key in (None, 'sumber_daya_air', 'penanganan_banjir', 'irigasi_pertanian', 'bencana_alam'):
+        for t in sample_raw:
+            for kind, m in re.findall(r'\b(BBWS|BWS|Sungai)\s+([A-Z][a-zA-Z\-]+(?:\s+[A-Z0-9I\-][a-zA-Z0-9\-]+)?)', t):
+                nm = _clean_captured_entity(m)
+                if nm:
+                    entities[f"{kind} {nm}"] += 1
+
+    # 4. Jembatan / Ruas Spesifik (khusus bencana & preservasi jalan — jangan campur ke tol!)
+    if topic_key in (None, 'bencana_alam', 'jalan_rusak_preservasi'):
+        for t in sample_raw:
+            for m in re.findall(r'\bJembatan\s+([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)?)', t):
+                nm = _clean_captured_entity(m)
+                if nm:
+                    entities[f"Jembatan {nm}"] += 1
+
+    # 5. Lokasi Geografis Nyata
+    locs = collections.Counter()
+    for loc_name, loc_pat in _KNOWN_LOCI_PATTERNS:
+        c = int(clean_s.str.contains(loc_pat, case=False, na=False).sum())
+        if c > 0:
+            locs[loc_name] = c
+
+    # 6. Sub-tema Spesifik (multi-kata bermakna)
+    themes = collections.Counter()
+    for th_name, th_pat in _SPECIFIC_SUBTHEME_PATTERNS:
+        c = int(clean_s.str.contains(th_pat, case=False, na=False).sum())
+        if c > 0:
+            themes[th_name] = c
+
+    top_entities = [k for k, v in entities.most_common(4) if v >= 1]
+    top_locs = [k for k, v in locs.most_common(3) if v >= 1]
+    top_themes = [k for k, v in themes.most_common(3) if v >= 1]
+    return top_entities, top_locs, top_themes
+
+
+def _build_rich_platform_note(sub_p, p_name, pos_pct, neg_pct):
+    """
+    Membangun Catatan Dinamis yang spesifik, koheren, dan bebas kata umum
+    ('kementerian', 'menteri', 'jalan', 'terjemahkan', 'nataru' berdiri sendiri).
+    """
+    if sub_p is None or len(sub_p) == 0:
+        return "Belum ada data pada rentang filter ini"
+
+    clean_p = sub_p['cleaned_content'].fillna(sub_p.get('raw_content', '')).astype(str)
+    # Cari sub-tema dominan beserta subset postingan yang cocok agar entitas/lokasi 100% koheren
+    best_th_name, best_th_cnt, best_th_sub = None, 0, None
+    second_th_name, second_th_cnt = None, 0
+    for th_name, th_pat in _SPECIFIC_SUBTHEME_PATTERNS:
+        m_th = clean_p.str.contains(th_pat, case=False, na=False)
+        cnt_th = int(m_th.sum())
+        if cnt_th > best_th_cnt:
+            second_th_name, second_th_cnt = best_th_name, best_th_cnt
+            best_th_name, best_th_cnt, best_th_sub = th_name, cnt_th, sub_p[m_th]
+        elif cnt_th > second_th_cnt:
+            second_th_name, second_th_cnt = th_name, cnt_th
+
+    # Pemetaan sub-tema ke topic_key agar entitas yang diekstrak relevan 100% dengan temanya
+    th_key_map = {
+        "Diskon tarif tol Nataru": "jalan_tol",
+        "Tol fungsional Nataru": "jalan_tol",
+        "Henti sementara konstruksi Nataru": "jalan_tol",
+        "Penyesuaian tarif tol": "jalan_tol",
+        "Aduan jalan rusak & berlubang": "jalan_rusak_preservasi",
+        "Jembatan bailey & buka akses longsor": "bencana_alam",
+        "Siaga bencana musim hujan": "bencana_alam",
+        "Perbaikan tanggul & normalisasi sungai": "sumber_daya_air",
+        "Rehabilitasi irigasi & ketahanan pangan": "irigasi_pertanian",
+        "Pasokan air bersih & jaringan SPAM": "air_bersih",
+        "Pembangunan & operasional bendungan": "bendungan_waduk",
+        "Pembangunan Sekolah Rakyat & madrasah": "sekolah_rakyat",
+        "Program PU Mengajar & literasi": "sekolah_rakyat",
+    }
+
+    parts = []
+    detail_chips = []
+    if best_th_name and best_th_sub is not None:
+        parts.append(best_th_name)
+        ents, locs, _ = _extract_specific_topic_details(best_th_sub, topic_key=th_key_map.get(best_th_name))
+        for e in ents[:2]:
+            if e.lower() not in best_th_name.lower():
+                detail_chips.append(e)
+        for l in locs[:2]:
+            if len(detail_chips) < 2 and not any(l.lower() in d.lower() for d in detail_chips):
+                detail_chips.append(l)
+    else:
+        ents, locs, _ = _extract_specific_topic_details(sub_p, topic_key=None)
+        try:
+            from src.tab_sentiment_drilldown import extract_issue_category
+            cats = sub_p['issue_category'] if 'issue_category' in sub_p.columns else clean_p.apply(extract_issue_category)
+            vc_cat = cats[cats != 'Isu Umum Infrastruktur'].value_counts()
+            if not vc_cat.empty:
+                parts.append(vc_cat.index[0])
+        except Exception:
+            pass
+        detail_chips.extend(ents[:2] if ents else locs[:2])
+
+    if not parts and not detail_chips:
+        kws = [w for w, _ in _get_frequent_words(sub_p, max_words=3)]
+        if kws:
+            parts.append("Fokus " + ", ".join(kws[:2]))
+
+    if parts and detail_chips:
+        topic_summary = f"{parts[0]} ({', '.join(detail_chips[:2])})"
+    elif parts:
+        topic_summary = parts[0]
+        if second_th_name and second_th_cnt > 0:
+            topic_summary += f" & {second_th_name.lower()}"
+    elif detail_chips:
+        topic_summary = f"Sorotan {', '.join(detail_chips[:2])}"
+    else:
+        topic_summary = "Percakapan layanan infrastruktur"
+
+    # Karakteristik nada sentimen platform (tanpa mengulang angka kolom POSITIF/NEGATIF secara mentah)
+    if neg_pct >= 25.0:
+        tone = "pusat kritik tinggi"
+    elif pos_pct >= 35.0 and neg_pct < 15.0:
+        tone = "apresiasi sangat kuat"
+    elif pos_pct >= 25.0 and pos_pct > neg_pct:
+        tone = "condong apresiatif"
+    elif neg_pct > pos_pct and neg_pct >= 12.0:
+        tone = "nada kritis menonjol"
+    elif (100.0 - pos_pct - neg_pct) >= 80.0:
+        tone = "dominan informatif/faktual"
+    else:
+        tone = "opini berimbang"
+
+    return f"{topic_summary} &bull; {tone}"
+
+
 def _get_frequent_words(df, max_words=25, sentiment_filter=None):
     """
-    Extracts top keywords dynamically from cleaned_content.
+    Extracts top specific keywords dynamically from cleaned_content,
+    filtering out generic stopwords & scraped UI noise ('terjemahkan', 'kementerian', dll).
     """
     if len(df) == 0 or 'cleaned_content' not in df.columns:
         return []
@@ -426,7 +724,7 @@ def _get_frequent_words(df, max_words=25, sentiment_filter=None):
     tokens = []
     for text in sample:
         words = re.findall(r'\b[a-zA-Z]{4,}\b', str(text).lower())
-        tokens.extend([w for w in words if w not in ID_STOPWORDS])
+        tokens.extend([w for w in words if w not in ID_STOPWORDS and w not in _EXTRA_NOISE_WORDS])
         
     counts = collections.Counter(tokens).most_common(max_words)
     return counts
@@ -657,7 +955,29 @@ def _extract_top_6_issue_findings(df_sub=None, m=None):
                 else:
                     top_plat = 'Sosial Media'
                     plat_vol = vol
-                statement = f"{vol:,} sebutan, {neg_c:,} negatif ({neg_p}% rasio kritik). Menjadi sorotan utama di platform {top_plat} ({plat_vol:,} sebutan)."
+
+                # Ekstrak entitas spesifik (ruas tol mana, bendungan/sungai apa, daerah mana, sub-bahasan apa)
+                ents, locs, themes = _extract_specific_topic_details(sub, topic_key=c['key'])
+                spec_bits = []
+                if ents:
+                    spec_bits.append(", ".join(ents[:3]))
+                if locs:
+                    # Hindari duplikasi nama lokasi yang sudah ada di nama entitas
+                    uniq_locs = [l for l in locs[:2] if not any(l.lower() in e.lower() for e in ents[:3])]
+                    if uniq_locs:
+                        spec_bits.append("Wilayah: " + ", ".join(uniq_locs))
+                if themes:
+                    uniq_th = [t for t in themes[:2] if not any(t.lower() in s.lower() for s in spec_bits)]
+                    if uniq_th:
+                        spec_bits.append(uniq_th[0])
+
+                if spec_bits:
+                    spec_html = f"<div style='font-size:10.5px; color:#1D4ED8; font-weight:600; margin-bottom:3px;'>Sorotan spesifik: {' &bull; '.join(spec_bits[:2])}</div>"
+                else:
+                    kws_sub = [w.capitalize() for w, _ in _get_frequent_words(sub, max_words=3)]
+                    spec_html = f"<div style='font-size:10.5px; color:#1D4ED8; font-weight:600; margin-bottom:3px;'>Fokus kata kunci: {', '.join(kws_sub)}</div>" if kws_sub else ""
+
+                statement = f"{spec_html}{vol:,} sebutan, {neg_c:,} negatif ({neg_p}% kritik) &bull; {pos_c:,} positif ({pos_p}%). Terbanyak di {top_plat} ({plat_vol:,} sebutan)."
                 findings.append({
                     'title': c['title'],
                     'short': c['short'],
@@ -1081,14 +1401,9 @@ def render_slide_5_platform_review(df, selected_topic='Semua', topic_label=None,
             pos_col = "#10B981" if r['pos_pct'] >= 40 else "#475569"
             neg_col = "#EF4444" if r['neg_pct'] >= 30 else "#F59E0B"
             
-            # Ekstraksi fokus isu riil per saluran secara dinamis dari dataset aktif
+            # Ekstraksi Catatan Dinamis spesifik & kontekstual per saluran (bebas kata umum/UI noise)
             sub_p = df[df['platform'] == p_name] if 'platform' in df.columns else df
-            top_p_words = _get_frequent_words(sub_p, max_words=3)
-            if top_p_words:
-                w_str = ", ".join([w[0] for w in top_p_words[:2]])
-                note = f"Isu: {w_str} (positif {p_pos}, negatif {p_neg})"
-            else:
-                note = f"Positif {p_pos}, negatif {p_neg}"
+            note = _build_rich_platform_note(sub_p, p_name, r['pos_pct'], r['neg_pct'])
                 
             rows_html.append(f"""<tr style="border-bottom:1px solid #F1F5F9;">
 <td style="font-weight:600; padding:6px 4px;">{p_name}</td>
@@ -1096,7 +1411,7 @@ def render_slide_5_platform_review(df, selected_topic='Semua', topic_label=None,
 <td><strong>{p_eng}</strong></td>
 <td style="color:{pos_col}; font-weight:600;">{p_pos}</td>
 <td style="color:{neg_col}; font-weight:600;">{p_neg}</td>
-<td style="color:#64748B; font-size:10px;">{note}</td>
+<td style="color:#334155; font-size:10px; line-height:1.35;">{note}</td>
 </tr>""")
 
         tbl_html = f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
@@ -2895,6 +3210,301 @@ def render_slide_framing_analysis(df, selected_topic='Semua', topic_label=None, 
 
     render_callout_target(f"Sintesis Framing: Kunci pergeseran narasi ke arah positif bertumpu pada transparansi penanganan isu {top_issue} serta konsistensi publikasi aksi cepat balai lapangan.")
     render_mh_footer(f"Modul Analitik Tambahan • Analisis Framing Robert Entman • Periode {m.get('cur_str', '')}")
+
+
+# ==============================================================================
+# SUPLEMEN 4 (BAB 2): PENCARIAN SENTIMEN & EKSPLORASI ASPEK INTERAKTIF (SCROLLABLE)
+# ==============================================================================
+def render_slide_sentiment_search(df, selected_topic='Semua', topic_label=None, **kwargs):
+    import html as _html
+    m = _get_slide_metrics(df, selected_topic, topic_label)
+    df_full = kwargs.get('df_full', None)
+    render_mh_top_bar(slide_num="Suplemen 4")
+    render_mh_title(
+        "Pencarian Sentimen & Eksplorasi Aspek",
+        "Telusuri Sentimen Positif, Negatif & Netral untuk Topik/Proyek Spesifik Pilihan Anda",
+        "Ketik nama proyek, ruas tol, daerah, atau kata kunci tertentu untuk melihat total masing-masing sentimen dan menelusuri seluruh data postingan (scrollable) di dalam slide ini."
+    )
+
+    # 1. Bar Pencarian & Opsi Cakupan Data
+    with st.container(border=True):
+        c_q, c_mode, c_scope = st.columns([2.6, 1.2, 1.3], vertical_alignment="bottom")
+        if "mh_supp4_query" not in st.session_state:
+            st.session_state["mh_supp4_query"] = ""
+
+        with c_q:
+            query_raw = st.text_input(
+                "🔎 Cari Kata Kunci / Aspek / Proyek / Daerah:",
+                key="mh_supp4_query",
+                placeholder="Contoh: Tol Puncak, diskon tol, banjir, sekolah rakyat, perpustakaan, bendungan..."
+            )
+        with c_mode:
+            match_mode = st.selectbox(
+                "Mode Pencocokan:",
+                ["Salah Satu Kata (OR)", "Semua Kata (AND)"],
+                index=0,
+                key="mh_supp4_match_mode"
+            )
+        with c_scope:
+            has_full = df_full is not None and len(df_full) > len(df)
+            scope_opts = (
+                [f"Filter Sidebar ({len(df):,} data)", f"Seluruh Korpus ({len(df_full):,} data)"]
+                if has_full else
+                [f"Filter Sidebar ({len(df):,} data)"]
+            )
+            selected_scope = st.selectbox(
+                "Cakupan Pencarian:",
+                scope_opts,
+                index=0,
+                key="mh_supp4_scope"
+            )
+
+        # Saran cepat 100% dinamis dari entitas & kata kunci real di dataset aktif
+        df_base = df_full if (has_full and "Seluruh Korpus" in selected_scope) else df
+        ents_s, locs_s, _ = _extract_specific_topic_details(df, topic_key=None)
+        quick_suggestions = []
+        for item_s in (ents_s[:3] + locs_s[:3]):
+            if item_s and item_s not in quick_suggestions:
+                quick_suggestions.append(item_s)
+        if len(quick_suggestions) < 6:
+            for w_s, _ in _get_frequent_words(df, max_words=8):
+                cap_w = w_s.capitalize()
+                if cap_w not in quick_suggestions:
+                    quick_suggestions.append(cap_w)
+                if len(quick_suggestions) >= 6:
+                    break
+
+        if quick_suggestions:
+            st.caption("⚡ Saran pencarian cepat (berdasarkan entitas & kata kunci nyata pada periode aktif):")
+            q_cols = st.columns(len(quick_suggestions[:6]))
+            def _set_supp4_q(val):
+                st.session_state["mh_supp4_query"] = val
+            for idx_q, sug in enumerate(quick_suggestions[:6]):
+                with q_cols[idx_q]:
+                    st.button(
+                        sug[:18],
+                        key=f"mh_supp4_sug_{idx_q}_{sug}",
+                        use_container_width=True,
+                        on_click=_set_supp4_q,
+                        args=(sug,)
+                    )
+
+    query_str = (query_raw or "").strip()
+    if not query_str:
+        st.info("Ketik kata kunci di kotak pencarian di atas (atau klik salah satu tombol saran cepat) untuk melihat rincian jumlah sentimen Positif, Negatif, dan Netral beserta daftar lengkap postingannya.")
+        render_mh_footer(f"Suplemen Bab 2 • Pencarian Sentimen Berbasis Aspek • Total Data Siap Cari: {len(df_base):,} rekaman")
+        return
+
+    # 2. Proses Pencarian Multi-Kata (kombinasi koma atau frase tunggal)
+    terms = [t.strip() for t in re.split(r'[,;|]+', query_str) if t.strip()]
+    if not terms:
+        terms = [query_str]
+
+    search_blob = (
+        df_base.get('raw_content', pd.Series('', index=df_base.index)).fillna('').astype(str) + " " +
+        df_base.get('cleaned_content', pd.Series('', index=df_base.index)).fillna('').astype(str) + " " +
+        df_base.get('author', pd.Series('', index=df_base.index)).fillna('').astype(str)
+    )
+
+    if "Semua Kata" in match_mode:
+        mask_match = pd.Series(True, index=df_base.index)
+        for t in terms:
+            mask_match &= search_blob.str.contains(re.escape(t), case=False, na=False)
+    else:
+        combined_pat = "|".join(re.escape(t) for t in terms)
+        mask_match = search_blob.str.contains(combined_pat, case=False, na=False)
+
+    df_res = df_base[mask_match].copy()
+    tot_res = len(df_res)
+
+    if tot_res == 0:
+        st.warning(f"Tidak ditemukan postingan yang mengandung kata kunci **\"{query_str}\"** pada cakupan data terpilih ({len(df_base):,} baris). Coba ubah kata kunci atau ganti cakupan ke **Seluruh Korpus**.")
+        render_mh_footer(f"Suplemen Bab 2 • Pencarian: '{query_str}' (0 hasil)")
+        return
+
+    # 3. Ringkasan Total Sentimen (Positif, Negatif, Netral, NSS, Engagement)
+    n_pos = int((df_res['sentiment_name'] == 'Positif').sum()) if 'sentiment_name' in df_res.columns else 0
+    n_net = int((df_res['sentiment_name'] == 'Netral').sum()) if 'sentiment_name' in df_res.columns else 0
+    n_neg = int((df_res['sentiment_name'] == 'Negatif').sum()) if 'sentiment_name' in df_res.columns else 0
+
+    p_pos = round(n_pos / tot_res * 100, 1)
+    p_net = round(n_net / tot_res * 100, 1)
+    p_neg = round(n_neg / tot_res * 100, 1)
+    nss_val = round((n_pos - n_neg) / tot_res * 100, 1)
+    tot_eng_res = int(df_res['total_engagement'].sum()) if 'total_engagement' in df_res.columns else 0
+
+    chips = [
+        {"label": "Total Ditemukan", "val": f"{tot_res:,}".replace(',', '.'), "sub": f"{round(tot_res / max(1, len(df_base)) * 100, 2)}% dari korpus", "dot": "#2563EB", "val_color": "#0F2942"},
+        {"label": "Sentimen Positif", "val": f"{n_pos:,}".replace(',', '.'), "sub": f"{p_pos}% dari hasil cari", "dot": "#10B981", "val_color": "#10B981"},
+        {"label": "Sentimen Netral", "val": f"{n_net:,}".replace(',', '.'), "sub": f"{p_net}% dari hasil cari", "dot": "#94A3B8", "val_color": "#64748B"},
+        {"label": "Sentimen Negatif", "val": f"{n_neg:,}".replace(',', '.'), "sub": f"{p_neg}% dari hasil cari", "dot": "#EF4444", "val_color": "#EF4444"},
+        {"label": "NSS & Interaksi", "val": f"{nss_val:+.1f}", "sub": f"Engagement: {fmt_val(tot_eng_res)}", "dot": "#10B981" if nss_val >= 0 else "#EF4444", "val_color": "#10B981" if nss_val >= 0 else "#EF4444"},
+    ]
+    render_kpi_chips(chips)
+
+    # Bar proporsi visual sentimen + ringkasan platform & daerah
+    plat_top = df_res['platform'].value_counts().head(5) if 'platform' in df_res.columns else pd.Series(dtype=int)
+    plat_pills = " &bull; ".join(f"<strong>{pl}</strong> ({cnt:,})" for pl, cnt in plat_top.items()) if not plat_top.empty else "-"
+
+    reg_col_val = df_res['detected_region'] if 'detected_region' in df_res.columns else pd.Series(dtype=str)
+    reg_top = reg_col_val[reg_col_val != 'Nasional / Terpusat'].value_counts().head(4) if len(reg_col_val) > 0 else pd.Series(dtype=int)
+    reg_pills = " &bull; ".join(f"<strong>{rg}</strong> ({cnt:,})" for rg, cnt in reg_top.items()) if not reg_top.empty else "Nasional / Lintas Wilayah"
+
+    render_html(f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:12px 16px; margin-bottom:12px; box-shadow:0 1px 2px rgba(0,0,0,0.02);">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-size:11px; font-weight:700; color:#0F2942;">
+    <span>Proporsi Sentimen untuk Aspek: <span style="color:#2563EB;">"{_html.escape(query_str)}"</span></span>
+    <span style="font-size:10px; color:#64748B;">Positif {p_pos}% &bull; Netral {p_net}% &bull; Negatif {p_neg}%</span>
+</div>
+<div style="width:100%; height:14px; border-radius:7px; overflow:hidden; display:flex; background:#F1F5F9; margin-bottom:8px;">
+    <div style="width:{p_pos}%; background:#10B981; height:100%;" title="Positif: {n_pos:,} ({p_pos}%)"></div>
+    <div style="width:{p_net}%; background:#94A3B8; height:100%;" title="Netral: {n_net:,} ({p_net}%)"></div>
+    <div style="width:{p_neg}%; background:#EF4444; height:100%;" title="Negatif: {n_neg:,} ({p_neg}%)"></div>
+</div>
+<div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:10.5px; color:#475569;">
+    <div><strong>Sebaran Kanal:</strong> {plat_pills}</div>
+    <div><strong>Wilayah Terdeteksi:</strong> {reg_pills}</div>
+</div>
+</div>""")
+
+    # 4. Kontrol Filter Lanjutan & Unduh CSV
+    c_f1, c_f2, c_f3 = st.columns([1.4, 1.4, 1.2], vertical_alignment="bottom")
+    with c_f1:
+        avail_plats = ["Semua Platform"] + sorted(df_res['platform'].dropna().unique().tolist()) if 'platform' in df_res.columns else ["Semua Platform"]
+        sel_plat_s = st.selectbox("Filter Saluran:", avail_plats, index=0, key="mh_supp4_plat")
+    with c_f2:
+        sort_opt = st.selectbox(
+            "Urutkan Postingan:",
+            ["Engagement Tertinggi", "Terbaru", "Terlama"],
+            index=0,
+            key="mh_supp4_sort"
+        )
+    with c_f3:
+        export_cols = [c for c in ['date_str', 'platform', 'sentiment_name', 'emotion', 'author', 'detected_region', 'total_engagement', 'likes', 'comments', 'shares', 'raw_content', 'url'] if c in df_res.columns]
+        csv_bytes = df_res[export_cols].to_csv(index=False, encoding='utf-8-sig').encode('utf-8-sig')
+        st.download_button(
+            f"📥 Unduh Semua ({tot_res:,} baris)",
+            data=csv_bytes,
+            file_name=f"sentimen_{re.sub(r'[^a-zA-Z0-9]+', '_', query_str)[:30].strip('_')}.csv",
+            mime="text/csv",
+            use_container_width=True,
+            key="mh_supp4_dl"
+        )
+
+    df_view = df_res if sel_plat_s == "Semua Platform" else df_res[df_res['platform'] == sel_plat_s]
+    if sort_opt == "Engagement Tertinggi" and 'total_engagement' in df_view.columns:
+        df_view = df_view.sort_values(by='total_engagement', ascending=False)
+    elif sort_opt == "Terbaru" and 'date_str' in df_view.columns:
+        df_view = df_view.sort_values(by='date_str', ascending=False)
+    elif sort_opt == "Terlama" and 'date_str' in df_view.columns:
+        df_view = df_view.sort_values(by='date_str', ascending=True)
+
+    df_v_neg = df_view[df_view['sentiment_name'] == 'Negatif'] if 'sentiment_name' in df_view.columns else df_view.head(0)
+    df_v_pos = df_view[df_view['sentiment_name'] == 'Positif'] if 'sentiment_name' in df_view.columns else df_view.head(0)
+    df_v_net = df_view[df_view['sentiment_name'] == 'Netral'] if 'sentiment_name' in df_view.columns else df_view.head(0)
+
+    hl_re = re.compile("(" + "|".join(re.escape(t) for t in terms) + ")", re.IGNORECASE)
+
+    def _highlight_text(raw_txt):
+        safe = _html.escape(re.sub(r'\s+', ' ', str(raw_txt or '')).strip())
+        if len(safe) > 360:
+            safe = safe[:357] + "..."
+        return hl_re.sub(r'<mark style="background:#FEF08A; color:#0F172A; padding:0 2px; border-radius:2px; font-weight:700;">\1</mark>', safe)
+
+    def _render_scrollable_cards(sub_df, tab_key, empty_msg):
+        n_sub = len(sub_df)
+        if n_sub == 0:
+            st.info(empty_msg)
+            return
+
+        show_all = True
+        if n_sub > 120:
+            c_info, c_chk = st.columns([3, 1.3])
+            with c_info:
+                st.caption(f"Menampilkan daftar scrollable ({n_sub:,} postingan). Gulir ke bawah di dalam kotak untuk membaca seluruh hasil.")
+            with c_chk:
+                show_all = st.checkbox(f"Tampilkan semua {n_sub:,} kartu", value=False, key=f"mh_supp4_all_{tab_key}")
+            df_iter = sub_df if show_all else sub_df.head(120)
+        else:
+            st.caption(f"Menampilkan seluruh {n_sub:,} postingan (gulir di dalam panel di bawah).")
+            df_iter = sub_df
+
+        cards_html = []
+        for _, r in df_iter.iterrows():
+            s_nm = str(r.get('sentiment_name', 'Netral'))
+            s_col = '#10B981' if s_nm == 'Positif' else ('#EF4444' if s_nm == 'Negatif' else '#64748B')
+            s_bg = '#ECFDF5' if s_nm == 'Positif' else ('#FEF2F2' if s_nm == 'Negatif' else '#F8FAFC')
+            emo_nm = _html.escape(str(r.get('emotion', 'Neutral')))
+            plat_nm = _html.escape(str(r.get('platform', 'Web')))
+            auth_nm = _html.escape(str(r.get('author', 'Anonim')).strip()[:28])
+            dt_nm = _html.escape(str(r.get('date_str', '-')))
+            reg_nm = _html.escape(str(r.get('detected_region', 'Nasional')))
+            likes_v = int(r.get('likes', 0) if pd.notna(r.get('likes')) else 0)
+            comm_v = int(r.get('comments', 0) if pd.notna(r.get('comments')) else 0)
+            sh_v = int(max(r.get('shares', 0) if pd.notna(r.get('shares')) else 0, r.get('reposts', 0) if pd.notna(r.get('reposts')) else 0))
+            url_v = str(r.get('url', '')).strip()
+            link_html = f'<a href="{_html.escape(url_v)}" target="_blank" rel="noopener noreferrer" style="color:#2563EB; font-weight:700; text-decoration:none; background:#EFF6FF; padding:2px 8px; border-radius:4px; font-size:10px;">Buka Sumber ↗</a>' if url_v.startswith("http") else ""
+            body_hl = _highlight_text(r.get('raw_content', r.get('cleaned_content', '')))
+
+            cards_html.append(f"""<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-left:4px solid {s_col}; border-radius:8px; padding:11px 14px; margin-bottom:9px; box-shadow:0 1px 2px rgba(0,0,0,0.02);">
+<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:6px;">
+    <div style="font-size:11px; color:#0F2942;">
+        <strong>{auth_nm}</strong>
+        <span style="background:#F1F5F9; color:#475569; font-size:9.5px; font-weight:600; padding:1px 6px; border-radius:4px; margin-left:4px;">{plat_nm}</span>
+        <span style="color:#64748B; font-size:10px; margin-left:4px;">&bull; {dt_nm} &bull; {reg_nm}</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:5px;">
+        <span style="background:{s_bg}; color:{s_col}; border:1px solid {s_col}30; font-size:9.5px; font-weight:800; padding:1.5px 7px; border-radius:4px;">{s_nm.upper()}</span>
+        <span style="background:#F8FAFC; color:#475569; border:1px solid #E2E8F0; font-size:9.5px; font-weight:600; padding:1.5px 6px; border-radius:4px;">{emo_nm}</span>
+    </div>
+</div>
+<div style="font-size:11.5px; color:#1E293B; line-height:1.5; margin-bottom:7px;">{body_hl}</div>
+<div style="display:flex; justify-content:space-between; align-items:center; font-size:10px; color:#64748B; border-top:1px solid #F1F5F9; padding-top:5px;">
+    <span>❤️ {likes_v:,} &bull; 💬 {comm_v:,} &bull; 🔁 {sh_v:,}</span>
+    {link_html}
+</div>
+</div>""")
+
+        with st.container(height=540, border=True):
+            render_html("".join(cards_html))
+
+    # 5. Tab Scrollable per Sentimen + Tabel Lengkap 100% Data
+    t_neg, t_pos, t_net, t_all = st.tabs([
+        f"🔴 Negatif ({len(df_v_neg):,})",
+        f"🟢 Positif ({len(df_v_pos):,})",
+        f"⚪ Netral ({len(df_v_net):,})",
+        f"📋 Semua Data & Tabel ({len(df_view):,})"
+    ])
+
+    with t_neg:
+        _render_scrollable_cards(df_v_neg, "neg", f"Tidak ada postingan bersentimen Negatif untuk pencarian '{query_str}'.")
+    with t_pos:
+        _render_scrollable_cards(df_v_pos, "pos", f"Tidak ada postingan bersentimen Positif untuk pencarian '{query_str}'.")
+    with t_net:
+        _render_scrollable_cards(df_v_net, "net", f"Tidak ada postingan bersentimen Netral untuk pencarian '{query_str}'.")
+    with t_all:
+        st.caption(f"Tabel lengkap scrollable berisi seluruh {len(df_view):,} baris hasil pencarian '{query_str}' (semua sentimen).")
+        tbl_cols = [c for c in ['date_str', 'sentiment_name', 'emotion', 'platform', 'author', 'detected_region', 'total_engagement', 'raw_content', 'url'] if c in df_view.columns]
+        st.dataframe(
+            df_view[tbl_cols].rename(columns={
+                'date_str': 'Tanggal',
+                'sentiment_name': 'Sentimen',
+                'emotion': 'Emosi',
+                'platform': 'Platform',
+                'author': 'Akun / Media',
+                'detected_region': 'Wilayah',
+                'total_engagement': 'Interaksi',
+                'raw_content': 'Isi Postingan',
+                'url': 'Tautan'
+            }),
+            use_container_width=True,
+            height=500,
+            hide_index=True,
+            column_config={
+                "Tautan": st.column_config.LinkColumn("Tautan", display_text="Buka ↗")
+            } if 'url' in tbl_cols else None
+        )
+
+    render_mh_footer(f"Suplemen 4 (Bab 2) • Pencarian Aspek: '{query_str}' • Total {tot_res:,} data (Positif {n_pos:,}, Netral {n_net:,}, Negatif {n_neg:,})")
 
 
 # ==============================================================================
