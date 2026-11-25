@@ -414,7 +414,7 @@ def render_tab_sentiment_drilldown(df_filtered, **kwargs):
                                     {author}
                                 </div>
                                 <div style="font-size:9.5px; color:#2563EB; font-weight:600;">
-                                    📍 {reg_val[:20]}
+                                    📍 {reg_val[:30]}
                                 </div>
                             </div>
                         </div>

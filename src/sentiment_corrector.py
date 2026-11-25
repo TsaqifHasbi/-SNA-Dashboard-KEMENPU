@@ -210,7 +210,12 @@ STRONG_POSITIVE_PHRASES = [
     'suasana belajar kini jauh lebih nyaman dan aman', 'harapan baru dari sekolah rakyat',
     'titipan surat dari siswa-siswi sekolah rakyat', 'kini sekolah gratis di sekolah rakyat',
     'membangun semuanya dari nol', 'putus rantai kemiskinan', 'memutus rantai kemiskinan',
-    'memutus mata rantai kemiskinan', 'pendidikan gratis 100% berasrama',
+    # Capaian Infrastruktur, Perbaikan Rampung & Kabar Baik (KemenPU)
+    'kabar baik', 'hadir dengan wajah baru', 'tampil dengan wajah baru',
+    'resmi beroperasi', 'siap dilintasi', 'kini sudah lebih lapang',
+    'mobilitas warga makin lancar', 'menurunkan angka kecelakaan',
+    'sinergi kuat', 'langkah nyata', 'runtuhkan keterisolasian',
+    'dirgahayu republik indonesia', 'merdeka!', 'selamat hari jadi',
 ]
 
 # Pola Pembelaan Kebijakan & Afirmasi Kebaikan Program (Pro-Policy Defense Patterns)
@@ -255,6 +260,11 @@ NEUTRAL_INFORMATIONAL_PREFIXES = [
     r'(?:rekrutmen\s+casn.*?dibuka|membuka\s+\d+\s+formasi\s+pppk|formasi\s+pppk\s+guru)',
     # Berita komparasi program pendidikan (explanatory journalism)
     r'(?:apa\s+bedanya\s+dengan\s+sekolah\s+rakyat|perbedaan\s+sekolah\s+negeri\s+vs\s+sekolah\s+rakyat)',
+    # Konten edukasi / ensiklopedis infrastruktur akun resmi Balai/PU ("Tanggul adalah...", "Halo Sobat...", "Yuk simak...")
+    r'^(?:halo,?\s+sobat|hai\s+sobat|tahukah\s+(?:kamu|sobat|anda)|yuk\s+simak)\b',
+    r'\b(?:adalah\s+bangunan\s+di\s+sepanjang|memiliki\s+peran\s+penting\s+bagi\s+kehidupan|berfungsi\s+menahan\s+dan\s+mengendalikan\s+luapan)\b',
+    # Pemetaan / rencana energi bersih & PLTS bendungan lintas kementerian yang bersifat informatif/positif
+    r'\b(?:memetakan\s+pemanfaatan\s+bendungan\s+sebagai\s+lokasi\s+pembangkit\s+listrik|pembangkit\s+listrik\s+tenaga\s+surya\s*\(plts\)\s*terapung)\b',
 ]
 
 # ============================================================
@@ -339,14 +349,33 @@ def _has_profanity(text_lower):
     words = set(re.findall(r'\b\w+\b', text_lower))
     return bool(words & PROFANITY)
 
+# Pre-compile regex word-boundary untuk STRONG_NEGATIVE_PHRASES & STRONG_POSITIVE_PHRASES
+# Mencegah false-positive substring seperti 'ulat' di 'berdaulat', 'basi' di 'berbasis',
+# 'demo' di 'demokrat'/'demokrasi', 'mual' di 'assalamualaikum', 'halu' di 'halus', dll.
+_COMPILED_STRONG_NEG = [
+    (phrase, re.compile(r'(?<!\w)' + re.escape(phrase) + r'(?!\w)', re.IGNORECASE))
+    for phrase in STRONG_NEGATIVE_PHRASES
+]
+_COMPILED_STRONG_POS = [
+    (phrase, re.compile(r'(?<!\w)' + re.escape(phrase) + r'(?!\w)', re.IGNORECASE))
+    for phrase in STRONG_POSITIVE_PHRASES
+]
+
+
 def _has_strong_negative(text_lower):
-    # Masking nama institusi resmi agar tidak memicu false positive korupsi
-    clean_text = text_lower.replace('komisi pemberantasan korupsi', 'kpk_institusi')
-    clean_text = clean_text.replace('pencegahan korupsi', 'anti_korupsi_positif')
-    for phrase in STRONG_NEGATIVE_PHRASES:
-        if phrase in clean_text:
+    # Masking nama institusi resmi & istilah zona integritas agar tidak memicu false positive korupsi/pungli
+    clean_text = text_lower
+    for safe_term in (
+        'komisi pemberantasan korupsi', 'pencegahan korupsi', 'anti korupsi', 'antikorupsi',
+        'hari antikorupsi', 'wilayah bebas dari korupsi', 'wilayah bebas korupsi',
+        'bebas pungli', 'stop pungli', 'saber pungli', 'berantas korupsi', 'tolak korupsi'
+    ):
+        clean_text = clean_text.replace(safe_term, ' __institusi_integritas__ ')
+    for phrase, pat in _COMPILED_STRONG_NEG:
+        if pat.search(clean_text):
             return True, phrase
     return False, None
+
 
 def _has_sarcasm(text_lower):
     for pattern in SARCASM_PATTERNS:
@@ -354,9 +383,10 @@ def _has_sarcasm(text_lower):
             return True, pattern
     return False, None
 
+
 def _has_strong_positive(text_lower):
-    for phrase in STRONG_POSITIVE_PHRASES:
-        if phrase in text_lower:
+    for phrase, pat in _COMPILED_STRONG_POS:
+        if pat.search(text_lower):
             return True, phrase
     return False, None
 
@@ -450,19 +480,40 @@ def correct_sentiment(text, current_sentiment, current_score=0.0):
         pos_signals += 3
         reasons.append(caps_reason)
 
-    # 2. CEK APRESIASI FASILITAS, PERPUSTAKAAN & RUANG PUBLIK (KONTEKSTUAL & ANTI-SARKASME)
+    # 2. CEK CAPAIAN INFRASTRUKTUR RAMPUNG / BEFORE-AFTER PERBAIKAN / TANGGAP CEPAT PEMULIHAN
+    # Contoh: "Jembatan Batang A kini hadir dengan wajah baru setelah dilakukan penggantian... Jembatan yang sempit kini sudah lebih lapang, aman, dan nyaman"
+    #         "Kabar baik untuk pariwisata Lombok! Pemerintah melalui Kementerian PU mengalokasikan anggaran Rp81 miliar untuk merevitalisasi..."
+    #         "Akibat terputusnya jembatan pasca bencana, Kementerian PU, TNI, dan BUMN bergerak bersama melakukan percepatan penanganan..."
+    INFRA_RESOLUTION_PATTERNS = [
+        r'\b(?:kabar\s+baik|angin\s+segar)\b.*?\b(?:kemen[\s-]*pu|pekerjaan\s+umum|jalan|jembatan|bendungan|irigasi|tol|revitalisasi|renovasi)\b',
+        r'\b(?:hadir|tampil)\s+dengan\s+wajah\s+baru\b',
+        r'\bkini\s+(?:sudah\s+)?(?:lebih\s+(?:lapang|lebar|aman|nyaman|mulus|lancar)|hadir\s+dengan|siap\s+dilintasi|resmi\s+beroperasi)\b',
+        r'\bsetelah\s+dilakukan\s+(?:penggantian|pelebaran|perbaikan|revitalisasi|rehabilitasi|penanganan|normalisasi)\b.*?\b(?:kini|lebih|aman|nyaman|lancar|mulus)\b',
+        r'\b(?:kementerian\s+pu|kemen[\s-]*pu|bbws|bws|bbpjn|bpjn).*?\bbergerak\s+(?:cepat|bersama)\s+melakukan\s+percepatan\b',
+        r'\bsinergi\s+kuat\b.*?\b(?:kemen[\s-]*pu|pekerjaan\s+umum|bbws|bpjn|waduk|bendungan|irigasi)\b',
+    ]
+    STALLED_OR_CRITICISM_BLOCKERS = [
+        r'\b(?:namun|tapi|sayangnya|padahal|faktanya|nyatanya)\s+.*?\b(?:masih\s+tertahan|belum\s+jelas|mangkrak|batal|rusak\s+lagi|belum\s+terealisasi|kecewa|dikritik|menuai\s+kritik)\b',
+        r'\b(?:masih\s+tertahan|belum\s+kelihatan|menuai\s+kritik|dinilai\s+belum\s+memuaskan)\b'
+    ]
+    has_infra_resolution = any(re.search(pat, text_lower) for pat in INFRA_RESOLUTION_PATTERNS)
+    has_stalled_blocker = any(re.search(pat, text_lower) for pat in STALLED_OR_CRITICISM_BLOCKERS)
+    if has_infra_resolution and not has_stalled_blocker and not _has_profanity(text_lower) and not _has_sarcasm(text_lower)[0]:
+        return 'Positif', 2, max(current_score, 0.85), 'capaian_perbaikan_infrastruktur_positif'
+
+    # 2b. CEK APRESIASI FASILITAS DALAM RUANG / PERPUSTAKAAN & RUANG PUBLIK (KONTEKSTUAL & ANTI-SARKASME)
     FACILITY_PRAISE_PATTERNS = [
-        r'\b(?:perpus|perpustakaan|ruang\s+baca|wfc|fasilitas|kantor\s+pu)\b.*?\b(?:suka\s+banget|suka\s+bgt|nyaman|cozy|adem|dingin|kenceng|bersih|luas|bagus|keren|lengkap|gratis|free|enak|betah|rekomendasi|surganya)\b',
-        r'\b(?:suka\s+banget|suka\s+bgt|nyaman|cozy|adem|dingin|kenceng|bersih|luas|bagus|keren|lengkap|gratis|free|enak|betah|rekomendasi|surganya)\b.*?\b(?:perpus|perpustakaan|ruang\s+baca|wfc|fasilitas|kantor\s+pu)\b'
+        r'\b(?:perpus|perpustakaan|ruang\s+baca|wfc|kantor\s+pu)\b.*?\b(?:suka\s+banget|suka\s+bgt|nyaman|cozy|adem|dingin|kenceng|bersih|luas|bagus|keren|lengkap|gratis|free|enak|betah|rekomendasi|surganya)\b',
+        r'\b(?:suka\s+banget|suka\s+bgt|nyaman|cozy|adem|dingin|kenceng|bersih|luas|bagus|keren|lengkap|gratis|free|enak|betah|rekomendasi|surganya)\b.*?\b(?:perpus|perpustakaan|ruang\s+baca|wfc|kantor\s+pu)\b'
     ]
     FACILITY_COMPLAINT_PATTERNS = [
-        r'\b(?:mati|panas|gerah|bau\s+apek|apek|kotor|jorok|sempit|bising|antri|antre|rusak|bocor|galak|judes|tidak\s+ramah|pelayanan\s+buruk|mengecewakan|kecewa|sayang\s+sekali|bobrok)\b'
+        r'\b(?:ac\s+mati|listrik\s+mati|wifi\s+mati|panas|gerah|bau\s+apek|apek|kotor|jorok|bising|antri|antre|bocor|galak|judes|tidak\s+ramah|pelayanan\s+buruk|mengecewakan|kecewa|sayang\s+sekali|bobrok)\b'
     ]
     has_facility_praise = any(re.search(pat, text_lower) for pat in FACILITY_PRAISE_PATTERNS)
     has_facility_complaint = any(re.search(pat, text_lower) for pat in FACILITY_COMPLAINT_PATTERNS)
 
     if has_facility_praise:
-        if has_facility_complaint:
+        if has_facility_complaint and not has_infra_resolution:
             # Jika ada kata fasilitas positif tapi diikuti komplain nyata (misal: "perpus cozy tapi AC mati kotor")
             neg_signals += 2
             reasons.append('komplain_fasilitas')

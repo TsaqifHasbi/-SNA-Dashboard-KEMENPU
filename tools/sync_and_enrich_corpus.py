@@ -259,9 +259,18 @@ def main():
         for _, row in df_old.iterrows():
             u = str(row.get('url', '')).strip()
             if u and u not in old_lookup:
+                sc_raw = row.get('sentiment_score', np.nan)
+                # Pulihkan label IndoBERT murni (sebelum koreksi rule-based lama) dari raw_indobert_sentiment atau sentiment_score
+                raw_ib = row.get('raw_indobert_sentiment', None)
+                if not raw_ib or pd.isna(raw_ib):
+                    if pd.notna(sc_raw):
+                        fv = float(sc_raw)
+                        raw_ib = 'Positif' if fv >= 0.35 else ('Negatif' if fv <= -0.35 else 'Netral')
+                    else:
+                        raw_ib = row.get('predicted_sentiment', 'Netral')
                 old_lookup[u] = {
-                    'sentiment_score': row.get('sentiment_score', np.nan),
-                    'predicted_sentiment': row.get('predicted_sentiment', 'Netral'),
+                    'sentiment_score': sc_raw,
+                    'raw_indobert_sentiment': str(raw_ib),
                     'emotion': row.get('emotion', 'Neutral'),
                     'emotion_confidence': row.get('emotion_confidence', np.nan),
                     'date': row.get('date', None),
@@ -307,7 +316,7 @@ def main():
             if pd.notna(sc_val) and not is_dummy_sentinel:
                 needs_infer = False
                 s_scores[idx] = float(sc_val)
-                s_preds[idx] = str(meta['predicted_sentiment'])
+                s_preds[idx] = str(meta['raw_indobert_sentiment'])
                 emos[idx] = str(meta['emotion'])
                 emo_confs[idx] = float(ec_val) if pd.notna(ec_val) else 0.85
 
@@ -327,6 +336,7 @@ def main():
             emo_confs[row_idx] = ec[pos]
 
     df_master['sentiment_score'] = np.array(s_scores, dtype='float64')
+    df_master['raw_indobert_sentiment'] = s_preds
     df_master['predicted_sentiment'] = s_preds
     df_master['emotion'] = emos
     df_master['emotion_confidence'] = np.array(emo_confs, dtype='float64')
