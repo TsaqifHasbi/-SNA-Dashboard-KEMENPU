@@ -1038,7 +1038,7 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
         )
 
     findings_grid_html = (
-        f"""<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 30px;">
+        f"""<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px 30px;">
             <div>{_render_finding_items(left_findings)}</div>
             <div>{_render_finding_items(right_findings)}</div>
         </div>"""
@@ -1048,8 +1048,7 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
 
     active_acts = top_actions[:3]
     if active_acts:
-        cols_tpl = " ".join(["1fr"] * len(active_acts))
-        actions_grid_html = f'<div style="display:grid; grid-template-columns:{cols_tpl}; gap:16px; flex-grow:1;">' + "".join(
+        actions_grid_html = '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px 16px; flex:1 1 300px;">' + "".join(
             f"""<div>
                 <div style="color:#FFFFFF; font-weight:700; font-size:12px; margin-bottom:2px;">{a['action_title']} ({a['vol']:,} sebutan)</div>
                 <div style="color:#94A3B8; font-size:10.5px; line-height:1.35;">{a['action_desc']}</div>
@@ -1140,7 +1139,7 @@ def render_slide_2_executive_summary(df, selected_topic='Semua', topic_label=Non
         </div>
 
         <!-- Dark Navy PRIORITAS Banner -->
-        <div style="background:#0F2942; border-radius:8px; padding:14px 20px; color:#FFFFFF; display:flex; align-items:center; gap:16px;">
+        <div style="background:#0F2942; border-radius:8px; padding:14px 20px; color:#FFFFFF; display:flex; align-items:center; flex-wrap:wrap; gap:14px 16px;">
             <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:70px; border-right:1px solid rgba(255,255,255,0.18); padding-right:14px;">
                 <span style="width:12px; height:12px; border-radius:50%; background:#2563EB; display:inline-block; margin-bottom:4px;"></span>
                 <span style="color:#FFFFFF; font-weight:800; font-size:10px; letter-spacing:0.8px; text-transform:uppercase;">PRIORITAS</span>
