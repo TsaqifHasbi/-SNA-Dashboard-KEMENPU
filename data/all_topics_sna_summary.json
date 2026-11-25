@@ -1,6 +1,6 @@
 {
-    "total_nodes": 9716,
-    "total_edges": 2772,
+    "total_nodes": 9683,
+    "total_edges": 2765,
     "top_influencers": [
         {
             "rank": 1,
@@ -9,7 +9,7 @@
             "out_degree": 234,
             "sentiment": "Netral",
             "emotion": "Neutral",
-            "nss": 27.5,
+            "nss": 37.92,
             "platform": "Threads",
             "engagement": 380196
         },
@@ -31,14 +31,14 @@
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Neutral",
-            "nss": 8.82,
+            "nss": 11.76,
             "platform": "Mentioned",
             "engagement": 0
         },
         {
             "rank": 4,
             "user": "pu_sda_bbwsc3",
-            "in_degree": 399,
+            "in_degree": 398,
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Neutral",
@@ -73,9 +73,9 @@
             "user": "pu_bpsdm",
             "in_degree": 138,
             "out_degree": 34,
-            "sentiment": "Netral",
+            "sentiment": "Positif",
             "emotion": "Neutral",
-            "nss": 47.37,
+            "nss": 50.0,
             "platform": "TikTok",
             "engagement": 27222
         },
@@ -86,7 +86,7 @@
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Neutral",
-            "nss": 16.1,
+            "nss": 24.58,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -97,7 +97,7 @@
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Anticipation",
-            "nss": 14.04,
+            "nss": 21.05,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -108,7 +108,7 @@
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Anticipation",
-            "nss": 15.38,
+            "nss": 25.27,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -119,7 +119,7 @@
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Anticipation",
-            "nss": 21.18,
+            "nss": 32.94,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -130,7 +130,7 @@
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Anticipation",
-            "nss": 14.63,
+            "nss": 29.27,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -141,7 +141,7 @@
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Anticipation",
-            "nss": 22.06,
+            "nss": 25.0,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -150,9 +150,9 @@
             "user": "pu_bjkw5_banjarmasin",
             "in_degree": 56,
             "out_degree": 0,
-            "sentiment": "Positif",
+            "sentiment": "Netral",
             "emotion": "Joy",
-            "nss": 66.67,
+            "nss": 33.33,
             "platform": "Instagram",
             "engagement": 285
         },
@@ -163,12 +163,23 @@
             "out_degree": 16,
             "sentiment": "Netral",
             "emotion": "Neutral",
-            "nss": 8.33,
+            "nss": 33.33,
             "platform": "Threads",
             "engagement": 2143
         },
         {
             "rank": 16,
+            "user": "pu_bpsdm_bapekom6",
+            "in_degree": 49,
+            "out_degree": 20,
+            "sentiment": "Netral",
+            "emotion": "Anticipation",
+            "nss": 26.67,
+            "platform": "YouTube",
+            "engagement": 224
+        },
+        {
+            "rank": 17,
             "user": "agusyudhoyono",
             "in_degree": 49,
             "out_degree": 14,
@@ -177,17 +188,6 @@
             "nss": 16.67,
             "platform": "Instagram",
             "engagement": 87386
-        },
-        {
-            "rank": 17,
-            "user": "pu_bpsdm_bapekom6",
-            "in_degree": 49,
-            "out_degree": 20,
-            "sentiment": "Netral",
-            "emotion": "Anticipation",
-            "nss": 13.33,
-            "platform": "YouTube",
-            "engagement": 224
         },
         {
             "rank": 18,
@@ -207,7 +207,7 @@
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Neutral",
-            "nss": 17.5,
+            "nss": 20.0,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -217,7 +217,7 @@
             "in_degree": 38,
             "out_degree": 4,
             "sentiment": "Netral",
-            "emotion": "Anger",
+            "emotion": "Neutral",
             "nss": 0.0,
             "platform": "Instagram",
             "engagement": 21

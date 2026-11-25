@@ -1,6 +1,6 @@
 {
-    "total_nodes": 5769,
-    "total_edges": 1856,
+    "total_nodes": 5736,
+    "total_edges": 1849,
     "top_influencers": [
         {
             "rank": 1,
@@ -9,7 +9,7 @@
             "out_degree": 112,
             "sentiment": "Netral",
             "emotion": "Neutral",
-            "nss": 26.81,
+            "nss": 38.41,
             "platform": "Threads",
             "engagement": 157992
         },
@@ -31,14 +31,14 @@
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Neutral",
-            "nss": 9.45,
+            "nss": 12.09,
             "platform": "Mentioned",
             "engagement": 0
         },
         {
             "rank": 4,
             "user": "pu_sda_bbwsc3",
-            "in_degree": 387,
+            "in_degree": 386,
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Neutral",
@@ -64,7 +64,7 @@
             "out_degree": 34,
             "sentiment": "Netral",
             "emotion": "Neutral",
-            "nss": 42.86,
+            "nss": 45.71,
             "platform": "TikTok",
             "engagement": 26391
         },
@@ -86,7 +86,7 @@
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Anticipation",
-            "nss": 13.46,
+            "nss": 19.23,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -96,8 +96,8 @@
             "in_degree": 54,
             "out_degree": 0,
             "sentiment": "Netral",
-            "emotion": "Neutral",
-            "nss": 5.56,
+            "emotion": "Anticipation",
+            "nss": 16.67,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -108,7 +108,7 @@
             "out_degree": 12,
             "sentiment": "Netral",
             "emotion": "Neutral",
-            "nss": -10.0,
+            "nss": 20.0,
             "platform": "Threads",
             "engagement": 1977
         },
@@ -119,31 +119,31 @@
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Neutral",
-            "nss": 24.39,
+            "nss": 34.15,
             "platform": "Mentioned",
             "engagement": 0
         },
         {
             "rank": 12,
+            "user": "pu_binakonstruksi",
+            "in_degree": 38,
+            "out_degree": 0,
+            "sentiment": "Netral",
+            "emotion": "Neutral",
+            "nss": 0.0,
+            "platform": "TikTok",
+            "engagement": 101
+        },
+        {
+            "rank": 13,
             "user": "pu_bpsdm_bapekom6",
             "in_degree": 38,
             "out_degree": 11,
             "sentiment": "Netral",
             "emotion": "Neutral",
-            "nss": 20.0,
+            "nss": 40.0,
             "platform": "YouTube",
             "engagement": 199
-        },
-        {
-            "rank": 13,
-            "user": "pu_binakonstruksi",
-            "in_degree": 38,
-            "out_degree": 0,
-            "sentiment": "Netral",
-            "emotion": "Sadness",
-            "nss": 0.0,
-            "platform": "TikTok",
-            "engagement": 101
         },
         {
             "rank": 14,
@@ -152,7 +152,7 @@
             "out_degree": 0,
             "sentiment": "Positif",
             "emotion": "Joy",
-            "nss": 100.0,
+            "nss": 50.0,
             "platform": "Instagram",
             "engagement": 260
         },
@@ -163,7 +163,7 @@
             "out_degree": 95,
             "sentiment": "Netral",
             "emotion": "Anticipation",
-            "nss": 16.67,
+            "nss": 20.0,
             "platform": "Instagram",
             "engagement": 10652
         },
@@ -173,8 +173,8 @@
             "in_degree": 33,
             "out_degree": 23,
             "sentiment": "Netral",
-            "emotion": "Neutral",
-            "nss": 25.71,
+            "emotion": "Anticipation",
+            "nss": 28.57,
             "platform": "YouTube",
             "engagement": 996
         },
@@ -185,7 +185,7 @@
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Neutral",
-            "nss": 18.18,
+            "nss": 21.21,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -206,7 +206,7 @@
             "in_degree": 29,
             "out_degree": 13,
             "sentiment": "Positif",
-            "emotion": "Anticipation",
+            "emotion": "Neutral",
             "nss": 25.0,
             "platform": "TikTok",
             "engagement": 8058
@@ -218,7 +218,7 @@
             "out_degree": 23,
             "sentiment": "Positif",
             "emotion": "Anticipation",
-            "nss": 44.44,
+            "nss": 55.56,
             "platform": "Instagram",
             "engagement": 18370
         }

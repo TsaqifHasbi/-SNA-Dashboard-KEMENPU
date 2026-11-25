@@ -8,8 +8,8 @@
             "in_degree": 215,
             "out_degree": 122,
             "sentiment": "Netral",
-            "emotion": "Trust",
-            "nss": 28.43,
+            "emotion": "Anticipation",
+            "nss": 37.25,
             "platform": "Instagram",
             "engagement": 222204
         },
@@ -20,7 +20,7 @@
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Trust",
-            "nss": 17.86,
+            "nss": 33.67,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -42,7 +42,7 @@
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Anticipation",
-            "nss": 19.23,
+            "nss": 32.05,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -53,7 +53,7 @@
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Neutral",
-            "nss": 11.69,
+            "nss": 19.48,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -63,8 +63,8 @@
             "in_degree": 74,
             "out_degree": 0,
             "sentiment": "Netral",
-            "emotion": "Trust",
-            "nss": 22.97,
+            "emotion": "Anticipation",
+            "nss": 35.14,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -74,8 +74,8 @@
             "in_degree": 55,
             "out_degree": 0,
             "sentiment": "Netral",
-            "emotion": "Anticipation",
-            "nss": 3.64,
+            "emotion": "Neutral",
+            "nss": 9.09,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -86,7 +86,7 @@
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Anticipation",
-            "nss": 15.69,
+            "nss": 17.65,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -97,7 +97,7 @@
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Anticipation",
-            "nss": 29.73,
+            "nss": 37.84,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -118,7 +118,7 @@
             "in_degree": 31,
             "out_degree": 4,
             "sentiment": "Netral",
-            "emotion": "Anger",
+            "emotion": "Neutral",
             "nss": 0.0,
             "platform": "Instagram",
             "engagement": 21
@@ -129,7 +129,7 @@
             "in_degree": 25,
             "out_degree": 0,
             "sentiment": "Netral",
-            "emotion": "Anger",
+            "emotion": "Neutral",
             "nss": 0.0,
             "platform": "Instagram",
             "engagement": 310469
@@ -162,8 +162,8 @@
             "in_degree": 16,
             "out_degree": 0,
             "sentiment": "Netral",
-            "emotion": "Anticipation",
-            "nss": 31.25,
+            "emotion": "Neutral",
+            "nss": 43.75,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -173,8 +173,8 @@
             "in_degree": 14,
             "out_degree": 0,
             "sentiment": "Netral",
-            "emotion": "Trust",
-            "nss": 14.29,
+            "emotion": "Neutral",
+            "nss": 28.57,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -184,30 +184,30 @@
             "in_degree": 13,
             "out_degree": 4,
             "sentiment": "Netral",
-            "emotion": "Disgust",
+            "emotion": "Neutral",
             "nss": 40.0,
             "platform": "YouTube",
             "engagement": 7430
         },
         {
             "rank": 18,
-            "user": "kemenkoinfra",
-            "in_degree": 12,
-            "out_degree": 0,
-            "sentiment": "Netral",
-            "emotion": "Anticipation",
-            "nss": 33.33,
-            "platform": "Mentioned",
-            "engagement": 0
-        },
-        {
-            "rank": 19,
             "user": "pu_sda_bbwsc3",
             "in_degree": 12,
             "out_degree": 0,
             "sentiment": "Positif",
             "emotion": "Anticipation",
             "nss": 58.33,
+            "platform": "Mentioned",
+            "engagement": 0
+        },
+        {
+            "rank": 19,
+            "user": "kemenkoinfra",
+            "in_degree": 12,
+            "out_degree": 0,
+            "sentiment": "Netral",
+            "emotion": "Neutral",
+            "nss": 33.33,
             "platform": "Mentioned",
             "engagement": 0
         },

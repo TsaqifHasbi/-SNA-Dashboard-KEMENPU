@@ -43,15 +43,27 @@ NEGATIVE_LEXICON = set([
 # Frasa negasi yang membalik polaritas
 NEGATION_WORDS = set(['tidak', 'tak', 'bukan', 'jangan', 'belum', 'gak', 'ga', 'nggak', 'tdk'])
 
+# Pola mitigasi / pencegahan / solusi yang meniadakan penalti leksikon negatif murni
+ACTION_MITIGATION_CTX = re.compile(
+    r'\b(?:atasi|mengatasi|tangani|menangani|penanganan|perbaikan|memperbaiki|cegah|mencegah|pencegahan|'
+    r'waspada|bantah|membantah|pulihkan|pemulihan|selamatkan|menyelamatkan|antisipasi|mengantisipasi|'
+    r'lindung[i]?|melindungi|tolak|anti[\s-]?)\s+(?:\w+\s+){0,3}'
+    r'(?:krisis|ancaman|rusak|kerusakan|korban|masalah|korupsi|penipuan|gagal|banjir|kekeringan)\b',
+    re.I
+)
+
 def rule_based_sentiment_scorer(text):
     """
     Menghitung skor sentimen berbasis leksikon kontekstual & polaritas negasi.
+    Menghormati konteks aksi/mitigasi (mis. "atasi krisis", "cegah korupsi", "perbaiki jalan rusak")
+    agar teks berita penanganan/pencegahan tidak terlabeli Negatif palsu saat fine-tuning.
     Return:
         0: Negatif
         1: Netral
         2: Positif
     """
-    words = re.findall(r'\b\w+\b', text.lower())
+    cleaned = ACTION_MITIGATION_CTX.sub(' __aksi_mitigasi__ ', text.lower())
+    words = re.findall(r'\b\w+\b', cleaned)
     if not words:
         return 1
     

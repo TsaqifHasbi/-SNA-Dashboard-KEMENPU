@@ -138,7 +138,7 @@ pat_kemenpu_core = re.compile(
 
 pat_kemenpu_cooccur = re.compile(
     r'(?:kementerian|kementrian|kantor|balai).{0,40}(?:pekerjaan\s+umum|\bpu\b|bina\s+marga|sda\b|cipta\s+karya)|'
-    r'(?:pegawai|asn|pejabat|staf|inspektorat|lingkungan|internal|vendor|orang).{0,25}(?:kemen[\s-]*pu|\bpu\b|\bpupr\b|pekerjaan\s+umum)|'
+    r'(?:pegawai|asn|pejabat|staf|inspektorat|di\s+lingkungan|internal|vendor|orang).{0,25}(?:kemen[\s-]*pu|\bpu\b|\bpupr\b|pekerjaan\s+umum)|'
     r'(?:pekerjaan\s+umum).{0,60}(?:republik\s+indonesia|ri\b|jalan\s+tol|jalan\s+nasional|jembatan|bendungan|irigasi|tanggul|banjir|infrastruktur|proyek|anggaran|tender|apbn|prabowo|tenaga)|'
     r'(?:infrastruktur|proyek|preservasi\s+jalan|normalisasi\s+sungai|penanganan\s+banjir).{0,50}(?:kemen\s*pu|pu\s*ri|kementerian\s*pu|kementrian\s*pu)',
     re.I
@@ -151,7 +151,14 @@ pat_dinas_pemda_only = re.compile(
     re.I
 )
 pat_vertikal_pu = re.compile(
-    r'\b(?:kemen[\s-]*pu|kementerian|menteri|dody|hanggodo|balai|bbws|bws|bbpjn|bpjn|bp2jk|bppw|ditjen|cipta\s+karya|bina\s+marga|sda\b|apbn|inpres\s+jalan\s+daerah|ijd)\b',
+    r'\b(?:kemen[\s-]*pu(?:pr)?|kement(?:eri|ri)an[\s-]+(?:pu(?:pr)?|pekerjaan[\s-]+umum)|'
+    r'ment(?:eri|ri)[\s-]+(?:pu(?:pr)?|pekerjaan[\s-]+umum|dody)|wamen[\s-]+pu|'
+    r'dody[\s-]+hanggodo|hanggodo|basuki[\s-]+hadimuljono|diana[\s-]+kusumastuti|lomba\s+kementerian\s+pu|'
+    r'balai[\s-]+(?:besar|pelaksanaan|wilayah|pengelolaan|prasarana|jasa|teknik)|'
+    r'bbws|bws|bbpjn|bpjn|bp2jk|bppw|bina\s+marga\s+kementerian|'
+    r'pu_(?:jalan|sda|ciptakarya|bpsdm|bjkw|binamarga|prasaranastrategis)|'
+    r'ditjen[\s-]+(?:bina[\s-]+marga|sumber[\s-]+daya[\s-]+air|cipta[\s-]+karya|bina[\s-]+konstruksi|prasarana)|'
+    r'inpres[\s-]+jalan[\s-]+daerah|\bijd\b|apbn)\b',
     re.I
 )
 
