@@ -6,6 +6,80 @@ import pandas as pd
 import re
 import html
 import unicodedata
+import urllib.parse
+
+
+def canonicalize_url(u):
+    """
+    Normalisasi & ekstraksi URL kanonik lintas platform:
+    1. Membuka pembungkus redirector Bing News (apiclick.aspx?...&url=...) & Google (google.com/url?q=...)
+    2. Menyatukan alias skema & domain (http->https, twitter.com->x.com, threads.net->threads.com, m.facebook->www.facebook)
+    3. Menghapus parameter pelacak acak (tid, aid, utm_*, fbclid, igsh, xmt, dll) tanpa merusak ID postingan asli (v, fbid, story_fbid, id).
+    """
+    if u is None or (isinstance(u, float) and pd.isna(u)):
+        return ""
+    s = str(u).strip()
+    if not s or s.lower() in ("nan", "none"):
+        return ""
+
+    # 1. Buka pembungkus redirector Bing News RSS
+    if "bing.com/news/apiclick.aspx" in s.lower():
+        try:
+            parsed = urllib.parse.urlparse(s)
+            qs = urllib.parse.parse_qs(parsed.query)
+            if "url" in qs and qs["url"]:
+                s = urllib.parse.unquote(qs["url"][0]).strip()
+        except Exception:
+            pass
+
+    # 2. Buka pembungkus redirector Google URL
+    if "google.com/url?" in s.lower():
+        try:
+            parsed = urllib.parse.urlparse(s)
+            qs = urllib.parse.parse_qs(parsed.query)
+            for k in ("q", "url"):
+                if k in qs and qs[k]:
+                    s = urllib.parse.unquote(qs[k][0]).strip()
+                    break
+        except Exception:
+            pass
+
+    # 3. Normalisasi protokol & domain alias sosial media
+    s = re.sub(r"^http://", "https://", s, flags=re.I)
+    s = re.sub(r"^https://(?:www\.|mobile\.|m\.)?(?:twitter\.com|x\.com)/", "https://x.com/", s, flags=re.I)
+    s = re.sub(r"^https://(?:m\.|web\.|mobile\.)?facebook\.com/", "https://www.facebook.com/", s, flags=re.I)
+    s = re.sub(r"^https://(?:www\.)?threads\.net/", "https://www.threads.com/", s, flags=re.I)
+
+    # 4. Bersihkan query parameter tracking acak namun pertahankan parameter identitas konten
+    try:
+        p = urllib.parse.urlparse(s)
+        if p.scheme and p.netloc:
+            keep_keys = {"v", "fbid", "story_fbid", "id", "p", "article_id", "read"}
+            drop_prefixes = (
+                "utm_", "ref", "tid", "aid", "mkt", "fbclid", "gclid", "igsh",
+                "xmt", "__cft__", "__tn__", "oc", "ved", "usg", "hl", "gl", "ceid"
+            )
+            drop_exact = {"s", "t", "c", "src", "amp"}
+            if p.query:
+                qs_pairs = urllib.parse.parse_qsl(p.query, keep_blank_values=False)
+                filtered_pairs = [
+                    (k, v) for (k, v) in qs_pairs
+                    if not (k.lower() == "page" and v.strip().lower() in ("all", "1"))
+                    and (
+                        k.lower() in keep_keys
+                        or k.lower() == "page"
+                        or (not k.lower().startswith(drop_prefixes) and k.lower() not in drop_exact)
+                    )
+                ]
+                new_q = urllib.parse.urlencode(sorted(filtered_pairs))
+            else:
+                new_q = ""
+            clean_path = p.path.rstrip("/") if p.path != "/" else ""
+            s = urllib.parse.urlunparse((p.scheme.lower(), p.netloc.lower(), clean_path, "", new_q, ""))
+    except Exception:
+        s = s.rstrip("/")
+
+    return s
 
 # Fix console encoding on Windows
 if sys.platform == 'win32':
@@ -174,6 +248,15 @@ def run_filter_pipeline():
 
         keep_mask = has_any_topic & (~hits_noise)
         df_clean = df_raw[keep_mask].copy()
+
+        # Kanonikalisasi & deduplikasi URL (membuka bungkus Bing apiclick & tracking query)
+        if 'url' in df_clean.columns:
+            df_clean['url'] = df_clean['url'].apply(canonicalize_url)
+            has_u = df_clean['url'] != ''
+            df_clean = pd.concat([
+                df_clean[has_u].drop_duplicates(subset=['url'], keep='first'),
+                df_clean[~has_u]
+            ], ignore_index=True)
 
         # Update topic classification
         df_clean.loc[eval_norm.loc[df_clean.index].str.contains(pat_menpu_core), 'topic'] = 'Menteri_PU'

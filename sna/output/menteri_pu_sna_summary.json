@@ -1,26 +1,26 @@
 {
-    "total_nodes": 5114,
-    "total_edges": 1090,
+    "total_nodes": 5110,
+    "total_edges": 1088,
     "top_influencers": [
         {
             "rank": 1,
             "user": "kementerianpu",
-            "in_degree": 216,
+            "in_degree": 215,
             "out_degree": 122,
             "sentiment": "Netral",
             "emotion": "Trust",
-            "nss": 28.16,
-            "platform": "Threads",
-            "engagement": 222211
+            "nss": 28.43,
+            "platform": "Instagram",
+            "engagement": 222204
         },
         {
             "rank": 2,
             "user": "bakom.ri",
-            "in_degree": 197,
+            "in_degree": 196,
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Trust",
-            "nss": 17.77,
+            "nss": 17.86,
             "platform": "Mentioned",
             "engagement": 0
         },
@@ -191,23 +191,23 @@
         },
         {
             "rank": 18,
-            "user": "pu_sda_bbwsc3",
-            "in_degree": 12,
-            "out_degree": 0,
-            "sentiment": "Positif",
-            "emotion": "Anticipation",
-            "nss": 58.33,
-            "platform": "Mentioned",
-            "engagement": 0
-        },
-        {
-            "rank": 19,
             "user": "kemenkoinfra",
             "in_degree": 12,
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Anticipation",
             "nss": 33.33,
+            "platform": "Mentioned",
+            "engagement": 0
+        },
+        {
+            "rank": 19,
+            "user": "pu_sda_bbwsc3",
+            "in_degree": 12,
+            "out_degree": 0,
+            "sentiment": "Positif",
+            "emotion": "Anticipation",
+            "nss": 58.33,
             "platform": "Mentioned",
             "engagement": 0
         },

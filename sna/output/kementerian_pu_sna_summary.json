@@ -9,14 +9,14 @@
             "out_degree": 112,
             "sentiment": "Netral",
             "emotion": "Neutral",
-            "nss": 25.9,
+            "nss": 26.81,
             "platform": "Threads",
-            "engagement": 158000
+            "engagement": 157992
         },
         {
             "rank": 2,
             "user": "bakom.ri",
-            "in_degree": 1074,
+            "in_degree": 1073,
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Surprise",
@@ -207,9 +207,9 @@
             "out_degree": 13,
             "sentiment": "Positif",
             "emotion": "Anticipation",
-            "nss": 29.41,
+            "nss": 25.0,
             "platform": "TikTok",
-            "engagement": 8059
+            "engagement": 8058
         },
         {
             "rank": 20,

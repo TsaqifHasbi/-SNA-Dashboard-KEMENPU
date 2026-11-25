@@ -19,6 +19,7 @@ sys.path.insert(0, str(root_dir))
 from src.sentiment_corrector import correct_sentiment, align_emotion_valence_9class
 from src.tab_sentiment_drilldown import extract_affected_region, extract_issue_category
 from src.data_loader import detect_emotion
+from models.execute_all_platforms_filter import canonicalize_url
 
 PARQUET_PATH = root_dir / 'data' / 'enriched_corpus_for_sna.parquet'
 CSV_PATH = root_dir / 'data' / 'enriched_corpus_for_sna.csv'
@@ -249,7 +250,28 @@ def run_indobert_inference_subset(texts, batch_size=64, max_length=128):
 def main():
     print(f"1. Membaca Master Scraped Corpus: {MASTER_CSV_PATH}")
     df_master = pd.read_csv(MASTER_CSV_PATH, low_memory=False)
-    print(f"   Total baris master: {len(df_master):,}")
+    print(f"   Total baris master (awal): {len(df_master):,}")
+
+    # Pastikan URL kanonik & bebas duplikat URL / token Google News kembar
+    if 'url' in df_master.columns:
+        df_master['url'] = df_master['url'].apply(canonicalize_url)
+        before_dedup = len(df_master)
+        has_u = df_master['url'] != ''
+        df_master = pd.concat([
+            df_master[has_u].drop_duplicates(subset=['url'], keep='first'),
+            df_master[~has_u]
+        ], ignore_index=True)
+        news_m = (df_master.get('platform', '') == 'News')
+        if news_m.any():
+            df_nw = df_master[news_m].copy()
+            df_nw['_is_gn'] = df_nw['url'].astype(str).str.contains('news.google.com/', case=False, na=False).astype(int)
+            df_nw['_orig_idx'] = df_nw.index
+            df_nw_sorted = df_nw.sort_values(['_is_gn', '_orig_idx'])
+            nw_dups = df_nw_sorted.duplicated(subset=['author', 'cleaned_content'], keep='first')
+            if nw_dups.any():
+                df_master = df_master.drop(df_nw_sorted[nw_dups].index).reset_index(drop=True)
+        if len(df_master) < before_dedup:
+            print(f"   [DEDUP] Dihapus {before_dedup - len(df_master):,} duplikat URL kanonik -> Sisa bersih: {len(df_master):,} baris")
 
     old_lookup = {}
     if PARQUET_PATH.exists():
@@ -257,24 +279,28 @@ def main():
         df_old = pd.read_parquet(PARQUET_PATH)
         print(f"   Total baris parquet lama: {len(df_old):,}")
         for _, row in df_old.iterrows():
-            u = str(row.get('url', '')).strip()
-            if u and u not in old_lookup:
-                sc_raw = row.get('sentiment_score', np.nan)
-                # Pulihkan label IndoBERT murni (sebelum koreksi rule-based lama) dari raw_indobert_sentiment atau sentiment_score
-                raw_ib = row.get('raw_indobert_sentiment', None)
-                if not raw_ib or pd.isna(raw_ib):
-                    if pd.notna(sc_raw):
-                        fv = float(sc_raw)
-                        raw_ib = 'Positif' if fv >= 0.35 else ('Negatif' if fv <= -0.35 else 'Netral')
-                    else:
-                        raw_ib = row.get('predicted_sentiment', 'Netral')
-                old_lookup[u] = {
-                    'sentiment_score': sc_raw,
-                    'raw_indobert_sentiment': str(raw_ib),
-                    'emotion': row.get('emotion', 'Neutral'),
-                    'emotion_confidence': row.get('emotion_confidence', np.nan),
-                    'date': row.get('date', None),
-                }
+            u_raw = str(row.get('url', '')).strip()
+            u_can = canonicalize_url(u_raw)
+            sc_raw = row.get('sentiment_score', np.nan)
+            # Pulihkan label IndoBERT murni (sebelum koreksi rule-based lama) dari raw_indobert_sentiment atau sentiment_score
+            raw_ib = row.get('raw_indobert_sentiment', None)
+            if not raw_ib or pd.isna(raw_ib):
+                if pd.notna(sc_raw):
+                    fv = float(sc_raw)
+                    raw_ib = 'Positif' if fv >= 0.35 else ('Negatif' if fv <= -0.35 else 'Netral')
+                else:
+                    raw_ib = row.get('predicted_sentiment', 'Netral')
+            entry_meta = {
+                'sentiment_score': sc_raw,
+                'raw_indobert_sentiment': str(raw_ib),
+                'emotion': row.get('emotion', 'Neutral'),
+                'emotion_confidence': row.get('emotion_confidence', np.nan),
+                'date': row.get('date', None),
+            }
+            if u_raw and u_raw not in old_lookup:
+                old_lookup[u_raw] = entry_meta
+            if u_can and u_can not in old_lookup:
+                old_lookup[u_can] = entry_meta
     else:
         print("2. Parquet lama belum ada — semua baris akan diinferensi penuh.")
 

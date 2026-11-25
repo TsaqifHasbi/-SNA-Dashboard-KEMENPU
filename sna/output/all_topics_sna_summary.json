@@ -1,22 +1,22 @@
 {
-    "total_nodes": 9717,
+    "total_nodes": 9716,
     "total_edges": 2772,
     "top_influencers": [
         {
             "rank": 1,
             "user": "kementerianpu",
-            "in_degree": 1679,
+            "in_degree": 1678,
             "out_degree": 234,
             "sentiment": "Netral",
             "emotion": "Neutral",
-            "nss": 26.86,
+            "nss": 27.5,
             "platform": "Threads",
-            "engagement": 380211
+            "engagement": 380196
         },
         {
             "rank": 2,
             "user": "bakom.ri",
-            "in_degree": 1271,
+            "in_degree": 1269,
             "out_degree": 0,
             "sentiment": "Netral",
             "emotion": "Surprise",
