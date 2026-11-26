@@ -170,6 +170,14 @@ def _load_main_data_cached(file_mtime: float):
 
     if 'author' in df.columns:
         df['author'] = df['author'].fillna(df.get('handle', '')).fillna('anonim').astype(str)
+        _inv_pat = re.compile(r'[\s\u200b-\u200f\u202a-\u202e\u2060\u3164\u2800\ufeff\u115f\u1160\uffa0\xa0._-]+')
+        _empty_auth_mask = df['author'].apply(lambda x: len(_inv_pat.sub('', str(x))) == 0)
+        if _empty_auth_mask.any():
+            _handles = df.loc[_empty_auth_mask, 'handle'].astype(str) if 'handle' in df.columns else pd.Series('', index=df.index[_empty_auth_mask])
+            df.loc[_empty_auth_mask, 'author'] = [
+                h.strip() if len(_inv_pat.sub('', str(h))) > 0 and str(h).strip().lower() not in ('nan', 'none') else 'Anonim'
+                for h in _handles
+            ]
 
     # Deduplicate normalized URLs without duplicating dataframe memory
     if 'url' in df.columns:
